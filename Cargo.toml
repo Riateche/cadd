@@ -1,8 +1,13 @@
 [package]
 name = "cadd"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 #edition = "2024"
 edition = "2021"
+
+description = "Painless checked arithmetics and conversions"
+license = "MIT OR Apache-2.0"
+categories = ["rust-patterns", "mathematics", "no-std"]
+repository = "https://github.com/Riateche/cadd"
 
 [features]
 default = ["std"]

@@ -34,6 +34,9 @@ impl_cfrom!(
     (isize, u128), (isize, i128), (isize, u64), (isize, i64), (isize, u32), (isize, i32), (isize, u16), (isize, i16), (isize, u8), (isize, i8),
 );
 
+// TODO: impl cfrom and saturating_from based on
+// https://doc.rust-lang.org/src/core/convert/num.rs.html
+
 // to smaller type
 #[rustfmt::skip]
 impl_cfrom!(
@@ -71,18 +74,69 @@ macro_rules! impl_saturating_from {
     ($(($from:ty, $to:ty),)*) => {
         $(
             impl $crate::convert::SaturatingFrom<$from> for $to {
-                fn saturating_from(from: $from) -> $crate::Result<Self> {
+                fn saturating_from(from: $from) -> Self {
                     ::core::convert::TryFrom::try_from(from)
-                        .map_err(|_| $crate::Error::new(
-                            ::alloc::format!(
-                                "cannot convert value {:?} from {} to {}: value is out of bounds",
-                                from,
-                                ::core::any::type_name::<$from>(),
-                                ::core::any::type_name::<$to>(),
-                            )
-                        ))
+                        .unwrap_or_else(|_| {
+                            if from < (<$to>::MIN) as $from {
+                                <$to>::MIN
+                            } else {
+                                <$to>::MAX
+                            }
+
+                        })
                 }
             }
         )*
     }
 }
+
+impl_saturating_from!(
+    // signed to smaller signed
+    (i128, i64),
+    (i128, i32),
+    (i128, i16),
+    (i128, i8),
+    (i64, i32),
+    (i64, i16),
+    (i64, i8),
+    (i32, i16),
+    (i32, i8),
+    (i16, i8),
+    // signed to smaller unsigned
+    (i128, u64),
+    (i128, u32),
+    (i128, u16),
+    (i128, u8),
+    (i64, u32),
+    (i64, u16),
+    (i64, u8),
+    (i32, u16),
+    (i32, u8),
+    (i16, u8),
+    // usize
+    (usize, u32),
+    (usize, u16),
+    (usize, u8),
+    // unsigned to smalled unsigned
+    (u128, u64),
+    (u128, u32),
+    (u128, u16),
+    (u128, u8),
+    (u64, u32),
+    (u64, u16),
+    (u64, u8),
+    (u32, u16),
+    (u32, u8),
+    (u16, u8),
+    // unsigned to signed
+    (u128, i64),
+    (u128, i32),
+    (u128, i16),
+    (u128, i8),
+    (u64, i32),
+    (u64, i16),
+    (u64, i8),
+    (u32, i16),
+    (u32, i8),
+    (u16, i8),
+);

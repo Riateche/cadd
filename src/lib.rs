@@ -40,3 +40,8 @@ macro_rules! impl_to_non_zero {
 }
 
 impl_to_non_zero!(u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize,);
+
+// TODO: String <-> OsString conversions
+// TODO: &[u8] -> String utf8 conversions
+// TODO: Path conversions
+// TODO: ops for non-nan and finite floats (real_float crate?)
