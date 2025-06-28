@@ -1,6 +1,8 @@
-use std::{
-    num::NonZero,
-    time::{Duration, Instant, SystemTime},
+#[cfg(feature = "std")]
+use std::time::{Instant, SystemTime};
+use {
+    alloc::format,
+    core::{num::NonZero, time::Duration},
 };
 
 macro_rules! impl_binary_op {
@@ -88,13 +90,13 @@ macro_rules! impl_cfrom {
         $(
             impl $crate::Cfrom<$from> for $to {
                 fn cfrom(from: $from) -> $crate::Result<Self> {
-                    ::std::convert::TryFrom::try_from(from)
+                    ::core::convert::TryFrom::try_from(from)
                         .map_err(|_| $crate::Error::new(
-                            format!(
+                            ::alloc::format!(
                                 "cannot convert value {:?} from {} to {}: value is out of bounds",
                                 from,
-                                ::std::any::type_name::<$from>(),
-                                ::std::any::type_name::<$to>(),
+                                ::core::any::type_name::<$from>(),
+                                ::core::any::type_name::<$to>(),
                             )
                         ))
                 }
@@ -113,6 +115,11 @@ impl_binary_ops!(
     (NonZero<u64>, u64, NonZero<u64>),
     (NonZero<u128>, u128, NonZero<u128>),
     (NonZero<usize>, usize, NonZero<usize>),
+);
+#[cfg(feature = "std")]
+impl_binary_ops!(
+    Cadd, cadd, checked_add, msg="overflow: {:?} + {:?}"
+    for
     (Instant, Duration, Instant),
     (SystemTime, Duration, SystemTime),
 );
@@ -143,6 +150,11 @@ impl_binary_ops!(
     Csub, csub, checked_sub, msg="overflow: {:?} - {:?}"
     for (u8), (i8), (u16), (i16), (u32), (i32), (u64), (i64), (u128), (i128), (usize), (isize),
     (Duration),
+);
+#[cfg(feature = "std")]
+impl_binary_ops!(
+    Csub, csub, checked_sub, msg="overflow: {:?} - {:?}"
+    for
     (Instant, Duration, Instant),
     (SystemTime, Duration, SystemTime),
 );

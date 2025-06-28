@@ -1,6 +1,6 @@
 use {
     crate::{cadd, Cadd, Cinto, IntoType, Result, ToNonZero},
-    std::fmt::Debug,
+    std::{fmt::Debug, string::ToString},
 };
 
 fn _inference1(y: u32) -> crate::Result<i32> {

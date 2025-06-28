@@ -1,15 +1,23 @@
+#![no_std]
+
+extern crate alloc;
+#[cfg(any(test, feature = "std"))]
+extern crate std;
+
 mod error;
 mod impls;
 mod into;
 #[cfg(test)]
 mod tests;
 
+pub mod prelude;
+
 pub use crate::{
     error::Error,
     into::{Cfrom, Cinto, IntoType, SaturatingFrom, SaturatingInto},
 };
 
-pub type Result<T, E = Error> = std::result::Result<T, E>;
+pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 macro_rules! declare_binary_trait {
     ($trait_:ident, $trait_fn:ident, $doc:literal) => {
