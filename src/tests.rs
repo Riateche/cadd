@@ -1,5 +1,5 @@
 use {
-    crate::{cadd, Cadd, Cinto, IntoType, Result, ToNonZero},
+    crate::{prelude::*, Result},
     std::{fmt::Debug, string::ToString},
 };
 
@@ -23,5 +23,8 @@ fn test1() {
         "cannot convert value -5 from i32 to u32: value is out of bounds",
     );
 
+    let _a = 2u32.to_non_zero().unwrap();
+    let _b = non_zero(2u32).unwrap();
     assert_err(0u32.to_non_zero(), "unexpected zero value");
+    assert_err(non_zero(0u32), "unexpected zero value");
 }

@@ -7,8 +7,9 @@ use {
 
 macro_rules! impl_binary_op {
     ($trait_:ident, $trait_fn:ident, $source_fn:ident, msg=$msg:literal for $t1:ty, $t2:ty, $out:ty) => {
-        impl $crate::$trait_<$t2> for $t1 {
+        impl $crate::ops::$trait_<$t2> for $t1 {
             type Output = $out;
+            type Error = $crate::Error;
             fn $trait_fn(self, b: $t2) -> $crate::Result<$out> {
                 self.$source_fn(b)
                     .ok_or_else(|| crate::Error::new(format!($msg, self, b)))
@@ -16,8 +17,9 @@ macro_rules! impl_binary_op {
         }
     };
     ($trait_:ident, $trait_fn:ident, $source_fn:ident, err=$err:expr, for $t1:ty, $t2:ty, $out:ty) => {
-        impl $crate::$trait_<$t2> for $t1 {
+        impl $crate::ops::$trait_<$t2> for $t1 {
             type Output = $out;
+            type Error = $crate::Error;
             fn $trait_fn(self, b: $t2) -> $crate::Result<$out> {
                 self.$source_fn(b)
                     .ok_or_else(|| crate::Error::new(($err)(self, b)))
@@ -47,8 +49,9 @@ macro_rules! impl_binary_ops {
 
 macro_rules! impl_unary_op {
     ($trait_:ident, $trait_fn:ident, $source_fn:ident, msg=$msg:literal for $t1:ty, $out:ty) => {
-        impl $crate::$trait_ for $t1 {
+        impl $crate::ops::$trait_ for $t1 {
             type Output = $out;
+            type Error = $crate::Error;
             fn $trait_fn(self) -> $crate::Result<$out> {
                 self.$source_fn()
                     .ok_or_else(|| crate::Error::new(format!($msg, self)))
@@ -56,8 +59,9 @@ macro_rules! impl_unary_op {
         }
     };
     ($trait_:ident, $trait_fn:ident, $source_fn:ident, err=$err:expr, for $t1:ty, $out:ty) => {
-        impl $crate::$trait_ for $t1 {
+        impl $crate::ops::$trait_ for $t1 {
             type Output = $out;
+            type Error = $crate::Error;
             fn $trait_fn(self) -> $crate::Result<$out> {
                 self.$source_fn()
                     .ok_or_else(|| crate::Error::new(($err)(self)))
@@ -83,26 +87,6 @@ macro_rules! impl_unary_ops {
             impl_unary_op!($trait_, $trait_fn, $source_fn, err=$err, for $($t1)*);
         )*
     };
-}
-
-macro_rules! impl_cfrom {
-    ($(($from:ty, $to:ty),)*) => {
-        $(
-            impl $crate::Cfrom<$from> for $to {
-                fn cfrom(from: $from) -> $crate::Result<Self> {
-                    ::core::convert::TryFrom::try_from(from)
-                        .map_err(|_| $crate::Error::new(
-                            ::alloc::format!(
-                                "cannot convert value {:?} from {} to {}: value is out of bounds",
-                                from,
-                                ::core::any::type_name::<$from>(),
-                                ::core::any::type_name::<$to>(),
-                            )
-                        ))
-                }
-            }
-        )*
-    }
 }
 
 impl_binary_ops!(
@@ -366,66 +350,3 @@ impl_unary_ops!(
     for (u8), (u16), (u32), (u64), (u128), (usize),
     (NonZero<u8>), (NonZero<u16>), (NonZero<u32>), (NonZero<u64>), (NonZero<u128>), (NonZero<usize>),
 );
-
-// to/from usize
-#[rustfmt::skip]
-impl_cfrom!(
-    (i8, usize),
-    (i16, usize),
-    (u32, usize), (u32, isize),
-    (i32, usize), (i32, isize),
-    (u64, usize), (u64, isize),
-    (i64, usize), (i64, isize),
-    (u128, usize), (u128, isize),
-    (i128, usize), (i128, isize),
-    (usize, u128), (usize, i128), (usize, u64), (usize, i64), (usize, u32), (usize, i32), (usize, u16), (usize, i16), (usize, u8), (usize, i8),
-    (isize, u128), (isize, i128), (isize, u64), (isize, i64), (isize, u32), (isize, i32), (isize, u16), (isize, i16), (isize, u8), (isize, i8),
-);
-
-// to smaller type
-#[rustfmt::skip]
-impl_cfrom!(
-    (u16, u8),
-    (i16, i8),
-    (u32, u16), (u32, u8),
-    (i32, i16), (i32, i8),
-    (u64, u32), (u64, u16), (u64, u8),
-    (i64, i32), (i64, i16), (i64, i8),
-    (u128, u64), (u128, u32), (u128, u16), (u128, u8),
-    (i128, i64), (i128, i32), (i128, i16), (i128, i8),
-);
-
-// from signed to unsigned
-#[rustfmt::skip]
-impl_cfrom!(
-    (i8, u8), (i8, u16), (i8, u32), (i8, u64), (i8, u128),
-    (i16, u8), (i16, u16), (i16, u32), (i16, u64), (i16, u128),
-    (i32, u8), (i32, u16), (i32, u32), (i32, u64), (i32, u128),
-    (i64, u8), (i64, u16), (i64, u32), (i64, u64), (i64, u128),
-    (i128, u8), (i128, u16), (i128, u32), (i128, u64), (i128, u128),
-);
-
-// from unsigned to signed
-#[rustfmt::skip]
-impl_cfrom!(
-    (u8, i8),
-    (u16, i8), (u16, i16),
-    (u32, i8), (u32, i16), (u32, i32),
-    (u64, i8), (u64, i16), (u64, i32), (u64, i64),
-    (u128, i8), (u128, i16), (u128, i32), (u128, i64), (u128, i128),
-);
-
-macro_rules! impl_to_non_zero {
-    ($($ty:ident,)*) => {
-        $(
-            impl $crate::ToNonZero for $ty {
-                type NonZero = NonZero<$ty>;
-                fn to_non_zero(self) -> $crate::Result<Self::NonZero> {
-                    NonZero::new(self).ok_or_else(|| $crate::Error::new("unexpected zero value".into()))
-                }
-            }
-        )*
-    }
-}
-
-impl_to_non_zero!(u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize,);

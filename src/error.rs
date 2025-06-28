@@ -23,6 +23,15 @@ impl Error {
             backtrace: Backtrace::capture(),
         }))
     }
+
+    pub fn message(&self) -> &str {
+        &self.0.message
+    }
+
+    #[cfg(feature = "std")]
+    pub fn backtrace(&self) -> &Backtrace {
+        &self.0.backtrace
+    }
 }
 
 impl Debug for Error {
