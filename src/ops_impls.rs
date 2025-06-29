@@ -10,6 +10,7 @@ macro_rules! impl_binary_op {
         impl $crate::ops::$trait_<$t2> for $t1 {
             type Output = $out;
             type Error = $crate::Error;
+            #[inline]
             fn $trait_fn(self, b: $t2) -> $crate::Result<$out> {
                 self.$source_fn(b)
                     .ok_or_else(|| crate::Error::new(format!($msg, self, b)))
@@ -20,6 +21,7 @@ macro_rules! impl_binary_op {
         impl $crate::ops::$trait_<$t2> for $t1 {
             type Output = $out;
             type Error = $crate::Error;
+            #[inline]
             fn $trait_fn(self, b: $t2) -> $crate::Result<$out> {
                 self.$source_fn(b)
                     .ok_or_else(|| crate::Error::new(($err)(self, b)))
@@ -52,6 +54,7 @@ macro_rules! impl_unary_op {
         impl $crate::ops::$trait_ for $t1 {
             type Output = $out;
             type Error = $crate::Error;
+            #[inline]
             fn $trait_fn(self) -> $crate::Result<$out> {
                 self.$source_fn()
                     .ok_or_else(|| crate::Error::new(format!($msg, self)))
@@ -62,6 +65,7 @@ macro_rules! impl_unary_op {
         impl $crate::ops::$trait_ for $t1 {
             type Output = $out;
             type Error = $crate::Error;
+            #[inline]
             fn $trait_fn(self) -> $crate::Result<$out> {
                 self.$source_fn()
                     .ok_or_else(|| crate::Error::new(($err)(self)))
@@ -327,12 +331,6 @@ impl_unary_ops!(
     (i8), (i16), (i32), (i64), (i128), (isize),
     (NonZero<i8>), (NonZero<i16>), (NonZero<i32>), (NonZero<i64>), (NonZero<i128>), (NonZero<isize>),
 );
-
-// impl_unary_ops!(
-//     Cisqrt, cisqrt, checked_isqrt, msg="number is negative: isqrt({})"
-//     for
-//     (i8), (i16), (i32), (i64), (i128), (isize),
-// );
 
 impl_binary_ops!(
     CnextMultipleOf, cnext_multiple_of, checked_next_multiple_of, err=|a, b| {

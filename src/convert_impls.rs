@@ -14,6 +14,7 @@ macro_rules! impl_cfrom {
         $(
             impl $crate::convert::Cfrom<$from> for $to {
                 type Error = $crate::Error;
+                #[inline]
                 fn cfrom(from: $from) -> $crate::Result<Self> {
                     ::core::convert::TryFrom::try_from(from)
                         .map_err(|_| $crate::Error::new(
@@ -56,6 +57,7 @@ impl_cfrom!(
 
 impl Cfrom<CString> for String {
     type Error = crate::Error;
+    #[inline]
     fn cfrom(from: CString) -> crate::Result<Self> {
         from.try_into()
             .map_err(|from| crate::Error::new(alloc::format!("not a utf-8 string: {from:?}")))
@@ -64,6 +66,7 @@ impl Cfrom<CString> for String {
 
 impl Cfrom<Vec<u8>> for String {
     type Error = crate::Error;
+    #[inline]
     fn cfrom(from: Vec<u8>) -> crate::Result<Self> {
         from.try_into()
             .map_err(|from| crate::Error::new(alloc::format!("not a utf-8 string: {from:?}")))
@@ -72,6 +75,7 @@ impl Cfrom<Vec<u8>> for String {
 
 impl<'a> Cfrom<&'a OsStr> for &'a str {
     type Error = crate::Error;
+    #[inline]
     fn cfrom(from: &'a OsStr) -> crate::Result<Self> {
         from.try_into()
             .map_err(|err| crate::Error::new(alloc::format!("not a utf-8 string: {from:?}: {err}")))

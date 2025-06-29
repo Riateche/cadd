@@ -52,6 +52,7 @@ macro_rules! impl_cfrom_unbounded {
         }
 
         impl $crate::convert::SaturatingFrom<$source> for $target {
+            #[inline]
             fn saturating_from(u: $source) -> Self {
                 u as Self
             }
@@ -82,6 +83,7 @@ macro_rules! impl_cfrom_lower_bounded {
         }
 
         impl $crate::convert::SaturatingFrom<$source> for $target {
+            #[inline]
             fn saturating_from(u: $source) -> Self {
                 if u >= 0 {
                     u as Self
@@ -116,6 +118,7 @@ macro_rules! impl_cfrom_upper_bounded {
         }
 
         impl $crate::convert::SaturatingFrom<$source> for $target {
+            #[inline]
             fn saturating_from(u: $source) -> Self {
                 if u > (Self::MAX as $source) {
                     Self::MAX
@@ -152,6 +155,7 @@ macro_rules! impl_cfrom_both_bounded {
         }
 
         impl $crate::convert::SaturatingFrom<$source> for $target {
+            #[inline]
             fn saturating_from(u: $source) -> Self {
                 let min = Self::MIN as $source;
                 let max = Self::MAX as $source;

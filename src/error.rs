@@ -6,7 +6,7 @@ use {
     core::fmt::{self, Debug, Display, Formatter},
 };
 
-/// A general error with a message and backtrace (if enabled).
+/// A general error with a message and a backtrace (if enabled).
 pub struct Error(Box<ErrorInner>);
 
 struct ErrorInner {

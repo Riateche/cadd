@@ -91,10 +91,13 @@
 //!   The names may look a bit cryptic at first, but there is really only one rule to remember:
 //!   every function name is just the name of the unchecked alternative ([`add`](std::ops::Add::add),
 //!   [`pow`](u32::pow), [`ilog`](u32::ilog), etc) with the "c" suffix that stands for "checked".
+//!
+//! See also: [crate level documentation](crate).
 
 macro_rules! declare_binary_trait {
     ($trait_:ident, $trait_fn:ident, $doc:literal) => {
         #[doc = $doc]
+        #[allow(missing_docs)]
         pub trait $trait_<Other = Self>: Sized {
             type Error;
             type Output;
@@ -102,6 +105,7 @@ macro_rules! declare_binary_trait {
         }
 
         #[doc = $doc]
+        #[inline]
         pub fn $trait_fn<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
         where
             T1: $trait_<T2>,
@@ -114,6 +118,7 @@ macro_rules! declare_binary_trait {
 macro_rules! declare_unary_trait {
     ($trait_:ident, $trait_fn:ident, $doc:literal) => {
         #[doc = $doc]
+        #[allow(missing_docs)]
         pub trait $trait_: Sized {
             type Error;
             type Output;
@@ -121,6 +126,7 @@ macro_rules! declare_unary_trait {
         }
 
         #[doc = $doc]
+        #[inline]
         pub fn $trait_fn<T1>(value: T1) -> Result<T1::Output, T1::Error>
         where
             T1: $trait_,

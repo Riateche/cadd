@@ -31,6 +31,7 @@ impl<'a, T: Debug> Debug for SliceLimitedDebug<'a, T> {
 impl<'a, T: Debug, const N: usize> Cfrom<&'a [T]> for &'a [T; N] {
     type Error = crate::Error;
 
+    #[inline]
     fn cfrom(from: &'a [T]) -> Result<Self, Self::Error> {
         from.try_into().map_err(|_| slice_to_array_error(N, from))
     }
@@ -39,6 +40,7 @@ impl<'a, T: Debug, const N: usize> Cfrom<&'a [T]> for &'a [T; N] {
 impl<'a, T: Debug, const N: usize> Cfrom<&'a mut [T]> for &'a mut [T; N] {
     type Error = crate::Error;
 
+    #[inline]
     fn cfrom(from: &'a mut [T]) -> Result<Self, Self::Error> {
         // We have to do it with an extra check because of borrow checker.
         if from.len() == N {
@@ -52,6 +54,7 @@ impl<'a, T: Debug, const N: usize> Cfrom<&'a mut [T]> for &'a mut [T; N] {
 impl<'a, T: Copy + Debug, const N: usize> Cfrom<&'a [T]> for [T; N] {
     type Error = crate::Error;
 
+    #[inline]
     fn cfrom(from: &'a [T]) -> Result<Self, Self::Error> {
         from.try_into().map_err(|_| slice_to_array_error(N, from))
     }
@@ -60,6 +63,7 @@ impl<'a, T: Copy + Debug, const N: usize> Cfrom<&'a [T]> for [T; N] {
 impl<'a, T: Copy + Debug, const N: usize> Cfrom<&'a mut [T]> for [T; N] {
     type Error = crate::Error;
 
+    #[inline]
     fn cfrom(from: &'a mut [T]) -> Result<Self, Self::Error> {
         from.try_into().map_err(|_| slice_to_array_error(N, from))
     }
@@ -71,6 +75,7 @@ macro_rules! impl_cfrom_owned_to_array {
             impl<T: Debug, const N: usize> Cfrom<$from> for $to {
                 type Error = crate::Error;
 
+                #[inline]
                 fn cfrom(from: $from) -> Result<Self, Self::Error> {
                     if from.len() == N {
                         Ok(from.try_into().unwrap())

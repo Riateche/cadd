@@ -45,6 +45,7 @@ pub trait IntoType {
     /// use cadd::convert::IntoType;
     /// assert_eq!(2u32.into_type::<u64>(), 2);
     /// ```
+    #[inline]
     fn into_type<T>(self) -> T
     where
         Self: Into<T>,
@@ -58,6 +59,7 @@ pub trait IntoType {
     /// assert!((-2i32).try_into_type::<u32>().is_err());
     /// assert_eq!(2i32.try_into_type::<u32>().unwrap(), 2);
     /// ```
+    #[inline]
     fn try_into_type<T>(self) -> Result<T, Self::Error>
     where
         Self: TryInto<T>,
@@ -71,6 +73,7 @@ pub trait IntoType {
     /// assert!((-2i32).cinto_type::<u32>().is_err());
     /// assert_eq!(2i32.cinto_type::<u32>().unwrap(), 2);
     /// ```
+    #[inline]
     fn cinto_type<T>(self) -> Result<T, Self::Error>
     where
         Self: Cinto<T>,
@@ -83,6 +86,7 @@ pub trait IntoType {
     /// use cadd::convert::IntoType;
     /// assert_eq!(300_u32.saturating_into_type::<u8>(), 255);
     /// ```
+    #[inline]
     fn saturating_into_type<T>(self) -> T
     where
         Self: SaturatingInto<T>,
@@ -102,6 +106,7 @@ impl<T: ?Sized> IntoType for T {}
 /// [`Cinto`] trait provides an alternative way to do the same conversion.
 /// Similar to `TryFrom`, it's recommended to always implement `Cfrom` instead of [`Cinto`].
 /// The corresponding `Cinto` implementation will be covered by the blanket impl.
+#[allow(missing_docs)]
 pub trait Cfrom<F>: Sized {
     type Error;
     fn cfrom(from: F) -> Result<Self, Self::Error>;
@@ -115,6 +120,7 @@ pub trait Cfrom<F>: Sized {
 ///
 /// In order to help with type inference,
 /// the [`IntoType`] extension trait provides `.cinto_type::<T>()` syntax.
+#[allow(missing_docs)]
 pub trait Cinto<I>: Sized {
     type Error;
     fn cinto(self) -> Result<I, Self::Error>;
@@ -125,6 +131,7 @@ where
     I: Cfrom<F>,
 {
     type Error = <I as Cfrom<F>>::Error;
+    #[inline]
     fn cinto(self) -> Result<I, Self::Error> {
         I::cfrom(self)
     }
@@ -148,6 +155,7 @@ where
 /// `SaturatingFrom` instead of [`SaturatingInto`](Cinto).
 /// The corresponding `SaturatingInto` implementation will be covered by the blanket impl.
 pub trait SaturatingFrom<F>: Sized {
+    #[allow(missing_docs)]
     fn saturating_from(from: F) -> Self;
 }
 
@@ -174,6 +182,7 @@ pub trait SaturatingFrom<F>: Sized {
 /// assert_eq!((-300_i32).saturating_into_type::<i8>(), -128);
 /// ```
 pub trait SaturatingInto<I>: Sized {
+    #[allow(missing_docs)]
     fn saturating_into(self) -> I;
 }
 
@@ -181,7 +190,43 @@ impl<F, I> SaturatingInto<I> for F
 where
     I: SaturatingFrom<F>,
 {
+    #[inline]
     fn saturating_into(self) -> I {
         I::saturating_from(self)
     }
 }
+
+/// Conversion from an integer type to the corresponding [`NonZero`](std::num::NonZero) type.
+///
+/// If the value is zero, it returns an error with a backtrace.
+#[allow(missing_docs)]
+pub trait ToNonZero {
+    type Error;
+    type NonZero;
+    fn to_non_zero(self) -> Result<Self::NonZero, Self::Error>;
+}
+
+/// Conversion from an integer type to the corresponding [`NonZero`](std::num::NonZero) type.
+///
+/// If the value is zero, it returns an error with a backtrace.
+#[inline]
+pub fn non_zero<T: ToNonZero>(a: T) -> crate::Result<T::NonZero, T::Error> {
+    a.to_non_zero()
+}
+
+macro_rules! impl_to_non_zero {
+    ($($ty:ident,)*) => {
+        $(
+            impl $crate::convert::ToNonZero for $ty {
+                type Error = $crate::Error;
+                type NonZero = ::core::num::NonZero<$ty>;
+                #[inline]
+                fn to_non_zero(self) -> $crate::Result<Self::NonZero> {
+                    ::core::num::NonZero::new(self).ok_or_else(|| $crate::Error::new("unexpected zero value".into()))
+                }
+            }
+        )*
+    }
+}
+
+impl_to_non_zero!(u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize,);
