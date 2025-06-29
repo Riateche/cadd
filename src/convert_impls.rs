@@ -5,8 +5,10 @@ use {
     crate::convert::Cfrom,
     alloc::{ffi::CString, string::String, vec::Vec},
     core::num::NonZero,
-    std::ffi::OsStr,
 };
+
+#[cfg(feature = "std")]
+use std::ffi::OsStr;
 
 // delegate to TryFrom
 macro_rules! impl_cfrom {
@@ -73,6 +75,7 @@ impl Cfrom<Vec<u8>> for String {
     }
 }
 
+#[cfg(feature = "std")]
 impl<'a> Cfrom<&'a OsStr> for &'a str {
     type Error = crate::Error;
     #[inline]

@@ -1,9 +1,7 @@
 use {
     crate::convert::Cfrom,
-    alloc::boxed::Box,
-    alloc::vec::Vec,
+    alloc::{boxed::Box, rc::Rc, sync::Arc, vec::Vec},
     core::fmt::Debug,
-    std::{rc::Rc, sync::Arc},
 };
 
 struct SliceLimitedDebug<'a, T>(&'a [T]);
