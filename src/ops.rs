@@ -1,4 +1,4 @@
-//! Traits and functions for checked operations on numbers.
+//! Checked operations on numbers.
 //!
 //! Many operators on integer primitives (`a + b`, `a / b`, etc) and associated functions (`a.pow(b)`, `a.ilog(b)`, etc)
 //! can overflow or fail under certain conditions. With debug assertions enabled (default when building in debug mode),

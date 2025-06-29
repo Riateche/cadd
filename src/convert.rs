@@ -1,3 +1,5 @@
+//! Converting values to another type.
+
 /// Extention trait that enables `.into_type::<T>()` syntax. Also works for
 /// [`cinto`](Cinto),
 /// [`try_into`](TryInto),
@@ -5,16 +7,44 @@
 ///
 /// When you replace unchecked type casts (e.g. `number as u32`) with an infallible conversion
 /// (`number.into()`) or a fallible conversion (`number.try_into()?`), you may often encounter
-/// type inference errors. The easiest way to solve it is to use `From` or `TryFrom` instead
-/// so that you can specify the target type: `u32::from(number)`, `u32::try_from(number)?`.
-///
-/// However, if you don't want to rewrite your whole expression, you can use this extension trait
-/// to specify the target type at the end: `number.into_type::<u32>()`, `number.cinto_type::<u32>()?`.
+/// type inference errors if the context doesn't have enough information about the target type:
+/// ```
+/// fn f1(input: u32) -> u64 {
+///     10 + (input as u64) // Compiles
+/// }
+/// ```
+/// ```compile_fail
+/// fn f1(input: u32) -> Result<u64, std::num::TryFromIntError> {
+///     let a = 10 + input.try_into()?; // Doesn't compile
+///     Ok(a)
+/// }
+/// ```
+///  The easiest way to solve it in `std` is to use `From` or `TryFrom` instead
+/// so that you can specify the target type:
+/// ```
+/// fn f1(input: u32) -> Result<u64, std::num::TryFromIntError> {
+///     let a = 10 + u64::try_from(input)?; // Compiles
+///     Ok(a)
+/// }
+/// ```
+/// This can cause unnecessary friction because it requires some rearrangement of the code and reduces its
+/// readability. The `IntoType` trait provides an alternative way to do it:
+/// ```
+/// use cadd::convert::IntoType;
+/// fn f1(input: u32) -> Result<u64, std::num::TryFromIntError> {
+///     let a = 10 + input.try_into_type::<u64>()?; // Compiles
+///     Ok(a)
+/// }
+/// ```
 ///
 /// This trait is implemented for all types. However, each method has its own type bound that requires
 /// the corresponding conversion trait to be implemented.
 pub trait IntoType {
     /// An alternative to [`.into()`](std::convert::Into) that allows specifying the target type.
+    /// ```
+    /// use cadd::convert::IntoType;
+    /// assert_eq!(2u32.into_type::<u64>(), 2);
+    /// ```
     fn into_type<T>(self) -> T
     where
         Self: Into<T>,
@@ -23,6 +53,11 @@ pub trait IntoType {
     }
 
     /// An alternative to [`.try_into()`](std::convert::TryInto) that allows specifying the target type.
+    /// ```
+    /// use cadd::convert::IntoType;
+    /// assert!((-2i32).try_into_type::<u32>().is_err());
+    /// assert_eq!(2i32.try_into_type::<u32>().unwrap(), 2);
+    /// ```
     fn try_into_type<T>(self) -> Result<T, Self::Error>
     where
         Self: TryInto<T>,
@@ -31,6 +66,11 @@ pub trait IntoType {
     }
 
     /// An alternative to [`.cinto()`](Cinto) that allows specifying the target type.
+    /// ```
+    /// use cadd::convert::IntoType;
+    /// assert!((-2i32).cinto_type::<u32>().is_err());
+    /// assert_eq!(2i32.cinto_type::<u32>().unwrap(), 2);
+    /// ```
     fn cinto_type<T>(self) -> Result<T, Self::Error>
     where
         Self: Cinto<T>,
@@ -39,6 +79,10 @@ pub trait IntoType {
     }
 
     /// An alternative to [`.saturating_into()`](SaturatingInto) that allows specifying the target type.
+    /// ```
+    /// use cadd::convert::IntoType;
+    /// assert_eq!(300_u32.saturating_into_type::<u8>(), 255);
+    /// ```
     fn saturating_into_type<T>(self) -> T
     where
         Self: SaturatingInto<T>,
@@ -47,9 +91,7 @@ pub trait IntoType {
     }
 }
 
-// TODO: parse_into_type
-
-impl<T> IntoType for T {}
+impl<T: ?Sized> IntoType for T {}
 
 /// Checked conversion from `F` to `Self`.
 ///
@@ -57,6 +99,7 @@ impl<T> IntoType for T {}
 /// aims to provide a rich error message, as opposed to many implementations of `TryFrom` in `std`
 /// that provide minimal informations in errors.
 ///
+/// [`Cinto`] trait provides an alternative way to do the same conversion.
 /// Similar to `TryFrom`, it's recommended to always implement `Cfrom` instead of [`Cinto`].
 /// The corresponding `Cinto` implementation will be covered by the blanket impl.
 pub trait Cfrom<F>: Sized {
@@ -92,7 +135,15 @@ where
 /// If the value being converted is out of bounds for the target type,
 /// the closest representable value is returned. Consequently, if the value is out of bounds,
 /// this conversion always returns `Self::MIN` or `Self::MAX`.
+/// ```
+/// use cadd::convert::SaturatingFrom;
 ///
+/// assert_eq!(u8::saturating_from(300_u32), 255);
+/// assert_eq!(u8::saturating_from(200_u32), 200);
+/// assert_eq!(u8::saturating_from(-300_i32), 0);
+/// assert_eq!(i8::saturating_from(-300_i32), -128);
+/// ```
+/// [`SaturatingInto`] trait provides an alternative way to do the same conversion.
 /// Similar to [`TryFrom`], it's recommended to always implement
 /// `SaturatingFrom` instead of [`SaturatingInto`](Cinto).
 /// The corresponding `SaturatingInto` implementation will be covered by the blanket impl.
@@ -108,6 +159,20 @@ pub trait SaturatingFrom<F>: Sized {
 ///
 /// In order to help with type inference,
 /// the [`IntoType`] extension trait provides `.saturating_into_type::<T>()` syntax.
+///
+/// ```
+/// use cadd::convert::{SaturatingInto, IntoType};
+///
+/// let v: u8 = 300_u32.saturating_into();
+/// assert_eq!(v, 255);
+/// // Or with `IntoType` extension trait:
+/// assert_eq!(300_u32.saturating_into_type::<u8>(), 255);
+///
+/// // More examples:
+/// assert_eq!(200_u32.saturating_into_type::<u8>(), 200);
+/// assert_eq!((-300_i32).saturating_into_type::<u8>(), 0);
+/// assert_eq!((-300_i32).saturating_into_type::<i8>(), -128);
+/// ```
 pub trait SaturatingInto<I>: Sized {
     fn saturating_into(self) -> I;
 }
