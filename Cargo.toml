@@ -1,7 +1,6 @@
 [package]
 name = "cadd"
-version = "0.1.0-alpha.1"
-#edition = "2024"
+version = "0.1.0-alpha.2"
 edition = "2021"
 
 description = "Painless checked arithmetics and conversions"

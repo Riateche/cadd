@@ -3,11 +3,18 @@
 //! # `cadd`: painless checked arithmetics and conversions
 //!
 //! Features:
-//! * [ops]: Checked arithmetics with `Result` and backtraces
-//! * [`Cinto`](crate::convert::Cinto): `TryInto` with better error messages and backtraces for number conversions
-//! * [`SaturatingInto`](crate::convert::SaturatingInto): infallible number conversion that returns the closest valid value
-//! * [`non_zero`](crate::convert::non_zero) and [`to_non_zero()`](crate::convert::ToNonZero): conversion to [`NonZero`](std::num::NonZero) with `Result` and backtraces
-//! * <code>.[into_type](crate::convert::IntoType)::&lt;T&gt;()</code> as an alternative to `into()` and `try_into()` without type inference errors
+//! * [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html):
+//!   Checked arithmetics with `Result` and backtraces
+//! * [`Cinto`](https://docs.rs/cadd/latest/cadd/convert/trait.Cinto.html):
+//!   `TryInto` with better error messages and backtraces for number conversions
+//! * [`SaturatingInto`](https://docs.rs/cadd/latest/cadd/convert/trait.SaturatingInto.html):
+//!   infallible number conversion that returns the closest valid value
+//! * [`non_zero`](https://docs.rs/cadd/latest/cadd/convert/fn.non_zero.html)
+//!   and [`to_non_zero()`](https://docs.rs/cadd/latest/cadd/convert/trait.ToNonZero.html):
+//!   conversion to [`NonZero`](https://doc.rust-lang.org/nightly/core/num/struct.NonZero.html)
+//!   with `Result` and backtraces
+//! * <code>.[into_type](https://docs.rs/cadd/latest/cadd/convert/trait.IntoType.html)::&lt;T&gt;()</code>
+//!   as an alternative to `into()` and `try_into()` without type inference errors
 //!
 //! ## Intro to checked and unchecked math
 //!
@@ -88,11 +95,14 @@
 //!    0: std::backtrace_rs::backtrace::libunwind::trace
 //! ...
 //! ```
-//! You can also freely choose between method form (<code>a.[cadd](ops::Cadd::cadd)(b)</code>)
-//! and free function form (<code>[cadd](ops::cadd)(a, b)</code>) as you see fit.
+//! You can also freely choose between method form
+//! (<code>a.[cadd](https://docs.rs/cadd/latest/cadd/ops/trait.Cadd.html#tymethod.cadd)(b)</code>)
+//! and free function form (<code>[cadd](https://docs.rs/cadd/latest/cadd/ops/fn.cadd.html)(a, b)</code>)
+//! as you see fit.
 //! And it's not just operators (`+`, `-`, etc). For every `checked_*` function in `std`, there is a corresponding
-//! function in `cadd`: [`cdiv_euclid`](ops::cdiv_euclid), [`cilog2`](ops::cilog2), and so on.
-//! See [ops] module documentation for more information.
+//! function in `cadd`: [`cdiv_euclid`](https://docs.rs/cadd/latest/cadd/ops/fn.cdiv_euclid.html),
+//! [`cilog2`](https://docs.rs/cadd/latest/cadd/ops/fn.cilog2.html), and so on.
+//! See [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html) module documentation for more information.
 extern crate alloc;
 #[cfg(any(test, feature = "std"))]
 extern crate std;
