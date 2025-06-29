@@ -1,3 +1,5 @@
+//! Exports most of the library's traits and functions.
+
 pub use crate::{
     convert::{Cfrom, Cinto, IntoType, SaturatingFrom, SaturatingInto},
     non_zero,

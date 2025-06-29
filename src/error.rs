@@ -6,7 +6,7 @@ use {
     core::fmt::{self, Debug, Display, Formatter},
 };
 
-#[non_exhaustive]
+/// A general error with a message and backtrace (if enabled).
 pub struct Error(Box<ErrorInner>);
 
 struct ErrorInner {
@@ -16,6 +16,7 @@ struct ErrorInner {
 }
 
 impl Error {
+    /// Creates a new error and captures the backtrace (if enabled).
     pub fn new(message: String) -> Self {
         Self(Box::new(ErrorInner {
             message,
@@ -24,10 +25,12 @@ impl Error {
         }))
     }
 
+    /// Description of the error.
     pub fn message(&self) -> &str {
         &self.0.message
     }
 
+    /// Backtrace to where the error was created.
     #[cfg(feature = "std")]
     pub fn backtrace(&self) -> &Backtrace {
         &self.0.backtrace

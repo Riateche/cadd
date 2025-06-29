@@ -12,5 +12,3 @@ repository = "https://github.com/Riateche/cadd"
 [features]
 default = ["std"]
 std = []
-
-[dependencies]

@@ -1,4 +1,7 @@
-/// Extention trait that enables `.into_type::<T>()` syntax. Also works for `cinto`, `try_into`, `saturating_into`.
+/// Extention trait that enables `.into_type::<T>()` syntax. Also works for
+/// [`cinto`](Cinto),
+/// [`try_into`](TryInto),
+/// [`saturating_into`](SaturatingInto).
 ///
 /// When you replace unchecked type casts (e.g. `number as u32`) with an infallible conversion
 /// (`number.into()`) or a fallible conversion (`number.try_into()?`), you may often encounter
@@ -44,15 +47,17 @@ pub trait IntoType {
     }
 }
 
+// TODO: parse_into_type
+
 impl<T> IntoType for T {}
 
 /// Checked conversion from `F` to `Self`.
 ///
-/// This is semantically the same as [TryFrom](std::convert::TryFrom). However, `Cfrom`
+/// This is semantically the same as [`TryFrom`]. However, `Cfrom`
 /// aims to provide a rich error message, as opposed to many implementations of `TryFrom` in `std`
 /// that provide minimal informations in errors.
 ///
-/// Similar to `TryFrom`, it's recommended to always implement `Cfrom` instead of [`Cinto`](Cinto).
+/// Similar to `TryFrom`, it's recommended to always implement `Cfrom` instead of [`Cinto`].
 /// The corresponding `Cinto` implementation will be covered by the blanket impl.
 pub trait Cfrom<F>: Sized {
     type Error;
@@ -63,10 +68,10 @@ pub trait Cfrom<F>: Sized {
 ///
 /// This trait is automatically implemented when `I` implements `Cfrom<Self>`.
 ///
-/// See [`Cfrom`](Cfrom) for main documentation.
+/// See [`Cfrom`] for main documentation.
 ///
 /// In order to help with type inference,
-/// the [`IntoType`](IntoType) extension trait provides `.cinto_type::<T>()` syntax.
+/// the [`IntoType`] extension trait provides `.cinto_type::<T>()` syntax.
 pub trait Cinto<I>: Sized {
     type Error;
     fn cinto(self) -> Result<I, Self::Error>;
@@ -88,7 +93,7 @@ where
 /// the closest representable value is returned. Consequently, if the value is out of bounds,
 /// this conversion always returns `Self::MIN` or `Self::MAX`.
 ///
-/// Similar to [`TryFrom`](std::convert::TryFrom), it's recommended to always implement
+/// Similar to [`TryFrom`], it's recommended to always implement
 /// `SaturatingFrom` instead of [`SaturatingInto`](Cinto).
 /// The corresponding `SaturatingInto` implementation will be covered by the blanket impl.
 pub trait SaturatingFrom<F>: Sized {
@@ -99,10 +104,10 @@ pub trait SaturatingFrom<F>: Sized {
 ///
 /// This trait is automatically implemented when `I` implements `SaturatingFrom<Self>`.
 ///
-/// See [`SaturatingFrom`](SaturatingFrom) for main documentation.
+/// See [`SaturatingFrom`] for main documentation.
 ///
 /// In order to help with type inference,
-/// the [`IntoType`](IntoType) extension trait provides `.saturating_into_type::<T>()` syntax.
+/// the [`IntoType`] extension trait provides `.saturating_into_type::<T>()` syntax.
 pub trait SaturatingInto<I>: Sized {
     fn saturating_into(self) -> I;
 }
