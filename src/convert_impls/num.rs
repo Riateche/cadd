@@ -213,8 +213,6 @@ impl_cfrom_lower_bounded!(isize => usize);
 
 #[cfg(target_pointer_width = "16")]
 mod ptr_try_from_impls {
-    use super::TryFromIntError;
-
     impl_cfrom_upper_bounded!(usize => u8);
     impl_cfrom_unbounded!(usize => u16, u32, u64, u128);
     impl_cfrom_upper_bounded!(usize => i8, i16);
@@ -235,8 +233,6 @@ mod ptr_try_from_impls {
 
 #[cfg(target_pointer_width = "32")]
 mod ptr_try_from_impls {
-    use super::TryFromIntError;
-
     impl_cfrom_upper_bounded!(usize => u8, u16);
     impl_cfrom_unbounded!(usize => u32, u64, u128);
     impl_cfrom_upper_bounded!(usize => i8, i16, i32);
