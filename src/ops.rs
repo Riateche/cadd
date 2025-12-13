@@ -148,16 +148,19 @@ declare_extension_trait!(
 );
 
 macro_rules! declare_binary_trait {
-    ($trait_:ident, $trait_fn:ident, $doc:literal) => {
-        #[doc = $doc]
+    ($trait_:ident, $trait_fn:ident, $common_doc:literal, $fn_doc:literal, $doc_alias:literal) => {
+        #[doc = $common_doc]
+        #[doc(alias = $doc_alias)]
         #[allow(missing_docs)]
         pub trait $trait_<Other = Self>: Sized {
             type Error;
             type Output;
+            #[doc = concat!($common_doc, "\n\n", $fn_doc)]
             fn $trait_fn(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
         }
 
-        #[doc = $doc]
+        #[doc = concat!($common_doc, "\n\n", $fn_doc)]
+        #[doc(alias = $doc_alias)]
         #[inline]
         pub fn $trait_fn<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
         where
@@ -169,16 +172,19 @@ macro_rules! declare_binary_trait {
 }
 
 macro_rules! declare_unary_trait {
-    ($trait_:ident, $trait_fn:ident, $doc:literal) => {
-        #[doc = $doc]
+    ($trait_:ident, $trait_fn:ident, $common_doc:literal, $fn_doc:literal, $doc_alias:literal) => {
+        #[doc = $common_doc]
+        #[doc(alias = $doc_alias)]
         #[allow(missing_docs)]
         pub trait $trait_: Sized {
             type Error;
             type Output;
+            #[doc = concat!($common_doc, "\n\n", $fn_doc)]
             fn $trait_fn(a: Self) -> Result<Self::Output, Self::Error>;
         }
 
-        #[doc = $doc]
+        #[doc = concat!($common_doc, "\n\n", $fn_doc)]
+        #[doc(alias = $doc_alias)]
         #[inline]
         pub fn $trait_fn<T1>(value: T1) -> Result<T1::Output, T1::Error>
         where
@@ -192,87 +198,127 @@ macro_rules! declare_unary_trait {
 declare_binary_trait!(
     Cadd,
     cadd,
-    "Addition: `a + b`. Returns an error on overflow."
+    "Checked addition: computes `a + b`, returning an error if overflow occured.",
+    "Wrapper for `checked_add`.",
+    "checked_add"
 );
 declare_binary_trait!(
     Csub,
     csub,
-    "Subtraction: `a - b`. Returns an error on overflow."
+    "Checked subtraction:  computes`a - b`, returning an error if overflow occured.",
+    "Wrapper for `checked_sub`.",
+    "checked_sub"
 );
-declare_unary_trait!(Cneg, cneg, "Negation: `-a`. Returns an error on overflow.");
+declare_unary_trait!(
+    Cneg,
+    cneg,
+    "Checked negation: computes `-a`, returning an error if overflow occured.",
+    "Wrapper for `checked_neg`.",
+    "checked_neg"
+);
 declare_binary_trait!(
     Cmul,
     cmul,
-    "Multiplication: `a * b`. Returns an error on overflow or if the divisor is zero."
+    "Checked multiplication: computes `a * b`, returning an error if overflow occured or if the divisor is zero.",
+    "Wrapper for `checked_mul`.",
+    "checked_mul"
 );
 declare_binary_trait!(
     Cdiv,
     cdiv,
-    "Division: `a / b`. Returns an error on overflow or if the divisor is zero."
+    "Checked division: computes `a / b`, returning an error if overflow occured or if the divisor is zero.",
+    "Wrapper for `checked_div`.",
+    "checked_div"
 );
 declare_binary_trait!(
     CdivEuclid,
     cdiv_euclid,
-    "Euclidian division. Returns an error on overflow or if the divisor is zero."
+    "Checked euclidian division: computes `a.div_euclid(b)`, returning an error if overflow occured or if the divisor is zero.",
+    "Wrapper for `checked_div_euclid`.",
+    "checked_div_euclid"
 );
 declare_binary_trait!(
     Crem,
     crem,
-    "Remainder: `a % b`. Returns an error on overflow or if the divisor is zero."
+    "Checked remainder: computes `a % b`, returning an error if overflow occured or if the divisor is zero.",
+    "Wrapper for `checked_rem`.",
+    "checked_rem"
 );
 declare_binary_trait!(
     CremEuclid,
     crem_euclid,
-    "Euclidian reminder. Returns an error on overflow or if the divisor is zero."
+    "Checked euclidian reminder: computes `a.rem_euclid(b)`, returning an error if overflow occured or if the divisor is zero.",
+    "Wrapper for `checked_rem_euclid`.",
+    "checked_rem_euclid"
 );
 
 declare_binary_trait!(
     CILog,
     cilog,
-    "Logarithm: <code>log<sub>b</sub> a</code>. Returns an error if the number is negative or zero, or if the base is less than 2."
+    "Checked logarithm: computes <code>log<sub>b</sub> a</code>, returning an error if the number is negative or zero, or if the base is less than 2.",
+    "Wrapper for `checked_ilog`.",
+    "checked_ilog"
 );
 declare_unary_trait!(
     CILog2,
     cilog2,
-    "Base 2 logarithm: `ln a`. Returns an error if the number is negative or zero."
+    "Checked base 2 logarithm: computes `ln a`, returning an error if the number is negative or zero.",
+    "Wrapper for `checked_ilog2`.",
+    "checked_ilog2"
 );
 declare_unary_trait!(
     CILog10,
     cilog10,
-    "Base 10 logarithm: <code>log<sub>10</sub> a</code>. Returns an error if the number is negative or zero."
+    "Checked base 10 logarithm: computes <code>log<sub>10</sub> a</code>, returning an error if the number is negative or zero.",
+    "Wrapper for `checked_ilog10`.",
+    "checked_ilog10"
 );
 declare_binary_trait!(
     Cshl,
     cshl,
-    "Shift left: `a << b`. Returns an error if `b` is greater or equal to the number of bits in the type."
+    "Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.",
+    "Wrapper for `checked_shl`.",
+    "checked_shl"
 );
 declare_binary_trait!(
     Cshr,
     cshr,
-    "Shift right: `a >> b`. Returns an error if `b` is greater or equal to the number of bits in the type."
+    "Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.",
+    "Wrapper for `checked_shr`.",
+    "checked_shr"
 );
 declare_binary_trait!(
     Cpow,
     cpow,
-    "Exponentiation: <code>a<sup>b</sup></code>. Returns an error on overflow."
+    "Checked exponentiation: computes <code>a<sup>b</sup></code>, returning an error if overflow occured.",
+    "Wrapper for `checked_pow`.",
+    "checked_pow"
 );
 declare_unary_trait!(
     Cabs,
     cabs,
-    "Absolute value: `|a|` (signed types only). Returns an error if `a == MIN`."
+    "Checked absolute value: computes `|a|` (signed types only), returning an error if `a == MIN`.",
+    "Wrapper for `checked_abs`.",
+    "checked_abs"
 );
 declare_unary_trait!(
     Cisqrt,
     cisqrt,
-    "Square root: `√a` (signed types only). Returns an error if `a` is negative."
+    "Checked square root: computes `√a` (signed types only), returning an error if `a` is negative.",
+    "Wrapper for `checked_isqrt`.",
+    "checked_isqrt"
 );
 declare_binary_trait!(
     CnextMultipleOf,
     cnext_multiple_of,
-    "Next multiple of `b`. Returns an error on overflow or if `b` is zero."
+    "Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.",
+    "Wrapper for `checked_next_multiple_of`.",
+    "checked_next_multiple_of"
 );
 declare_unary_trait!(
     CnextPowerOfTwo,
     cnext_power_of_two,
-    "Next power of 2. Returns an error on overflow."
+    "Checked next power of 2, returning an error if overflow occured.",
+    "Wrapper for `checked_next_power_of_two`.",
+    "checked_next_power_of_two"
 );
