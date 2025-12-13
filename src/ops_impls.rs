@@ -11,9 +11,9 @@ macro_rules! impl_binary_op {
             type Output = $out;
             type Error = $crate::Error;
             #[inline]
-            fn $trait_fn(self, b: $t2) -> $crate::Result<$out> {
-                self.$source_fn(b)
-                    .ok_or_else(|| crate::Error::new(format!($msg, self, b)))
+            fn $trait_fn(a: $t1, b: $t2) -> $crate::Result<$out> {
+                a.$source_fn(b)
+                    .ok_or_else(|| crate::Error::new(format!($msg, a, b)))
             }
         }
     };
@@ -22,9 +22,9 @@ macro_rules! impl_binary_op {
             type Output = $out;
             type Error = $crate::Error;
             #[inline]
-            fn $trait_fn(self, b: $t2) -> $crate::Result<$out> {
-                self.$source_fn(b)
-                    .ok_or_else(|| crate::Error::new(($err)(self, b)))
+            fn $trait_fn(a: $t1, b: $t2) -> $crate::Result<$out> {
+                a.$source_fn(b)
+                    .ok_or_else(|| crate::Error::new(($err)(a, b)))
             }
         }
     };
@@ -55,9 +55,9 @@ macro_rules! impl_unary_op {
             type Output = $out;
             type Error = $crate::Error;
             #[inline]
-            fn $trait_fn(self) -> $crate::Result<$out> {
-                self.$source_fn()
-                    .ok_or_else(|| crate::Error::new(format!($msg, self)))
+            fn $trait_fn(a: Self) -> $crate::Result<$out> {
+                a.$source_fn()
+                    .ok_or_else(|| crate::Error::new(format!($msg, a)))
             }
         }
     };

@@ -149,7 +149,7 @@ macro_rules! declare_binary_trait {
         pub trait $trait_<Other = Self>: Sized {
             type Error;
             type Output;
-            fn $trait_fn(self, b: Other) -> Result<Self::Output, Self::Error>;
+            fn $trait_fn(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
         }
 
         #[doc = $doc]
@@ -158,7 +158,7 @@ macro_rules! declare_binary_trait {
         where
             T1: $trait_<T2>,
         {
-            a.$trait_fn(b)
+            $trait_::$trait_fn(a, b)
         }
     };
 }
@@ -170,7 +170,7 @@ macro_rules! declare_unary_trait {
         pub trait $trait_: Sized {
             type Error;
             type Output;
-            fn $trait_fn(self) -> Result<Self::Output, Self::Error>;
+            fn $trait_fn(a: Self) -> Result<Self::Output, Self::Error>;
         }
 
         #[doc = $doc]
@@ -179,7 +179,7 @@ macro_rules! declare_unary_trait {
         where
             T1: $trait_,
         {
-            value.$trait_fn()
+            $trait_::$trait_fn(value)
         }
     };
 }
