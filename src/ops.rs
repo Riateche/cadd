@@ -94,6 +94,54 @@
 //!
 //! See also: [crate level documentation](crate).
 
+macro_rules! declare_func {
+    ($fn:ident, $impl_fn:ident, $other:ty, $out:ty, $err:expr, $doc:literal) => {
+        #[doc = $doc]
+        fn $fn(self, other: $other) -> $crate::Result<$out>;
+    };
+}
+
+macro_rules! impl_func {
+    ($fn:ident, $impl_fn:ident, $other:ty, $out:ty, $err:expr, $doc:literal) => {
+        #[doc = $doc]
+        fn $fn(self, other: $other) -> $crate::Result<$out> {
+            self.$impl_fn(other)
+                .ok_or_else(|| $crate::Error::new(($err)(self, other)))
+        }
+    };
+}
+
+macro_rules! declare_extension_trait {
+    ($trait_:ident, $type_:ty, $doc:literal, $(($($func:tt)+),)+) => {
+        #[doc = $doc]
+        pub trait $trait_: Sized {
+            $(
+                declare_func!($($func)+);
+            )+
+        }
+
+        impl $trait_ for $type_ {
+            $(
+                impl_func!($($func)+);
+            )+
+        }
+    };
+}
+
+declare_extension_trait!(
+    U8Ext,
+    u8,
+    "doc U8Ext",
+    (
+        cadd,
+        checked_add,
+        u8,
+        u8,
+        |a, b| ::alloc::format!("overflow: {a} + {b}"),
+        "doc cadd"
+    ),
+);
+
 macro_rules! declare_binary_trait {
     ($trait_:ident, $trait_fn:ident, $doc:literal) => {
         #[doc = $doc]
