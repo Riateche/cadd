@@ -95,18 +95,23 @@
 //! See also: [crate level documentation](crate).
 
 macro_rules! declare_func {
-    ($fn:ident, $impl_fn:ident, $other:ty, $out:ty, $err:expr, $doc:literal) => {
+    (
+        fn_name = $fn_name:ident, impl_fn = $impl_fn:ident, other_type = $other_type:ty,
+        out_type = $out_type:ty, doc = $doc:literal,
+    ) => {
         #[doc = $doc]
-        fn $fn(self, other: $other) -> $crate::Result<$out>;
+        fn $fn_name(self, other: $other_type) -> $crate::Result<$out_type>;
     };
 }
 
 macro_rules! impl_func {
-    ($fn:ident, $impl_fn:ident, $other:ty, $out:ty, $err:expr, $doc:literal) => {
+    (
+        fn_name = $fn_name:ident, impl_fn = $impl_fn:ident, other_type = $other_type:ty,
+        out_type = $out_type:ty, doc = $doc:literal,
+    ) => {
         #[doc = $doc]
-        fn $fn(self, other: $other) -> $crate::Result<$out> {
-            self.$impl_fn(other)
-                .ok_or_else(|| $crate::Error::new(($err)(self, other)))
+        fn $fn_name(self, other: $other_type) -> $crate::Result<$out_type> {
+            $impl_fn(self, other)
         }
     };
 }
@@ -131,14 +136,14 @@ macro_rules! declare_extension_trait {
 declare_extension_trait!(
     U8Ext,
     u8,
-    "doc U8Ext",
+    "Enhanced checked arithmetics functions for `u8`.",
     (
-        cadd,
-        checked_add,
-        u8,
-        u8,
-        |a, b| ::alloc::format!("overflow: {a} + {b}"),
-        "doc cadd"
+        fn_name = cadd,
+        impl_fn = cadd,
+        other_type = u8,
+        out_type = u8,
+        doc = "Checked integer addition. Computes `self + other`, returning `None` if overflow occurred.\n\n\
+        Wrapper for [`u8::checked_add`].",
     ),
 );
 
