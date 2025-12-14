@@ -94,72 +94,148 @@
 //!
 //! See also: [crate level documentation](crate).
 
-macro_rules! declare_func {
-    (
-        fn_name = $fn_name:ident, impl_fn = $impl_fn:ident, other_type = $other_type:ty,
-        out_type = $out_type:ty, doc = $doc:literal,
-    ) => {
-        #[doc = $doc]
-        fn $fn_name(self, other: $other_type) -> $crate::Result<$out_type>;
+macro_rules! impl_fn_literal {
+    (cadd) => {
+        "checked_add"
+    };
+    (csub) => {
+        "checked_sub"
+    };
+    (cneg) => {
+        "checked_neg"
+    };
+    (cmul) => {
+        "checked_mul"
+    };
+    (cdiv) => {
+        "checked_div"
+    };
+    (cdiv_euclid) => {
+        "checked_div_euclid"
+    };
+    (crem) => {
+        "checked_rem"
+    };
+    (crem_euclid) => {
+        "checked_rem_euclid"
+    };
+    (cilog) => {
+        "checked_ilog"
+    };
+    (cilog2) => {
+        "checked_ilog2"
+    };
+    (cilog10) => {
+        "checked_ilog10"
+    };
+    (cshl) => {
+        "checked_shl"
+    };
+    (cshr) => {
+        "checked_shr"
+    };
+    (cpow) => {
+        "checked_pow"
+    };
+    (cabs) => {
+        "checked_abs"
+    };
+    (cisqrt) => {
+        "checked_isqrt"
+    };
+    (cnext_multiple_of) => {
+        "checked_next_multiple_of"
+    };
+    (cnext_power_of_two) => {
+        "checked_next_power_of_two"
     };
 }
 
-macro_rules! impl_func {
-    (
-        fn_name = $fn_name:ident, impl_fn = $impl_fn:ident, other_type = $other_type:ty,
-        out_type = $out_type:ty, doc = $doc:literal,
-    ) => {
-        #[doc = $doc]
-        fn $fn_name(self, other: $other_type) -> $crate::Result<$out_type> {
-            $impl_fn(self, other)
-        }
+macro_rules! doc_text {
+    (cadd) => {
+        "Checked addition: computes `a + b`, returning an error if overflow occured."
+    };
+    (csub) => {
+        "Checked subtraction:  computes`a - b`, returning an error if overflow occured."
+    };
+    (cneg) => {
+        "Checked negation: computes `-a`, returning an error if overflow occured."
+    };
+    (cmul) => {
+        "Checked multiplication: computes `a * b`, returning an error if overflow occured or if the divisor is zero."
+    };
+    (cdiv) => {
+        "Checked division: computes `a / b`, returning an error if overflow occured or if the divisor is zero."
+    };
+    (cdiv_euclid) => {
+        "Checked euclidian division: computes `a.div_euclid(b)`, returning an error if overflow occured or if the divisor is zero."
+    };
+    (crem) => {
+        "Checked remainder: computes `a % b`, returning an error if overflow occured or if the divisor is zero."
+    };
+    (crem_euclid) => {
+        "Checked euclidian reminder: computes `a.rem_euclid(b)`, returning an error if overflow occured or if the divisor is zero."
+    };
+    (cilog) => {
+        "Checked logarithm: computes <code>log<sub>b</sub> a</code>, returning an error if the number is negative or zero, or if the base is less than 2."
+    };
+    (cilog2) => {
+        "Checked base 2 logarithm: computes `ln a`, returning an error if the number is negative or zero."
+    };
+    (cilog10) => {
+        "Checked base 10 logarithm: computes <code>log<sub>10</sub> a</code>, returning an error if the number is negative or zero."
+    };
+    (cshl) => {
+        "Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type."
+    };
+    (cshr) => {
+        "Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type."
+    };
+    (cpow) => {
+        "Checked exponentiation: computes <code>a<sup>b</sup></code>, returning an error if overflow occured."
+    };
+    (cabs) => {
+        "Checked absolute value: computes `|a|` (signed types only), returning an error if `a == MIN`."
+    };
+    (cisqrt) => {
+        "Checked square root: computes `√a` (signed types only), returning an error if `a` is negative."
+    };
+    (cnext_multiple_of) => {
+        "Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero."
+    };
+    (cnext_power_of_two) => {
+        "Checked next power of 2, returning an error if overflow occured."
     };
 }
 
-macro_rules! declare_extension_trait {
-    ($trait_:ident, $type_:ty, $doc:literal, $(($($func:tt)+),)+) => {
-        #[doc = $doc]
-        pub trait $trait_: Sized {
-            $(
-                declare_func!($($func)+);
-            )+
-        }
-
-        impl $trait_ for $type_ {
-            $(
-                impl_func!($($func)+);
-            )+
-        }
+macro_rules! wrapper_doc_with_link {
+    (($($ty:tt)*), ($($impl_fn:tt)*)) => {
+        concat!(
+            "\n\nWrapper for [`",
+            $($ty)*,
+            "::",
+            impl_fn_literal!($($impl_fn)*),
+            "`]."
+        )
     };
 }
 
-declare_extension_trait!(
-    U8Ext,
-    u8,
-    "Enhanced checked arithmetics functions for `u8`.",
-    (
-        fn_name = cadd,
-        impl_fn = cadd,
-        other_type = u8,
-        out_type = u8,
-        doc = "Checked integer addition. Computes `self + other`, returning `None` if overflow occurred.\n\n\
-        Wrapper for [`u8::checked_add`].",
-    ),
-);
+pub(crate) use {doc_text, impl_fn_literal, wrapper_doc_with_link};
 
 macro_rules! declare_binary_trait {
-    ($trait_:ident, $trait_fn:ident, $common_doc:literal, $fn_doc:literal, $doc_alias:literal) => {
-        #[doc = $common_doc]
+    ($trait_:ident, $trait_fn:ident, $doc_alias:literal) => {
+        #[doc = doc_text!($trait_fn)]
+        // Cannot use `impl_fn_literal!($trait_fn)` here because macros don't expand in this position.
         #[doc(alias = $doc_alias)]
         #[allow(missing_docs)]
         pub trait $trait_<Other = Self>: Sized {
             type Error;
             type Output;
-            #[doc = concat!($common_doc, "\n\n", $fn_doc)]
+            #[doc = concat!(doc_text!($trait_fn), "\n\nWrapper for `", impl_fn_literal!($trait_fn), "`.")]
             fn $trait_fn(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
         }
 
-        #[doc = concat!($common_doc, "\n\n", $fn_doc)]
+        #[doc = concat!(doc_text!($trait_fn), "\n\nWrapper for `", impl_fn_literal!($trait_fn), "`.")]
         #[doc(alias = $doc_alias)]
         #[inline]
         pub fn $trait_fn<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
@@ -172,18 +248,18 @@ macro_rules! declare_binary_trait {
 }
 
 macro_rules! declare_unary_trait {
-    ($trait_:ident, $trait_fn:ident, $common_doc:literal, $fn_doc:literal, $doc_alias:literal) => {
-        #[doc = $common_doc]
+    ($trait_:ident, $trait_fn:ident, $doc_alias:literal) => {
+        #[doc = doc_text!($trait_fn)]
         #[doc(alias = $doc_alias)]
         #[allow(missing_docs)]
         pub trait $trait_: Sized {
             type Error;
             type Output;
-            #[doc = concat!($common_doc, "\n\n", $fn_doc)]
+            #[doc = concat!(doc_text!($trait_fn), "\n\nWrapper for `", impl_fn_literal!($trait_fn), "`.")]
             fn $trait_fn(a: Self) -> Result<Self::Output, Self::Error>;
         }
 
-        #[doc = concat!($common_doc, "\n\n", $fn_doc)]
+        #[doc = concat!(doc_text!($trait_fn), "\n\nWrapper for `", impl_fn_literal!($trait_fn), "`.")]
         #[doc(alias = $doc_alias)]
         #[inline]
         pub fn $trait_fn<T1>(value: T1) -> Result<T1::Output, T1::Error>
@@ -195,130 +271,30 @@ macro_rules! declare_unary_trait {
     };
 }
 
-declare_binary_trait!(
-    Cadd,
-    cadd,
-    "Checked addition: computes `a + b`, returning an error if overflow occured.",
-    "Wrapper for `checked_add`.",
-    "checked_add"
-);
-declare_binary_trait!(
-    Csub,
-    csub,
-    "Checked subtraction:  computes`a - b`, returning an error if overflow occured.",
-    "Wrapper for `checked_sub`.",
-    "checked_sub"
-);
-declare_unary_trait!(
-    Cneg,
-    cneg,
-    "Checked negation: computes `-a`, returning an error if overflow occured.",
-    "Wrapper for `checked_neg`.",
-    "checked_neg"
-);
-declare_binary_trait!(
-    Cmul,
-    cmul,
-    "Checked multiplication: computes `a * b`, returning an error if overflow occured or if the divisor is zero.",
-    "Wrapper for `checked_mul`.",
-    "checked_mul"
-);
-declare_binary_trait!(
-    Cdiv,
-    cdiv,
-    "Checked division: computes `a / b`, returning an error if overflow occured or if the divisor is zero.",
-    "Wrapper for `checked_div`.",
-    "checked_div"
-);
-declare_binary_trait!(
-    CdivEuclid,
-    cdiv_euclid,
-    "Checked euclidian division: computes `a.div_euclid(b)`, returning an error if overflow occured or if the divisor is zero.",
-    "Wrapper for `checked_div_euclid`.",
-    "checked_div_euclid"
-);
-declare_binary_trait!(
-    Crem,
-    crem,
-    "Checked remainder: computes `a % b`, returning an error if overflow occured or if the divisor is zero.",
-    "Wrapper for `checked_rem`.",
-    "checked_rem"
-);
-declare_binary_trait!(
-    CremEuclid,
-    crem_euclid,
-    "Checked euclidian reminder: computes `a.rem_euclid(b)`, returning an error if overflow occured or if the divisor is zero.",
-    "Wrapper for `checked_rem_euclid`.",
-    "checked_rem_euclid"
-);
+declare_binary_trait!(Cadd, cadd, "checked_add");
+declare_binary_trait!(Csub, csub, "checked_sub");
+declare_unary_trait!(Cneg, cneg, "checked_neg");
+declare_binary_trait!(Cmul, cmul, "checked_mul");
+declare_binary_trait!(Cdiv, cdiv, "checked_div");
+declare_binary_trait!(CdivEuclid, cdiv_euclid, "checked_div_euclid");
+declare_binary_trait!(Crem, crem, "checked_rem");
+declare_binary_trait!(CremEuclid, crem_euclid, "checked_rem_euclid");
 
-declare_binary_trait!(
-    CILog,
-    cilog,
-    "Checked logarithm: computes <code>log<sub>b</sub> a</code>, returning an error if the number is negative or zero, or if the base is less than 2.",
-    "Wrapper for `checked_ilog`.",
-    "checked_ilog"
-);
-declare_unary_trait!(
-    CILog2,
-    cilog2,
-    "Checked base 2 logarithm: computes `ln a`, returning an error if the number is negative or zero.",
-    "Wrapper for `checked_ilog2`.",
-    "checked_ilog2"
-);
-declare_unary_trait!(
-    CILog10,
-    cilog10,
-    "Checked base 10 logarithm: computes <code>log<sub>10</sub> a</code>, returning an error if the number is negative or zero.",
-    "Wrapper for `checked_ilog10`.",
-    "checked_ilog10"
-);
-declare_binary_trait!(
-    Cshl,
-    cshl,
-    "Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.",
-    "Wrapper for `checked_shl`.",
-    "checked_shl"
-);
-declare_binary_trait!(
-    Cshr,
-    cshr,
-    "Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.",
-    "Wrapper for `checked_shr`.",
-    "checked_shr"
-);
-declare_binary_trait!(
-    Cpow,
-    cpow,
-    "Checked exponentiation: computes <code>a<sup>b</sup></code>, returning an error if overflow occured.",
-    "Wrapper for `checked_pow`.",
-    "checked_pow"
-);
-declare_unary_trait!(
-    Cabs,
-    cabs,
-    "Checked absolute value: computes `|a|` (signed types only), returning an error if `a == MIN`.",
-    "Wrapper for `checked_abs`.",
-    "checked_abs"
-);
-declare_unary_trait!(
-    Cisqrt,
-    cisqrt,
-    "Checked square root: computes `√a` (signed types only), returning an error if `a` is negative.",
-    "Wrapper for `checked_isqrt`.",
-    "checked_isqrt"
-);
+declare_binary_trait!(CILog, cilog, "checked_ilog");
+declare_unary_trait!(CILog2, cilog2, "checked_ilog2");
+declare_unary_trait!(CILog10, cilog10, "checked_ilog10");
+declare_binary_trait!(Cshl, cshl, "checked_shl");
+declare_binary_trait!(Cshr, cshr, "checked_shr");
+declare_binary_trait!(Cpow, cpow, "checked_pow");
+declare_unary_trait!(Cabs, cabs, "checked_abs");
+declare_unary_trait!(Cisqrt, cisqrt, "checked_isqrt");
 declare_binary_trait!(
     CnextMultipleOf,
     cnext_multiple_of,
-    "Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.",
-    "Wrapper for `checked_next_multiple_of`.",
     "checked_next_multiple_of"
 );
 declare_unary_trait!(
     CnextPowerOfTwo,
     cnext_power_of_two,
-    "Checked next power of 2, returning an error if overflow occured.",
-    "Wrapper for `checked_next_power_of_two`.",
     "checked_next_power_of_two"
 );

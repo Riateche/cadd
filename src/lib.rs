@@ -115,6 +115,7 @@ mod tests;
 
 pub mod convert;
 pub mod ops;
+pub mod ops_ext;
 pub mod prelude;
 
 pub use crate::error::Error;

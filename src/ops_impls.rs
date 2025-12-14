@@ -1,6 +1,7 @@
 #[cfg(feature = "std")]
 use std::time::{Instant, SystemTime};
 use {
+    crate::ops::{doc_text, impl_fn_literal, wrapper_doc_with_link},
     alloc::format,
     core::{num::NonZero, time::Duration},
 };
@@ -10,6 +11,14 @@ macro_rules! impl_binary_op {
         impl $crate::ops::$trait_<$t2> for $t1 {
             type Output = $out;
             type Error = $crate::Error;
+            #[doc = concat!(
+                doc_text!($trait_fn),
+                "\n\nWrapper for [`",
+                stringify!($t1),
+                "::",
+                stringify!($source_fn),
+                "`]."
+            )]
             #[inline]
             fn $trait_fn(a: $t1, b: $t2) -> $crate::Result<$out> {
                 a.$source_fn(b)
@@ -21,6 +30,7 @@ macro_rules! impl_binary_op {
         impl $crate::ops::$trait_<$t2> for $t1 {
             type Output = $out;
             type Error = $crate::Error;
+            #[doc = concat!(doc_text!($trait_fn), "\n\nWrapper for `", stringify!($source_fn), "`.")]
             #[inline]
             fn $trait_fn(a: $t1, b: $t2) -> $crate::Result<$out> {
                 a.$source_fn(b)
