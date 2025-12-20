@@ -1,7 +1,7 @@
 #[cfg(feature = "std")]
 use std::time::{Instant, SystemTime};
 use {
-    crate::ops::{doc_text, impl_fn_literal, wrapper_doc_with_link},
+    crate::ops::doc_text,
     alloc::format,
     core::{num::NonZero, time::Duration},
 };

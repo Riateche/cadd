@@ -39,7 +39,7 @@
 //!
 //! * They return `Result` instead of `Option`, enabling the use of `?` in functions returning `Result`.
 //!   ```
-//!   use cadd::ops::{Cpow, Cdiv, cmul};
+//!   use cadd::{ops::{Cpow, cmul}, ops_ext::U32Ext};
 //!
 //!   fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
 //!       cmul(mass, velocity.cpow(2)?)?.cdiv(2)
@@ -47,7 +47,7 @@
 //!   ```
 //! * The error values they return provide a meaningful error message and a backtrace:
 //!   ```
-//!   # use cadd::ops::{Cpow, Cdiv, cmul};
+//!   # use cadd::{ops::cmul, ops_ext::U32Ext};
 //!   # fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
 //!   #     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
 //!   # }
@@ -62,9 +62,9 @@
 //!   # }
 //!   let err_msg = kinetic_energy(10, 100_000).unwrap_err().to_string();
 //!   if backtrace_enabled() {
-//!       assert!(err_msg.starts_with("overflow: pow(100000, 2)\nstack backtrace:\n"));
+//!       assert!(err_msg.starts_with("failed to compute pow(100000, 2): overflow\nstack backtrace:\n"));
 //!   } else {
-//!       assert_eq!(err_msg, "overflow: pow(100000, 2)");
+//!       assert_eq!(err_msg, "failed to compute pow(100000, 2): overflow");
 //!   }
 //!   ```
 //! * Both method style (`a.cadd(b)`) and function style (`cadd(a, b)`) APIs are available.
@@ -80,7 +80,7 @@
 //!   ```
 //!   Method style may be preferred for better chaining:
 //!   ```
-//!   # use cadd::ops::{Cadd, Cmul, Cdiv};
+//!   # use cadd::ops_ext::U32Ext;
 //!   fn f2(a1: u32, b1: u32, c1: u32, d1: u32) -> cadd::Result<u32> {
 //!       a1.cadd(b1)?
 //!          .cmul(c1)?
@@ -208,19 +208,7 @@ macro_rules! doc_text {
     };
 }
 
-macro_rules! wrapper_doc_with_link {
-    (($($ty:tt)*), ($($impl_fn:tt)*)) => {
-        concat!(
-            "\n\nWrapper for [`",
-            $($ty)*,
-            "::",
-            impl_fn_literal!($($impl_fn)*),
-            "`]."
-        )
-    };
-}
-
-pub(crate) use {doc_text, impl_fn_literal, wrapper_doc_with_link};
+pub(crate) use {doc_text, impl_fn_literal};
 
 macro_rules! declare_binary_trait {
     ($trait_:ident, $trait_fn:ident, $doc_alias:literal) => {

@@ -1,5 +1,5 @@
 use {
-    crate::{prelude::*, Result},
+    crate::{ops_ext::U8Ext, prelude::*, Result},
     alloc::format,
     core::sync::atomic::{AtomicU8, Ordering},
     std::{env, fmt::Debug, string::ToString},
@@ -42,17 +42,17 @@ fn assert_err<T: Debug>(value: Result<T>, expected: &str) {
     }
 }
 
-// #[test]
-// fn test1() {
-//     assert_eq!(2u8.cadd(3u8).unwrap(), 5);
-//     assert_err(200u8.cadd(100u8), "overflow: 200 + 100");
-//     assert_err(
-//         (-5i32).cinto_type::<u32>(),
-//         "cannot convert value -5 from i32 to u32: value is out of bounds",
-//     );
+#[test]
+fn test1() {
+    assert_eq!(2u8.cadd(3u8).unwrap(), 5);
+    assert_err(200u8.cadd(100u8), "failed to compute 200 + 100: overflow");
+    assert_err(
+        (-5i32).cinto_type::<u32>(),
+        "failed to convert value -5 from i32 to u32: value is out of bounds",
+    );
 
-//     let _a = 2u32.to_non_zero().unwrap();
-//     let _b = non_zero(2u32).unwrap();
-//     assert_err(0u32.to_non_zero(), "unexpected zero value");
-//     assert_err(non_zero(0u32), "unexpected zero value");
-// }
+    let _a = 2u32.to_non_zero().unwrap();
+    let _b = non_zero(2u32).unwrap();
+    assert_err(0u32.to_non_zero(), "unexpected zero value");
+    assert_err(non_zero(0u32), "unexpected zero value");
+}

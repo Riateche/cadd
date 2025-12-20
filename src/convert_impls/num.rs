@@ -72,7 +72,7 @@ macro_rules! impl_cfrom_lower_bounded {
                 } else {
                     Err($crate::Error::new(
                         ::alloc::format!(
-                            "cannot convert value {:?} from {} to {}: value is out of bounds",
+                            "failed to convert value {:?} from {} to {}: value is out of bounds",
                             u,
                             ::core::any::type_name::<$source>(),
                             ::core::any::type_name::<$target>(),
@@ -105,7 +105,7 @@ macro_rules! impl_cfrom_upper_bounded {
                 if u > (Self::MAX as $source) {
                     Err($crate::Error::new(
                         ::alloc::format!(
-                            "cannot convert value {:?} from {} to {}: value is out of bounds",
+                            "failed to convert value {:?} from {} to {}: value is out of bounds",
                             u,
                             ::core::any::type_name::<$source>(),
                             ::core::any::type_name::<$target>(),
@@ -142,7 +142,7 @@ macro_rules! impl_cfrom_both_bounded {
                 if u < min || u > max {
                     Err($crate::Error::new(
                         ::alloc::format!(
-                            "cannot convert value {:?} from {} to {}: value is out of bounds",
+                            "failed to convert value {:?} from {} to {}: value is out of bounds",
                             u,
                             ::core::any::type_name::<$source>(),
                             ::core::any::type_name::<$target>(),

@@ -21,7 +21,7 @@ macro_rules! impl_cfrom {
                     ::core::convert::TryFrom::try_from(from)
                         .map_err(|_| $crate::Error::new(
                             ::alloc::format!(
-                                "cannot convert value {:?} from {} to {}: value is out of bounds",
+                                "failed to convert value {:?} from {} to {}: value is out of bounds",
                                 from,
                                 ::core::any::type_name::<$from>(),
                                 ::core::any::type_name::<$to>(),

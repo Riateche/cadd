@@ -77,7 +77,7 @@
 //! #   async fn handle_request(&self) -> anyhow::Result<()> {
 //! #       let price: u32 = 0;
 //! #       let discount_rate: u32 = 0;
-//! use cadd::ops::{csub, Cmul, Cdiv};
+//! use cadd::{ops::csub, ops_ext::U32Ext};
 //!
 //! let amount = csub(
 //!     price,
@@ -103,6 +103,7 @@
 //! function in `cadd`: [`cdiv_euclid`](https://docs.rs/cadd/latest/cadd/ops/fn.cdiv_euclid.html),
 //! [`cilog2`](https://docs.rs/cadd/latest/cadd/ops/fn.cilog2.html), and so on.
 //! See [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html) module documentation for more information.
+
 extern crate alloc;
 #[cfg(any(test, feature = "std"))]
 extern crate std;
@@ -117,6 +118,10 @@ pub mod convert;
 pub mod ops;
 pub mod ops_ext;
 pub mod prelude;
+
+mod private {
+    pub trait Sealed: Sized {}
+}
 
 pub use crate::error::Error;
 
