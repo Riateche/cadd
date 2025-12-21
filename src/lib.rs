@@ -1,5 +1,6 @@
 #![no_std]
 #![warn(missing_docs)]
+
 //! # `cadd`: painless checked arithmetics and conversions
 //!
 //! Features:
@@ -125,6 +126,8 @@ mod private {
 
 pub use crate::error::Error;
 
+use core::{fmt::Debug, num::NonZero};
+
 /// `Result` with error type defaulting to `cadd::Error`.
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
@@ -133,3 +136,76 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 // TODO: Path conversions
 // TODO: ops for non-nan and finite floats (real_float crate?)
 // TODO: readme
+
+struct MaybeParens<T>(T);
+
+impl<T: Debug + IsNegative> Debug for MaybeParens<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        if self.0.is_negative() {
+            write!(f, "({:?})", self.0)
+        } else {
+            write!(f, "{:?}", self.0)
+        }
+    }
+}
+
+trait IsNegative {
+    fn is_negative(&self) -> bool;
+}
+macro_rules! impl_is_negative_false {
+    ($t:ty) => {
+        impl IsNegative for $t {
+            fn is_negative(&self) -> bool {
+                false
+            }
+        }
+    };
+}
+
+macro_rules! impl_is_negative {
+    ($t:ty) => {
+        impl IsNegative for $t {
+            fn is_negative(&self) -> bool {
+                *self < 0
+            }
+        }
+    };
+}
+
+macro_rules! impl_is_negative_non_zero {
+    ($t:ty) => {
+        impl IsNegative for $t {
+            fn is_negative(&self) -> bool {
+                const ONE: $t = <$t>::new(1).unwrap();
+                *self < ONE
+            }
+        }
+    };
+}
+
+impl_is_negative!(i8);
+impl_is_negative!(i16);
+impl_is_negative!(i32);
+impl_is_negative!(i64);
+impl_is_negative!(i128);
+impl_is_negative!(isize);
+impl_is_negative_non_zero!(NonZero<i8>);
+impl_is_negative_non_zero!(NonZero<i16>);
+impl_is_negative_non_zero!(NonZero<i32>);
+impl_is_negative_non_zero!(NonZero<i64>);
+impl_is_negative_non_zero!(NonZero<i128>);
+impl_is_negative_non_zero!(NonZero<isize>);
+
+impl_is_negative_false!(u8);
+impl_is_negative_false!(u16);
+impl_is_negative_false!(u32);
+impl_is_negative_false!(u64);
+impl_is_negative_false!(u128);
+impl_is_negative_false!(usize);
+impl_is_negative_false!(NonZero<u8>);
+impl_is_negative_false!(NonZero<u16>);
+impl_is_negative_false!(NonZero<u32>);
+impl_is_negative_false!(NonZero<u64>);
+impl_is_negative_false!(NonZero<u128>);
+impl_is_negative_false!(NonZero<usize>);
+impl_is_negative_false!(std::time::Duration);
