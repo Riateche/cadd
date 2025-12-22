@@ -62,6 +62,13 @@ fn test_u8_ext() {
     assert_eq!(2_u8.cadd(3).unwrap(), 5);
     assert_err(2_u8.cadd(255), "failed to compute 2 + 255: u8 overflow");
 
+    {
+        let mut a: u8 = 2;
+        a.cadd_assign(3).unwrap();
+        assert_eq!(a, 5);
+        assert_err(a.cadd_assign(255), "failed to compute 5 + 255: u8 overflow");
+    }
+
     assert_eq!(2_u8.cadd_signed(3).unwrap(), 5);
     assert_eq!(2_u8.cadd_signed(-1).unwrap(), 1);
     assert_err(
@@ -75,6 +82,13 @@ fn test_u8_ext() {
 
     assert_eq!(2_u8.csub(1).unwrap(), 1);
     assert_err(2_u8.csub(3), "failed to compute 2 - 3: u8 overflow");
+
+    {
+        let mut a: u8 = 2;
+        a.csub_assign(1).unwrap();
+        assert_eq!(a, 1);
+        assert_err(a.csub_assign(3), "failed to compute 1 - 3: u8 overflow");
+    }
 
     assert_eq!(2_u8.csub_signed(1).unwrap(), 1);
     assert_eq!(2_u8.csub_signed(-1).unwrap(), 3);
@@ -101,9 +115,26 @@ fn test_u8_ext() {
     assert_eq!(2_u8.cmul(3).unwrap(), 6);
     assert_err(2_u8.cmul(150), "failed to compute 2 * 150: u8 overflow");
 
+    {
+        let mut a: u8 = 2;
+        a.cmul_assign(3).unwrap();
+        assert_eq!(a, 6);
+        assert_err(a.cmul_assign(150), "failed to compute 6 * 150: u8 overflow");
+    }
+
     assert_eq!(2_u8.cdiv(3).unwrap(), 0);
     assert_eq!(200_u8.cdiv(10).unwrap(), 20);
     assert_err(2_u8.cdiv(0), "failed to compute 2 / 0: division by zero");
+
+    {
+        let mut a: u8 = 2;
+        a.cdiv_assign(3).unwrap();
+        assert_eq!(a, 0);
+        assert_err(
+            a.cdiv_assign(0),
+            "failed to compute 0 / 0: division by zero",
+        );
+    }
 
     assert_eq!(2_u8.cdiv_euclid(3).unwrap(), 0);
     assert_eq!(200_u8.cdiv_euclid(10).unwrap(), 20);
@@ -115,6 +146,16 @@ fn test_u8_ext() {
     assert_eq!(2_u8.crem(3).unwrap(), 2);
     assert_eq!(200_u8.crem(10).unwrap(), 0);
     assert_err(2_u8.crem(0), "failed to compute 2 % 0: division by zero");
+
+    {
+        let mut a: u8 = 2;
+        a.crem_assign(3).unwrap();
+        assert_eq!(a, 2);
+        assert_err(
+            a.crem_assign(0),
+            "failed to compute 2 % 0: division by zero",
+        );
+    }
 
     assert_eq!(2_u8.crem_euclid(3).unwrap(), 2);
     assert_eq!(200_u8.crem_euclid(10).unwrap(), 0);
@@ -162,6 +203,16 @@ fn test_u8_ext() {
         "failed to compute 3 << 8: shift amount is too large",
     );
 
+    {
+        let mut a: u8 = 3;
+        a.cshl_assign(1).unwrap();
+        assert_eq!(a, 6);
+        assert_err(
+            a.cshl_assign(8),
+            "failed to compute 6 << 8: shift amount is too large",
+        );
+    }
+
     assert_eq!(3_u8.cshr(0).unwrap(), 3);
     assert_eq!(3_u8.cshr(1).unwrap(), 1);
     assert_eq!(3_u8.cshr(7).unwrap(), 0);
@@ -169,6 +220,16 @@ fn test_u8_ext() {
         3_u8.cshr(8),
         "failed to compute 3 >> 8: shift amount is too large",
     );
+
+    {
+        let mut a: u8 = 3;
+        a.cshr_assign(1).unwrap();
+        assert_eq!(a, 1);
+        assert_err(
+            a.cshr_assign(8),
+            "failed to compute 1 >> 8: shift amount is too large",
+        );
+    }
 
     assert_eq!(3_u8.cpow(3).unwrap(), 27);
     assert_err(3_u8.cpow(100), "failed to compute pow(3, 100): u8 overflow");

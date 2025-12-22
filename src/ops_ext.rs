@@ -10,6 +10,10 @@ pub trait NonZeroU8Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u8>::checked_add`]
     fn cadd(self, other: u8) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u8>::checked_add`]
+    fn cadd_assign(&mut self, other: u8) -> Result<()>;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u8>::checked_next_power_of_two`]
@@ -18,6 +22,10 @@ pub trait NonZeroU8Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u8>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u8>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u8>::checked_pow`]
@@ -39,6 +47,15 @@ impl NonZeroU8Ext for NonZero<u8> {
                 "NonZero<u8>"
             ))
         })
+    }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u8>::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: u8) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -68,6 +85,15 @@ impl NonZeroU8Ext for NonZero<u8> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u8>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u8>::checked_pow`]
@@ -88,6 +114,10 @@ pub trait NonZeroU16Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u16>::checked_add`]
     fn cadd(self, other: u16) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u16>::checked_add`]
+    fn cadd_assign(&mut self, other: u16) -> Result<()>;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u16>::checked_next_power_of_two`]
@@ -96,6 +126,10 @@ pub trait NonZeroU16Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u16>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u16>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u16>::checked_pow`]
@@ -117,6 +151,15 @@ impl NonZeroU16Ext for NonZero<u16> {
                 "NonZero<u16>"
             ))
         })
+    }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u16>::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: u16) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -146,6 +189,15 @@ impl NonZeroU16Ext for NonZero<u16> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u16>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u16>::checked_pow`]
@@ -166,6 +218,10 @@ pub trait NonZeroU32Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u32>::checked_add`]
     fn cadd(self, other: u32) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u32>::checked_add`]
+    fn cadd_assign(&mut self, other: u32) -> Result<()>;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u32>::checked_next_power_of_two`]
@@ -174,6 +230,10 @@ pub trait NonZeroU32Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u32>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u32>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u32>::checked_pow`]
@@ -195,6 +255,15 @@ impl NonZeroU32Ext for NonZero<u32> {
                 "NonZero<u32>"
             ))
         })
+    }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u32>::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -224,6 +293,15 @@ impl NonZeroU32Ext for NonZero<u32> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u32>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u32>::checked_pow`]
@@ -244,6 +322,10 @@ pub trait NonZeroU64Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u64>::checked_add`]
     fn cadd(self, other: u64) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u64>::checked_add`]
+    fn cadd_assign(&mut self, other: u64) -> Result<()>;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u64>::checked_next_power_of_two`]
@@ -252,6 +334,10 @@ pub trait NonZeroU64Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u64>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u64>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u64>::checked_pow`]
@@ -273,6 +359,15 @@ impl NonZeroU64Ext for NonZero<u64> {
                 "NonZero<u64>"
             ))
         })
+    }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u64>::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: u64) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -302,6 +397,15 @@ impl NonZeroU64Ext for NonZero<u64> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u64>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u64>::checked_pow`]
@@ -322,6 +426,10 @@ pub trait NonZeroU128Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u128>::checked_add`]
     fn cadd(self, other: u128) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u128>::checked_add`]
+    fn cadd_assign(&mut self, other: u128) -> Result<()>;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u128>::checked_next_power_of_two`]
@@ -330,6 +438,10 @@ pub trait NonZeroU128Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<u128>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u128>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u128>::checked_pow`]
@@ -351,6 +463,15 @@ impl NonZeroU128Ext for NonZero<u128> {
                 "NonZero<u128>"
             ))
         })
+    }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u128>::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: u128) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -380,6 +501,15 @@ impl NonZeroU128Ext for NonZero<u128> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u128>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u128>::checked_pow`]
@@ -400,6 +530,10 @@ pub trait NonZeroUsizeExt: Sealed {
     ///
     ///Wrapper for [`NonZero<usize>::checked_add`]
     fn cadd(self, other: usize) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<usize>::checked_add`]
+    fn cadd_assign(&mut self, other: usize) -> Result<()>;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<usize>::checked_next_power_of_two`]
@@ -408,6 +542,10 @@ pub trait NonZeroUsizeExt: Sealed {
     ///
     ///Wrapper for [`NonZero<usize>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<usize>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<usize>::checked_pow`]
@@ -429,6 +567,15 @@ impl NonZeroUsizeExt for NonZero<usize> {
                 "NonZero<usize>"
             ))
         })
+    }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<usize>::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: usize) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -458,6 +605,15 @@ impl NonZeroUsizeExt for NonZero<usize> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<usize>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<usize>::checked_pow`]
@@ -486,6 +642,10 @@ pub trait NonZeroI8Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<i8>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i8>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i8>::checked_pow`]
@@ -534,6 +694,15 @@ impl NonZeroI8Ext for NonZero<i8> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i8>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i8>::checked_pow`]
@@ -562,6 +731,10 @@ pub trait NonZeroI16Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<i16>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i16>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i16>::checked_pow`]
@@ -610,6 +783,15 @@ impl NonZeroI16Ext for NonZero<i16> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i16>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i16>::checked_pow`]
@@ -638,6 +820,10 @@ pub trait NonZeroI32Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<i32>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i32>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i32>::checked_pow`]
@@ -686,6 +872,15 @@ impl NonZeroI32Ext for NonZero<i32> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i32>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i32>::checked_pow`]
@@ -714,6 +909,10 @@ pub trait NonZeroI64Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<i64>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i64>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i64>::checked_pow`]
@@ -762,6 +961,15 @@ impl NonZeroI64Ext for NonZero<i64> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i64>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i64>::checked_pow`]
@@ -790,6 +998,10 @@ pub trait NonZeroI128Ext: Sealed {
     ///
     ///Wrapper for [`NonZero<i128>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i128>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i128>::checked_pow`]
@@ -838,6 +1050,15 @@ impl NonZeroI128Ext for NonZero<i128> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i128>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i128>::checked_pow`]
@@ -866,6 +1087,10 @@ pub trait NonZeroIsizeExt: Sealed {
     ///
     ///Wrapper for [`NonZero<isize>::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<isize>::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<isize>::checked_pow`]
@@ -914,6 +1139,15 @@ impl NonZeroIsizeExt for NonZero<isize> {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<isize>::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<isize>::checked_pow`]
@@ -934,6 +1168,10 @@ pub trait I8Ext: Sealed {
     ///
     ///Wrapper for [`i8::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_add_unsigned`]
@@ -942,6 +1180,10 @@ pub trait I8Ext: Sealed {
     ///
     ///Wrapper for [`i8::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_sub_unsigned`]
@@ -950,10 +1192,18 @@ pub trait I8Ext: Sealed {
     ///
     ///Wrapper for [`i8::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i8::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_div_euclid`]
@@ -962,6 +1212,10 @@ pub trait I8Ext: Sealed {
     ///
     ///Wrapper for [`i8::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i8::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_rem_euclid`]
@@ -974,10 +1228,18 @@ pub trait I8Ext: Sealed {
     ///
     ///Wrapper for [`i8::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i8::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i8::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i8::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_abs`]
@@ -1020,6 +1282,15 @@ impl I8Ext for i8 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_add_unsigned`]
@@ -1047,6 +1318,15 @@ impl I8Ext for i8 {
                 "i8"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
@@ -1076,6 +1356,15 @@ impl I8Ext for i8 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_div`]
@@ -1100,6 +1389,15 @@ impl I8Ext for i8 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i8::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1147,6 +1445,15 @@ impl I8Ext for i8 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i8::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1197,6 +1504,15 @@ impl I8Ext for i8 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i8::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i8::checked_shr`]
@@ -1210,6 +1526,15 @@ impl I8Ext for i8 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i8::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -1305,6 +1630,10 @@ pub trait I16Ext: Sealed {
     ///
     ///Wrapper for [`i16::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_add_unsigned`]
@@ -1313,6 +1642,10 @@ pub trait I16Ext: Sealed {
     ///
     ///Wrapper for [`i16::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_sub_unsigned`]
@@ -1321,10 +1654,18 @@ pub trait I16Ext: Sealed {
     ///
     ///Wrapper for [`i16::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i16::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_div_euclid`]
@@ -1333,6 +1674,10 @@ pub trait I16Ext: Sealed {
     ///
     ///Wrapper for [`i16::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i16::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_rem_euclid`]
@@ -1345,10 +1690,18 @@ pub trait I16Ext: Sealed {
     ///
     ///Wrapper for [`i16::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i16::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i16::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i16::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_abs`]
@@ -1391,6 +1744,15 @@ impl I16Ext for i16 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_add_unsigned`]
@@ -1418,6 +1780,15 @@ impl I16Ext for i16 {
                 "i16"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
@@ -1447,6 +1818,15 @@ impl I16Ext for i16 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_div`]
@@ -1471,6 +1851,15 @@ impl I16Ext for i16 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i16::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1518,6 +1907,15 @@ impl I16Ext for i16 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i16::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1568,6 +1966,15 @@ impl I16Ext for i16 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i16::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i16::checked_shr`]
@@ -1581,6 +1988,15 @@ impl I16Ext for i16 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i16::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -1676,6 +2092,10 @@ pub trait I32Ext: Sealed {
     ///
     ///Wrapper for [`i32::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_add_unsigned`]
@@ -1684,6 +2104,10 @@ pub trait I32Ext: Sealed {
     ///
     ///Wrapper for [`i32::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_sub_unsigned`]
@@ -1692,10 +2116,18 @@ pub trait I32Ext: Sealed {
     ///
     ///Wrapper for [`i32::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i32::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_div_euclid`]
@@ -1704,6 +2136,10 @@ pub trait I32Ext: Sealed {
     ///
     ///Wrapper for [`i32::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i32::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_rem_euclid`]
@@ -1716,10 +2152,18 @@ pub trait I32Ext: Sealed {
     ///
     ///Wrapper for [`i32::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i32::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i32::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i32::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_abs`]
@@ -1762,6 +2206,15 @@ impl I32Ext for i32 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_add_unsigned`]
@@ -1789,6 +2242,15 @@ impl I32Ext for i32 {
                 "i32"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
@@ -1818,6 +2280,15 @@ impl I32Ext for i32 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_div`]
@@ -1842,6 +2313,15 @@ impl I32Ext for i32 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i32::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1889,6 +2369,15 @@ impl I32Ext for i32 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i32::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1939,6 +2428,15 @@ impl I32Ext for i32 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i32::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i32::checked_shr`]
@@ -1952,6 +2450,15 @@ impl I32Ext for i32 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i32::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -2047,6 +2554,10 @@ pub trait I64Ext: Sealed {
     ///
     ///Wrapper for [`i64::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_add_unsigned`]
@@ -2055,6 +2566,10 @@ pub trait I64Ext: Sealed {
     ///
     ///Wrapper for [`i64::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_sub_unsigned`]
@@ -2063,10 +2578,18 @@ pub trait I64Ext: Sealed {
     ///
     ///Wrapper for [`i64::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i64::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_div_euclid`]
@@ -2075,6 +2598,10 @@ pub trait I64Ext: Sealed {
     ///
     ///Wrapper for [`i64::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i64::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_rem_euclid`]
@@ -2087,10 +2614,18 @@ pub trait I64Ext: Sealed {
     ///
     ///Wrapper for [`i64::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i64::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i64::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i64::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_abs`]
@@ -2133,6 +2668,15 @@ impl I64Ext for i64 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_add_unsigned`]
@@ -2160,6 +2704,15 @@ impl I64Ext for i64 {
                 "i64"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
@@ -2189,6 +2742,15 @@ impl I64Ext for i64 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_div`]
@@ -2213,6 +2775,15 @@ impl I64Ext for i64 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i64::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2260,6 +2831,15 @@ impl I64Ext for i64 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i64::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2310,6 +2890,15 @@ impl I64Ext for i64 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i64::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i64::checked_shr`]
@@ -2323,6 +2912,15 @@ impl I64Ext for i64 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i64::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -2418,6 +3016,10 @@ pub trait I128Ext: Sealed {
     ///
     ///Wrapper for [`i128::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_add_unsigned`]
@@ -2426,6 +3028,10 @@ pub trait I128Ext: Sealed {
     ///
     ///Wrapper for [`i128::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_sub_unsigned`]
@@ -2434,10 +3040,18 @@ pub trait I128Ext: Sealed {
     ///
     ///Wrapper for [`i128::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i128::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_div_euclid`]
@@ -2446,6 +3060,10 @@ pub trait I128Ext: Sealed {
     ///
     ///Wrapper for [`i128::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i128::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_rem_euclid`]
@@ -2458,10 +3076,18 @@ pub trait I128Ext: Sealed {
     ///
     ///Wrapper for [`i128::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i128::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i128::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i128::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_abs`]
@@ -2504,6 +3130,15 @@ impl I128Ext for i128 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_add_unsigned`]
@@ -2531,6 +3166,15 @@ impl I128Ext for i128 {
                 "i128"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
@@ -2560,6 +3204,15 @@ impl I128Ext for i128 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_div`]
@@ -2584,6 +3237,15 @@ impl I128Ext for i128 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i128::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2631,6 +3293,15 @@ impl I128Ext for i128 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i128::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2681,6 +3352,15 @@ impl I128Ext for i128 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i128::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i128::checked_shr`]
@@ -2694,6 +3374,15 @@ impl I128Ext for i128 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i128::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -2789,6 +3478,10 @@ pub trait IsizeExt: Sealed {
     ///
     ///Wrapper for [`isize::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_add_unsigned`]
@@ -2797,6 +3490,10 @@ pub trait IsizeExt: Sealed {
     ///
     ///Wrapper for [`isize::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_sub_unsigned`]
@@ -2805,10 +3502,18 @@ pub trait IsizeExt: Sealed {
     ///
     ///Wrapper for [`isize::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`isize::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_div_euclid`]
@@ -2817,6 +3522,10 @@ pub trait IsizeExt: Sealed {
     ///
     ///Wrapper for [`isize::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`isize::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_rem_euclid`]
@@ -2829,10 +3538,18 @@ pub trait IsizeExt: Sealed {
     ///
     ///Wrapper for [`isize::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`isize::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`isize::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`isize::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_abs`]
@@ -2875,6 +3592,15 @@ impl IsizeExt for isize {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_add_unsigned`]
@@ -2902,6 +3628,15 @@ impl IsizeExt for isize {
                 "isize"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
@@ -2931,6 +3666,15 @@ impl IsizeExt for isize {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_div`]
@@ -2955,6 +3699,15 @@ impl IsizeExt for isize {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`isize::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3002,6 +3755,15 @@ impl IsizeExt for isize {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`isize::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3052,6 +3814,15 @@ impl IsizeExt for isize {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`isize::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`isize::checked_shr`]
@@ -3065,6 +3836,15 @@ impl IsizeExt for isize {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`isize::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -3160,6 +3940,10 @@ pub trait U8Ext: Sealed {
     ///
     ///Wrapper for [`u8::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_add_signed`]
@@ -3168,6 +3952,10 @@ pub trait U8Ext: Sealed {
     ///
     ///Wrapper for [`u8::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_sub_signed`]
@@ -3180,10 +3968,18 @@ pub trait U8Ext: Sealed {
     ///
     ///Wrapper for [`u8::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u8::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_div_euclid`]
@@ -3192,6 +3988,10 @@ pub trait U8Ext: Sealed {
     ///
     ///Wrapper for [`u8::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u8::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_rem_euclid`]
@@ -3216,10 +4016,18 @@ pub trait U8Ext: Sealed {
     ///
     ///Wrapper for [`u8::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u8::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u8::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u8::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_pow`]
@@ -3250,6 +4058,15 @@ impl U8Ext for u8 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_add_signed`]
@@ -3277,6 +4094,15 @@ impl U8Ext for u8 {
                 "u8"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
@@ -3319,6 +4145,15 @@ impl U8Ext for u8 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_div`]
@@ -3343,6 +4178,15 @@ impl U8Ext for u8 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u8::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3390,6 +4234,15 @@ impl U8Ext for u8 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u8::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3488,6 +4341,15 @@ impl U8Ext for u8 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u8::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u8::checked_shr`]
@@ -3501,6 +4363,15 @@ impl U8Ext for u8 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u8::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -3557,6 +4428,10 @@ pub trait U16Ext: Sealed {
     ///
     ///Wrapper for [`u16::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_add_signed`]
@@ -3565,6 +4440,10 @@ pub trait U16Ext: Sealed {
     ///
     ///Wrapper for [`u16::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_sub_signed`]
@@ -3577,10 +4456,18 @@ pub trait U16Ext: Sealed {
     ///
     ///Wrapper for [`u16::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u16::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_div_euclid`]
@@ -3589,6 +4476,10 @@ pub trait U16Ext: Sealed {
     ///
     ///Wrapper for [`u16::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u16::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_rem_euclid`]
@@ -3613,10 +4504,18 @@ pub trait U16Ext: Sealed {
     ///
     ///Wrapper for [`u16::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u16::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u16::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u16::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_pow`]
@@ -3647,6 +4546,15 @@ impl U16Ext for u16 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_add_signed`]
@@ -3674,6 +4582,15 @@ impl U16Ext for u16 {
                 "u16"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
@@ -3716,6 +4633,15 @@ impl U16Ext for u16 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_div`]
@@ -3740,6 +4666,15 @@ impl U16Ext for u16 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u16::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3787,6 +4722,15 @@ impl U16Ext for u16 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u16::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3885,6 +4829,15 @@ impl U16Ext for u16 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u16::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u16::checked_shr`]
@@ -3898,6 +4851,15 @@ impl U16Ext for u16 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u16::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -3954,6 +4916,10 @@ pub trait U32Ext: Sealed {
     ///
     ///Wrapper for [`u32::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_add_signed`]
@@ -3962,6 +4928,10 @@ pub trait U32Ext: Sealed {
     ///
     ///Wrapper for [`u32::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_sub_signed`]
@@ -3974,10 +4944,18 @@ pub trait U32Ext: Sealed {
     ///
     ///Wrapper for [`u32::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u32::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_div_euclid`]
@@ -3986,6 +4964,10 @@ pub trait U32Ext: Sealed {
     ///
     ///Wrapper for [`u32::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u32::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_rem_euclid`]
@@ -4010,10 +4992,18 @@ pub trait U32Ext: Sealed {
     ///
     ///Wrapper for [`u32::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u32::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u32::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u32::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_pow`]
@@ -4044,6 +5034,15 @@ impl U32Ext for u32 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_add_signed`]
@@ -4071,6 +5070,15 @@ impl U32Ext for u32 {
                 "u32"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
@@ -4113,6 +5121,15 @@ impl U32Ext for u32 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_div`]
@@ -4137,6 +5154,15 @@ impl U32Ext for u32 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u32::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4184,6 +5210,15 @@ impl U32Ext for u32 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u32::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4282,6 +5317,15 @@ impl U32Ext for u32 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u32::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u32::checked_shr`]
@@ -4295,6 +5339,15 @@ impl U32Ext for u32 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u32::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -4351,6 +5404,10 @@ pub trait U64Ext: Sealed {
     ///
     ///Wrapper for [`u64::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_add_signed`]
@@ -4359,6 +5416,10 @@ pub trait U64Ext: Sealed {
     ///
     ///Wrapper for [`u64::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_sub_signed`]
@@ -4371,10 +5432,18 @@ pub trait U64Ext: Sealed {
     ///
     ///Wrapper for [`u64::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u64::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_div_euclid`]
@@ -4383,6 +5452,10 @@ pub trait U64Ext: Sealed {
     ///
     ///Wrapper for [`u64::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u64::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_rem_euclid`]
@@ -4407,10 +5480,18 @@ pub trait U64Ext: Sealed {
     ///
     ///Wrapper for [`u64::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u64::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u64::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u64::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_pow`]
@@ -4441,6 +5522,15 @@ impl U64Ext for u64 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_add_signed`]
@@ -4468,6 +5558,15 @@ impl U64Ext for u64 {
                 "u64"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
@@ -4510,6 +5609,15 @@ impl U64Ext for u64 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_div`]
@@ -4534,6 +5642,15 @@ impl U64Ext for u64 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u64::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4581,6 +5698,15 @@ impl U64Ext for u64 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u64::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4679,6 +5805,15 @@ impl U64Ext for u64 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u64::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u64::checked_shr`]
@@ -4692,6 +5827,15 @@ impl U64Ext for u64 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u64::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -4748,6 +5892,10 @@ pub trait U128Ext: Sealed {
     ///
     ///Wrapper for [`u128::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_add_signed`]
@@ -4756,6 +5904,10 @@ pub trait U128Ext: Sealed {
     ///
     ///Wrapper for [`u128::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_sub_signed`]
@@ -4768,10 +5920,18 @@ pub trait U128Ext: Sealed {
     ///
     ///Wrapper for [`u128::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u128::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_div_euclid`]
@@ -4780,6 +5940,10 @@ pub trait U128Ext: Sealed {
     ///
     ///Wrapper for [`u128::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u128::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_rem_euclid`]
@@ -4804,10 +5968,18 @@ pub trait U128Ext: Sealed {
     ///
     ///Wrapper for [`u128::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u128::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u128::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u128::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_pow`]
@@ -4838,6 +6010,15 @@ impl U128Ext for u128 {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_add_signed`]
@@ -4865,6 +6046,15 @@ impl U128Ext for u128 {
                 "u128"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
@@ -4907,6 +6097,15 @@ impl U128Ext for u128 {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_div`]
@@ -4931,6 +6130,15 @@ impl U128Ext for u128 {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u128::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4978,6 +6186,15 @@ impl U128Ext for u128 {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u128::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -5076,6 +6293,15 @@ impl U128Ext for u128 {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u128::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u128::checked_shr`]
@@ -5089,6 +6315,15 @@ impl U128Ext for u128 {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u128::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -5145,6 +6380,10 @@ pub trait UsizeExt: Sealed {
     ///
     ///Wrapper for [`usize::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_add`]
+    fn cadd_assign(&mut self, other: Self) -> Result<()>;
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_add_signed`]
@@ -5153,6 +6392,10 @@ pub trait UsizeExt: Sealed {
     ///
     ///Wrapper for [`usize::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_sub`]
+    fn csub_assign(&mut self, other: Self) -> Result<()>;
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_sub_signed`]
@@ -5165,10 +6408,18 @@ pub trait UsizeExt: Sealed {
     ///
     ///Wrapper for [`usize::checked_mul`]
     fn cmul(self, other: Self) -> Result<Self>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_mul`]
+    fn cmul_assign(&mut self, other: Self) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_div`]
     fn cdiv(self, divisor: Self) -> Result<Self>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`usize::checked_div`]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_div_euclid`]
@@ -5177,6 +6428,10 @@ pub trait UsizeExt: Sealed {
     ///
     ///Wrapper for [`usize::checked_rem`]
     fn crem(self, divisor: Self) -> Result<Self>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`usize::checked_rem`]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()>;
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_rem_euclid`]
@@ -5201,10 +6456,18 @@ pub trait UsizeExt: Sealed {
     ///
     ///Wrapper for [`usize::checked_shl`]
     fn cshl(self, other: u32) -> Result<Self>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`usize::checked_shl`]
+    fn cshl_assign(&mut self, other: u32) -> Result<()>;
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`usize::checked_shr`]
     fn cshr(self, other: u32) -> Result<Self>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`usize::checked_shr`]
+    fn cshr_assign(&mut self, other: u32) -> Result<()>;
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_pow`]
@@ -5235,6 +6498,15 @@ impl UsizeExt for usize {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_add_signed`]
@@ -5262,6 +6534,15 @@ impl UsizeExt for usize {
                 "usize"
             ))
         })
+    }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
     }
     ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
@@ -5304,6 +6585,15 @@ impl UsizeExt for usize {
             ))
         })
     }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: Self) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_div`]
@@ -5328,6 +6618,15 @@ impl UsizeExt for usize {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`usize::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -5375,6 +6674,15 @@ impl UsizeExt for usize {
                 }
             })
         })
+    }
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`usize::checked_rem`]
+    #[inline]
+    #[track_caller]
+    fn crem_assign(&mut self, divisor: Self) -> Result<()> {
+        *self = self.crem(divisor)?;
+        Ok(())
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -5473,6 +6781,15 @@ impl UsizeExt for usize {
             ))
         })
     }
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`usize::checked_shl`]
+    #[inline]
+    #[track_caller]
+    fn cshl_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`usize::checked_shr`]
@@ -5486,6 +6803,15 @@ impl UsizeExt for usize {
                 MaybeParens(other)
             ))
         })
+    }
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`usize::checked_shr`]
+    #[inline]
+    #[track_caller]
+    fn cshr_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -5542,18 +6868,34 @@ pub trait DurationExt: Sealed {
     ///
     ///Wrapper for [`Duration::checked_add`]
     fn cadd(self, other: Duration) -> Result<Duration>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_add`]
+    fn cadd_assign(&mut self, other: Duration) -> Result<()>;
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
     ///Wrapper for [`Duration::checked_sub`]
     fn csub(self, other: Duration) -> Result<Duration>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_sub`]
+    fn csub_assign(&mut self, other: Duration) -> Result<()>;
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
     ///Wrapper for [`Duration::checked_mul`]
     fn cmul(self, other: u32) -> Result<Duration>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_mul`]
+    fn cmul_assign(&mut self, other: u32) -> Result<()>;
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`Duration::checked_div`]
     fn cdiv(self, divisor: u32) -> Result<Duration>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`Duration::checked_div`]
+    fn cdiv_assign(&mut self, divisor: u32) -> Result<()>;
 }
 impl Sealed for Duration {}
 impl DurationExt for Duration {
@@ -5572,6 +6914,15 @@ impl DurationExt for Duration {
             ))
         })
     }
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_add`]
+    #[inline]
+    #[track_caller]
+    fn cadd_assign(&mut self, other: Duration) -> Result<()> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
     ///Wrapper for [`Duration::checked_sub`]
@@ -5587,6 +6938,15 @@ impl DurationExt for Duration {
             ))
         })
     }
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_sub`]
+    #[inline]
+    #[track_caller]
+    fn csub_assign(&mut self, other: Duration) -> Result<()> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
     ///Wrapper for [`Duration::checked_mul`]
@@ -5601,6 +6961,15 @@ impl DurationExt for Duration {
                 "Duration"
             ))
         })
+    }
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_mul`]
+    #[inline]
+    #[track_caller]
+    fn cmul_assign(&mut self, other: u32) -> Result<()> {
+        *self = self.cmul(other)?;
+        Ok(())
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -5626,5 +6995,14 @@ impl DurationExt for Duration {
                 }
             })
         })
+    }
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`Duration::checked_div`]
+    #[inline]
+    #[track_caller]
+    fn cdiv_assign(&mut self, divisor: u32) -> Result<()> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
     }
 }
