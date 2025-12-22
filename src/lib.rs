@@ -111,13 +111,112 @@ extern crate std;
 
 mod convert_impls;
 mod error;
-mod ops_impls;
+
 #[cfg(test)]
 mod tests;
 
 pub mod convert;
+
+/// Checked operations on numbers.
+///
+/// Many operators on integer primitives (`a + b`, `a / b`, etc) and associated functions (`a.pow(b)`, `a.ilog(b)`, etc)
+/// can overflow or fail under certain conditions. With debug assertions enabled (default when building in debug mode),
+/// any such failures will be caught and converted into a panic. With debug assertions disabled
+/// (default when building in release mode), some failures (like division by zero) will still result in a panic,
+/// and overflows will silently return an overflown value, which is often an unexpected and incorrect result.
+/// Therefore, to write the code that returns correct values on every valid input and correctly handles every invalid input,
+/// it's highly recommended to use checked alternatives.
+///
+/// Rust offers great capabilities for checked arithmetics. For every operation that can overflow or otherwise fail,
+/// the standard library contains a function with the `checked_` prefix that returns `Option`. For example:
+/// ```
+/// assert_eq!(300_u32.checked_add(200_u32), Some(500));
+/// assert_eq!(3_000_000_000_u32.checked_add(2_000_000_000_u32), None);
+/// ```
+/// However, writing code that uses checked functions can be quite cumbersome, especially if you use `Result`
+/// throughout the code:
+/// ```
+/// # use std::error::Error;
+/// fn calculate_trajectory(mass: u32, velocity: u32) -> Result<(), Box<dyn Error>> {
+///     let kinetic_energy = velocity
+///         .checked_pow(2)
+///         .and_then(|v| mass.checked_mul(v))
+///         .and_then(|v| v.checked_div(2))
+///         .ok_or_else(|| "mass or velocity too large")?;
+///     //...
+///     Ok(())
+/// }
+/// ```
+/// It can be improved by moving all arithmetics into functions that return `Option` so that you can use `?`
+/// for early returns, but it requires even more restructuring of the code.
+///
+/// This crate offers a set of traits and functions for easy handling of checked arithmetics.
+/// These traits and functions are modelled after the `checked_*` family of functions provided by the standard
+/// library for primitive numeric types, such as [`checked_add`](u32::checked_add),
+/// [`checked_pow`](u32::checked_pow), etc. These traits and functions offer a number of benefits
+/// over the standard library functions:
+///
+/// * They return `Result` instead of `Option`, enabling the use of `?` in functions returning `Result`.
+///   ```
+///   use cadd::{ops::{Cpow, cmul}, ops_ext::U32Ext};
+///
+///   fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
+///       cmul(mass, velocity.cpow(2)?)?.cdiv(2)
+///   }
+///   ```
+/// * The error values they return provide a meaningful error message and a backtrace:
+///   ```
+///   # use cadd::{ops::cmul, ops_ext::U32Ext};
+///   # fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
+///   #     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
+///   # }
+///   # fn backtrace_enabled() -> bool {
+///   #     match std::env::var("RUST_LIB_BACKTRACE") {
+///   #         Ok(s) => s != "0",
+///   #         Err(_) => match std::env::var("RUST_BACKTRACE") {
+///   #             Ok(s) => s != "0",
+///   #             Err(_) => false,
+///   #         },
+///   #     }
+///   # }
+///   let err_msg = kinetic_energy(10, 100_000).unwrap_err().to_string();
+///   if backtrace_enabled() {
+///       assert!(err_msg.starts_with("failed to compute pow(100000, 2): u32 overflow\nstack backtrace:\n"));
+///   } else {
+///       assert_eq!(err_msg, "failed to compute pow(100000, 2): u32 overflow");
+///   }
+///   ```
+/// * Both method style (`a.cadd(b)`) and function style (`cadd(a, b)`) APIs are available.
+///   Free functions can make expressions more readable when there are multiple levels of nesting:
+///   ```
+///   # use cadd::ops::{cadd, cmul};
+///   fn f1(a1: u32, b1: u32, a2: u32, b2: u32) -> cadd::Result<u32> {
+///       cadd(
+///           cmul(a1, b1)?,
+///           cmul(a2, b2)?,
+///       )
+///   }
+///   ```
+///   Method style may be preferred for better chaining:
+///   ```
+///   # use cadd::ops_ext::U32Ext;
+///   fn f2(a1: u32, b1: u32, c1: u32, d1: u32) -> cadd::Result<u32> {
+///       a1.cadd(b1)?
+///          .cmul(c1)?
+///          .cdiv(d1)
+///   }
+///   ```
+/// * Function names are relatively short, so it's easier to keep the code readable.
+///   The names may look a bit cryptic at first, but there is really only one rule to remember:
+///   every function name is just the name of the unchecked alternative ([`add`](std::ops::Add::add),
+///   [`pow`](u32::pow), [`ilog`](u32::ilog), etc) with the "c" suffix that stands for "checked".
+///
+/// See also: [crate level documentation](crate).
 pub mod ops;
-pub mod ops_ext;
+
+/// Extension traits for enhanced checked arithmetics
+pub mod ext;
+
 pub mod prelude;
 
 mod private {

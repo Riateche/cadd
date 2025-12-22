@@ -1,5 +1,5 @@
 use {
-    crate::{ops_ext::U8Ext, prelude::*, Result},
+    crate::{ext::U8Ext, ops::cadd_unsigned, prelude::*, Result},
     alloc::format,
     core::sync::atomic::{AtomicU8, Ordering},
     std::{env, fmt::Debug, string::ToString},
@@ -28,7 +28,7 @@ fn backtrace_enabled() -> bool {
 
 fn _inference1(y: u32) -> crate::Result<i32> {
     let x: i32 = y.cinto()?;
-    cadd(x, y)
+    cadd_unsigned(x, y)
 }
 
 #[track_caller]
