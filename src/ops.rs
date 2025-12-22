@@ -62,9 +62,9 @@
 //!   # }
 //!   let err_msg = kinetic_energy(10, 100_000).unwrap_err().to_string();
 //!   if backtrace_enabled() {
-//!       assert!(err_msg.starts_with("failed to compute pow(100000, 2): overflow\nstack backtrace:\n"));
+//!       assert!(err_msg.starts_with("failed to compute pow(100000, 2): u32 overflow\nstack backtrace:\n"));
 //!   } else {
-//!       assert_eq!(err_msg, "failed to compute pow(100000, 2): overflow");
+//!       assert_eq!(err_msg, "failed to compute pow(100000, 2): u32 overflow");
 //!   }
 //!   ```
 //! * Both method style (`a.cadd(b)`) and function style (`cadd(a, b)`) APIs are available.

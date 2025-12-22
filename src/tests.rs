@@ -45,7 +45,7 @@ fn assert_err<T: Debug>(value: Result<T>, expected: &str) {
 #[test]
 fn test1() {
     assert_eq!(2u8.cadd(3).unwrap(), 5);
-    assert_err(200u8.cadd(100), "failed to compute 200 + 100: overflow");
+    assert_err(200u8.cadd(100), "failed to compute 200 + 100: u8 overflow");
     assert_err(
         (-5i32).cinto_type::<u32>(),
         "failed to convert value -5 from i32 to u32: value is out of bounds",
@@ -60,37 +60,46 @@ fn test1() {
 #[test]
 fn test_u8_ext() {
     assert_eq!(2_u8.cadd(3).unwrap(), 5);
-    assert_err(2_u8.cadd(255), "failed to compute 2 + 255: overflow");
+    assert_err(2_u8.cadd(255), "failed to compute 2 + 255: u8 overflow");
 
     assert_eq!(2_u8.cadd_signed(3).unwrap(), 5);
     assert_eq!(2_u8.cadd_signed(-1).unwrap(), 1);
-    assert_err(254_u8.cadd_signed(4), "failed to compute 254 + 4: overflow");
-    assert_err(2_u8.cadd_signed(-3), "failed to compute 2 + (-3): overflow");
+    assert_err(
+        254_u8.cadd_signed(4),
+        "failed to compute add_signed(254, 4): u8 overflow",
+    );
+    assert_err(
+        2_u8.cadd_signed(-3),
+        "failed to compute add_signed(2, -3): u8 overflow",
+    );
 
     assert_eq!(2_u8.csub(1).unwrap(), 1);
-    assert_err(2_u8.csub(3), "failed to compute 2 - 3: overflow");
+    assert_err(2_u8.csub(3), "failed to compute 2 - 3: u8 overflow");
 
     assert_eq!(2_u8.csub_signed(1).unwrap(), 1);
     assert_eq!(2_u8.csub_signed(-1).unwrap(), 3);
-    assert_err(2_u8.csub_signed(3), "failed to compute 2 - 3: overflow");
+    assert_err(
+        2_u8.csub_signed(3),
+        "failed to compute sub_signed(2, 3): u8 overflow",
+    );
     assert_err(
         254_u8.csub_signed(-3),
-        "failed to compute 254 - (-3): overflow",
+        "failed to compute sub_signed(254, -3): u8 overflow",
     );
 
     assert_eq!(2_u8.csigned_diff(1).unwrap(), 1);
     assert_eq!(2_u8.csigned_diff(3).unwrap(), -1);
     assert_err(
         2_u8.csigned_diff(200),
-        "failed to compute 2 - 200: overflow",
+        "failed to compute signed_diff(2, 200): i8 overflow",
     );
     assert_err(
         254_u8.csigned_diff(1),
-        "failed to compute 254 - 1: overflow",
+        "failed to compute signed_diff(254, 1): i8 overflow",
     );
 
     assert_eq!(2_u8.cmul(3).unwrap(), 6);
-    assert_err(2_u8.cmul(150), "failed to compute 2 * 150: overflow");
+    assert_err(2_u8.cmul(150), "failed to compute 2 * 150: u8 overflow");
 
     assert_eq!(2_u8.cdiv(3).unwrap(), 0);
     assert_eq!(200_u8.cdiv(10).unwrap(), 20);
@@ -142,7 +151,7 @@ fn test_u8_ext() {
     );
 
     assert_eq!(0_u8.cneg().unwrap(), 0);
-    assert_err(1_u8.cneg(), "failed to compute -(1): overflow");
+    assert_err(1_u8.cneg(), "failed to compute -(1): u8 overflow");
 
     assert_eq!(3_u8.cshl(0).unwrap(), 3);
     assert_eq!(3_u8.cshl(1).unwrap(), 6);
@@ -162,12 +171,12 @@ fn test_u8_ext() {
     );
 
     assert_eq!(3_u8.cpow(3).unwrap(), 27);
-    assert_err(3_u8.cpow(100), "failed to compute pow(3, 100): overflow");
+    assert_err(3_u8.cpow(100), "failed to compute pow(3, 100): u8 overflow");
 
     assert_eq!(3_u8.cnext_multiple_of(16).unwrap(), 16);
     assert_err(
         129_u8.cnext_multiple_of(128),
-        "failed to compute next_multiple_of(129, 128): overflow",
+        "failed to compute next_multiple_of(129, 128): u8 overflow",
     );
     assert_err(
         129_u8.cnext_multiple_of(0),
@@ -177,6 +186,6 @@ fn test_u8_ext() {
     assert_eq!(3_u8.cnext_power_of_two().unwrap(), 4);
     assert_err(
         129_u8.cnext_power_of_two(),
-        "failed to compute next_power_of_two(129): overflow",
+        "failed to compute next_power_of_two(129): u8 overflow",
     );
 }

@@ -1,8 +1,8 @@
 //!Extension traits for enhanced checked arithmetics
 use {
-    crate::{Error, Result, MaybeParens, private::Sealed},
-    core::{num::NonZero, time::Duration},
+    crate::{private::Sealed, Error, MaybeParens, Result},
     alloc::format,
+    core::{num::NonZero, time::Duration},
 };
 ///Enhanced checked arithmetics functions for [`NonZero<u8>`]
 pub trait NonZeroU8Ext: Sealed {
@@ -31,12 +31,14 @@ impl NonZeroU8Ext for NonZero<u8> {
     #[inline]
     #[track_caller]
     fn cadd(self, other: u8) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u8>"
             ))
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -44,10 +46,12 @@ impl NonZeroU8Ext for NonZero<u8> {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "NonZero<u8>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -55,12 +59,14 @@ impl NonZeroU8Ext for NonZero<u8> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u8>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -68,10 +74,12 @@ impl NonZeroU8Ext for NonZero<u8> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<u8>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<u16>`]
@@ -101,12 +109,14 @@ impl NonZeroU16Ext for NonZero<u16> {
     #[inline]
     #[track_caller]
     fn cadd(self, other: u16) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u16>"
             ))
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -114,10 +124,12 @@ impl NonZeroU16Ext for NonZero<u16> {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "NonZero<u16>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -125,12 +137,14 @@ impl NonZeroU16Ext for NonZero<u16> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u16>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -138,10 +152,12 @@ impl NonZeroU16Ext for NonZero<u16> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<u16>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<u32>`]
@@ -171,12 +187,14 @@ impl NonZeroU32Ext for NonZero<u32> {
     #[inline]
     #[track_caller]
     fn cadd(self, other: u32) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u32>"
             ))
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -184,10 +202,12 @@ impl NonZeroU32Ext for NonZero<u32> {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "NonZero<u32>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -195,12 +215,14 @@ impl NonZeroU32Ext for NonZero<u32> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u32>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -208,10 +230,12 @@ impl NonZeroU32Ext for NonZero<u32> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<u32>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<u64>`]
@@ -241,12 +265,14 @@ impl NonZeroU64Ext for NonZero<u64> {
     #[inline]
     #[track_caller]
     fn cadd(self, other: u64) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u64>"
             ))
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -254,10 +280,12 @@ impl NonZeroU64Ext for NonZero<u64> {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "NonZero<u64>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -265,12 +293,14 @@ impl NonZeroU64Ext for NonZero<u64> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u64>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -278,10 +308,12 @@ impl NonZeroU64Ext for NonZero<u64> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<u64>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<u128>`]
@@ -311,12 +343,14 @@ impl NonZeroU128Ext for NonZero<u128> {
     #[inline]
     #[track_caller]
     fn cadd(self, other: u128) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u128>"
             ))
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -324,10 +358,12 @@ impl NonZeroU128Ext for NonZero<u128> {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "NonZero<u128>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -335,12 +371,14 @@ impl NonZeroU128Ext for NonZero<u128> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<u128>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -348,10 +386,12 @@ impl NonZeroU128Ext for NonZero<u128> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<u128>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<usize>`]
@@ -381,12 +421,14 @@ impl NonZeroUsizeExt for NonZero<usize> {
     #[inline]
     #[track_caller]
     fn cadd(self, other: usize) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<usize>"
             ))
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -394,10 +436,12 @@ impl NonZeroUsizeExt for NonZero<usize> {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "NonZero<usize>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -405,12 +449,14 @@ impl NonZeroUsizeExt for NonZero<usize> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<usize>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -418,10 +464,12 @@ impl NonZeroUsizeExt for NonZero<usize> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<usize>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<i8>`]
@@ -451,10 +499,12 @@ impl NonZeroI8Ext for NonZero<i8> {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "NonZero<i8>"
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -462,10 +512,12 @@ impl NonZeroI8Ext for NonZero<i8> {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "NonZero<i8>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -473,12 +525,14 @@ impl NonZeroI8Ext for NonZero<i8> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<i8>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -486,10 +540,12 @@ impl NonZeroI8Ext for NonZero<i8> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<i8>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<i16>`]
@@ -519,10 +575,12 @@ impl NonZeroI16Ext for NonZero<i16> {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "NonZero<i16>"
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -530,10 +588,12 @@ impl NonZeroI16Ext for NonZero<i16> {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "NonZero<i16>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -541,12 +601,14 @@ impl NonZeroI16Ext for NonZero<i16> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<i16>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -554,10 +616,12 @@ impl NonZeroI16Ext for NonZero<i16> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<i16>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<i32>`]
@@ -587,10 +651,12 @@ impl NonZeroI32Ext for NonZero<i32> {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "NonZero<i32>"
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -598,10 +664,12 @@ impl NonZeroI32Ext for NonZero<i32> {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "NonZero<i32>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -609,12 +677,14 @@ impl NonZeroI32Ext for NonZero<i32> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<i32>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -622,10 +692,12 @@ impl NonZeroI32Ext for NonZero<i32> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<i32>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<i64>`]
@@ -655,10 +727,12 @@ impl NonZeroI64Ext for NonZero<i64> {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "NonZero<i64>"
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -666,10 +740,12 @@ impl NonZeroI64Ext for NonZero<i64> {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "NonZero<i64>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -677,12 +753,14 @@ impl NonZeroI64Ext for NonZero<i64> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<i64>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -690,10 +768,12 @@ impl NonZeroI64Ext for NonZero<i64> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<i64>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<i128>`]
@@ -723,10 +803,12 @@ impl NonZeroI128Ext for NonZero<i128> {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "NonZero<i128>"
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -734,10 +816,12 @@ impl NonZeroI128Ext for NonZero<i128> {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "NonZero<i128>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -745,12 +829,14 @@ impl NonZeroI128Ext for NonZero<i128> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<i128>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -758,10 +844,12 @@ impl NonZeroI128Ext for NonZero<i128> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<i128>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`NonZero<isize>`]
@@ -791,10 +879,12 @@ impl NonZeroIsizeExt for NonZero<isize> {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "NonZero<isize>"
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -802,10 +892,12 @@ impl NonZeroIsizeExt for NonZero<isize> {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "NonZero<isize>"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -813,12 +905,14 @@ impl NonZeroIsizeExt for NonZero<isize> {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "NonZero<isize>"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -826,10 +920,12 @@ impl NonZeroIsizeExt for NonZero<isize> {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "NonZero<isize>"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`i8`]
@@ -838,7 +934,7 @@ pub trait I8Ext: Sealed {
     ///
     ///Wrapper for [`i8::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_add_unsigned`]
     fn cadd_unsigned(self, other: u8) -> Result<Self>;
@@ -846,7 +942,7 @@ pub trait I8Ext: Sealed {
     ///
     ///Wrapper for [`i8::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_sub_unsigned`]
     fn csub_unsigned(self, other: u8) -> Result<Self>;
@@ -915,25 +1011,27 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i8"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_add_unsigned`]
     #[inline]
     #[track_caller]
     fn cadd_unsigned(self, other: u8) -> Result<Self> {
-        self.checked_add_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i8"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -941,25 +1039,27 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i8"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_sub_unsigned`]
     #[inline]
     #[track_caller]
     fn csub_unsigned(self, other: u8) -> Result<Self> {
-        self.checked_sub_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i8"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -967,12 +1067,14 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i8"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -980,20 +1082,24 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1001,8 +1107,8 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -1010,11 +1116,12 @@ impl I8Ext for i8 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1022,20 +1129,24 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1043,8 +1154,8 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -1052,11 +1163,12 @@ impl I8Ext for i8 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -1064,10 +1176,12 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "i8"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -1075,13 +1189,13 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -1089,13 +1203,13 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -1103,10 +1217,12 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "i8"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -1114,10 +1230,12 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "i8"
             ))
+        })
     }
     ///Checked square root: computes `√self`, returning an error if `self` is negative.
     ///
@@ -1125,10 +1243,12 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cisqrt(self) -> Result<Self> {
-        self.checked_isqrt()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute isqrt({:?}): argument is negative", self),
+        self.checked_isqrt().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute isqrt({:?}): argument is negative",
+                self
             ))
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -1136,12 +1256,12 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -1149,7 +1269,8 @@ impl I8Ext for i8 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -1157,10 +1278,12 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -1168,10 +1291,12 @@ impl I8Ext for i8 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`i16`]
@@ -1180,7 +1305,7 @@ pub trait I16Ext: Sealed {
     ///
     ///Wrapper for [`i16::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_add_unsigned`]
     fn cadd_unsigned(self, other: u16) -> Result<Self>;
@@ -1188,7 +1313,7 @@ pub trait I16Ext: Sealed {
     ///
     ///Wrapper for [`i16::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_sub_unsigned`]
     fn csub_unsigned(self, other: u16) -> Result<Self>;
@@ -1257,25 +1382,27 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i16"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_add_unsigned`]
     #[inline]
     #[track_caller]
     fn cadd_unsigned(self, other: u16) -> Result<Self> {
-        self.checked_add_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i16"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -1283,25 +1410,27 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i16"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_sub_unsigned`]
     #[inline]
     #[track_caller]
     fn csub_unsigned(self, other: u16) -> Result<Self> {
-        self.checked_sub_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i16"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -1309,12 +1438,14 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i16"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1322,20 +1453,24 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1343,8 +1478,8 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -1352,11 +1487,12 @@ impl I16Ext for i16 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1364,20 +1500,24 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1385,8 +1525,8 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -1394,11 +1534,12 @@ impl I16Ext for i16 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -1406,10 +1547,12 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "i16"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -1417,13 +1560,13 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -1431,13 +1574,13 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -1445,10 +1588,12 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "i16"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -1456,10 +1601,12 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "i16"
             ))
+        })
     }
     ///Checked square root: computes `√self`, returning an error if `self` is negative.
     ///
@@ -1467,10 +1614,12 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cisqrt(self) -> Result<Self> {
-        self.checked_isqrt()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute isqrt({:?}): argument is negative", self),
+        self.checked_isqrt().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute isqrt({:?}): argument is negative",
+                self
             ))
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -1478,12 +1627,12 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -1491,7 +1640,8 @@ impl I16Ext for i16 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -1499,10 +1649,12 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -1510,10 +1662,12 @@ impl I16Ext for i16 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`i32`]
@@ -1522,7 +1676,7 @@ pub trait I32Ext: Sealed {
     ///
     ///Wrapper for [`i32::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_add_unsigned`]
     fn cadd_unsigned(self, other: u32) -> Result<Self>;
@@ -1530,7 +1684,7 @@ pub trait I32Ext: Sealed {
     ///
     ///Wrapper for [`i32::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_sub_unsigned`]
     fn csub_unsigned(self, other: u32) -> Result<Self>;
@@ -1599,25 +1753,27 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i32"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_add_unsigned`]
     #[inline]
     #[track_caller]
     fn cadd_unsigned(self, other: u32) -> Result<Self> {
-        self.checked_add_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i32"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -1625,25 +1781,27 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i32"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_sub_unsigned`]
     #[inline]
     #[track_caller]
     fn csub_unsigned(self, other: u32) -> Result<Self> {
-        self.checked_sub_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i32"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -1651,12 +1809,14 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i32"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1664,20 +1824,24 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1685,8 +1849,8 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -1694,11 +1858,12 @@ impl I32Ext for i32 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1706,20 +1871,24 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -1727,8 +1896,8 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -1736,11 +1905,12 @@ impl I32Ext for i32 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -1748,10 +1918,12 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "i32"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -1759,13 +1931,13 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -1773,13 +1945,13 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -1787,10 +1959,12 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "i32"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -1798,10 +1972,12 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "i32"
             ))
+        })
     }
     ///Checked square root: computes `√self`, returning an error if `self` is negative.
     ///
@@ -1809,10 +1985,12 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cisqrt(self) -> Result<Self> {
-        self.checked_isqrt()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute isqrt({:?}): argument is negative", self),
+        self.checked_isqrt().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute isqrt({:?}): argument is negative",
+                self
             ))
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -1820,12 +1998,12 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -1833,7 +2011,8 @@ impl I32Ext for i32 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -1841,10 +2020,12 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -1852,10 +2033,12 @@ impl I32Ext for i32 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`i64`]
@@ -1864,7 +2047,7 @@ pub trait I64Ext: Sealed {
     ///
     ///Wrapper for [`i64::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_add_unsigned`]
     fn cadd_unsigned(self, other: u64) -> Result<Self>;
@@ -1872,7 +2055,7 @@ pub trait I64Ext: Sealed {
     ///
     ///Wrapper for [`i64::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_sub_unsigned`]
     fn csub_unsigned(self, other: u64) -> Result<Self>;
@@ -1941,25 +2124,27 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i64"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_add_unsigned`]
     #[inline]
     #[track_caller]
     fn cadd_unsigned(self, other: u64) -> Result<Self> {
-        self.checked_add_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i64"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -1967,25 +2152,27 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i64"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_sub_unsigned`]
     #[inline]
     #[track_caller]
     fn csub_unsigned(self, other: u64) -> Result<Self> {
-        self.checked_sub_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i64"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -1993,12 +2180,14 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i64"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2006,20 +2195,24 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2027,8 +2220,8 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -2036,11 +2229,12 @@ impl I64Ext for i64 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2048,20 +2242,24 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2069,8 +2267,8 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -2078,11 +2276,12 @@ impl I64Ext for i64 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -2090,10 +2289,12 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "i64"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -2101,13 +2302,13 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -2115,13 +2316,13 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -2129,10 +2330,12 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "i64"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -2140,10 +2343,12 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "i64"
             ))
+        })
     }
     ///Checked square root: computes `√self`, returning an error if `self` is negative.
     ///
@@ -2151,10 +2356,12 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cisqrt(self) -> Result<Self> {
-        self.checked_isqrt()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute isqrt({:?}): argument is negative", self),
+        self.checked_isqrt().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute isqrt({:?}): argument is negative",
+                self
             ))
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -2162,12 +2369,12 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -2175,7 +2382,8 @@ impl I64Ext for i64 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -2183,10 +2391,12 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -2194,10 +2404,12 @@ impl I64Ext for i64 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`i128`]
@@ -2206,7 +2418,7 @@ pub trait I128Ext: Sealed {
     ///
     ///Wrapper for [`i128::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_add_unsigned`]
     fn cadd_unsigned(self, other: u128) -> Result<Self>;
@@ -2214,7 +2426,7 @@ pub trait I128Ext: Sealed {
     ///
     ///Wrapper for [`i128::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_sub_unsigned`]
     fn csub_unsigned(self, other: u128) -> Result<Self>;
@@ -2283,25 +2495,27 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i128"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_add_unsigned`]
     #[inline]
     #[track_caller]
     fn cadd_unsigned(self, other: u128) -> Result<Self> {
-        self.checked_add_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i128"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -2309,25 +2523,27 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i128"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_sub_unsigned`]
     #[inline]
     #[track_caller]
     fn csub_unsigned(self, other: u128) -> Result<Self> {
-        self.checked_sub_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
+                self, other, "i128"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -2335,12 +2551,14 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "i128"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2348,20 +2566,24 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2369,8 +2591,8 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -2378,11 +2600,12 @@ impl I128Ext for i128 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2390,20 +2613,24 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "i128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2411,8 +2638,8 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -2420,11 +2647,12 @@ impl I128Ext for i128 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "i128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -2432,10 +2660,12 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "i128"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -2443,13 +2673,13 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -2457,13 +2687,13 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -2471,10 +2701,12 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "i128"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -2482,10 +2714,12 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "i128"
             ))
+        })
     }
     ///Checked square root: computes `√self`, returning an error if `self` is negative.
     ///
@@ -2493,10 +2727,12 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cisqrt(self) -> Result<Self> {
-        self.checked_isqrt()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute isqrt({:?}): argument is negative", self),
+        self.checked_isqrt().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute isqrt({:?}): argument is negative",
+                self
             ))
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -2504,12 +2740,12 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -2517,7 +2753,8 @@ impl I128Ext for i128 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -2525,10 +2762,12 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -2536,10 +2775,12 @@ impl I128Ext for i128 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`isize`]
@@ -2548,7 +2789,7 @@ pub trait IsizeExt: Sealed {
     ///
     ///Wrapper for [`isize::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_add_unsigned`]
     fn cadd_unsigned(self, other: usize) -> Result<Self>;
@@ -2556,7 +2797,7 @@ pub trait IsizeExt: Sealed {
     ///
     ///Wrapper for [`isize::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_sub_unsigned`]
     fn csub_unsigned(self, other: usize) -> Result<Self>;
@@ -2625,25 +2866,27 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "isize"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_add_unsigned`]
     #[inline]
     #[track_caller]
     fn cadd_unsigned(self, other: usize) -> Result<Self> {
-        self.checked_add_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_unsigned({:?}, {:?}): {} overflow",
+                self, other, "isize"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -2651,25 +2894,27 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "isize"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_unsigned(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_sub_unsigned`]
     #[inline]
     #[track_caller]
     fn csub_unsigned(self, other: usize) -> Result<Self> {
-        self.checked_sub_unsigned(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_unsigned(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
+                self, other, "isize"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -2677,12 +2922,14 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "isize"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2690,20 +2937,24 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "isize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2711,8 +2962,8 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -2720,11 +2971,12 @@ impl IsizeExt for isize {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "isize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2732,20 +2984,24 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "isize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -2753,8 +3009,8 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -2762,11 +3018,12 @@ impl IsizeExt for isize {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "isize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -2774,10 +3031,12 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "isize"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -2785,13 +3044,13 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -2799,13 +3058,13 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked absolute value: computes `|self|`, returning an error if overflow occured.
     ///
@@ -2813,10 +3072,12 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cabs(self) -> Result<Self> {
-        self.checked_abs()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute abs({:?}): overflow", self),
+        self.checked_abs().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute abs({:?}): {} overflow",
+                self, "isize"
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -2824,10 +3085,12 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "isize"
             ))
+        })
     }
     ///Checked square root: computes `√self`, returning an error if `self` is negative.
     ///
@@ -2835,10 +3098,12 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cisqrt(self) -> Result<Self> {
-        self.checked_isqrt()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute isqrt({:?}): argument is negative", self),
+        self.checked_isqrt().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute isqrt({:?}): argument is negative",
+                self
             ))
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -2846,12 +3111,12 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -2859,7 +3124,8 @@ impl IsizeExt for isize {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -2867,10 +3133,12 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -2878,10 +3146,12 @@ impl IsizeExt for isize {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`u8`]
@@ -2890,7 +3160,7 @@ pub trait U8Ext: Sealed {
     ///
     ///Wrapper for [`u8::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_add_signed`]
     fn cadd_signed(self, other: i8) -> Result<Self>;
@@ -2898,11 +3168,11 @@ pub trait U8Ext: Sealed {
     ///
     ///Wrapper for [`u8::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_sub_signed`]
     fn csub_signed(self, other: i8) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_signed_diff`]
     fn csigned_diff(self, other: Self) -> Result<i8>;
@@ -2971,25 +3241,27 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u8"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_add_signed`]
     #[inline]
     #[track_caller]
     fn cadd_signed(self, other: i8) -> Result<Self> {
-        self.checked_add_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_signed({:?}, {:?}): {} overflow",
+                self, other, "u8"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -2997,38 +3269,40 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u8"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_sub_signed`]
     #[inline]
     #[track_caller]
     fn csub_signed(self, other: i8) -> Result<Self> {
-        self.checked_sub_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_signed({:?}, {:?}): {} overflow",
+                self, other, "u8"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_signed_diff`]
     #[inline]
     #[track_caller]
     fn csigned_diff(self, other: Self) -> Result<i8> {
-        self.checked_signed_diff(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_signed_diff(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute signed_diff({:?}, {:?}): {} overflow",
+                self, other, "i8"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -3036,12 +3310,14 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u8"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3049,20 +3325,24 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3070,8 +3350,8 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -3079,11 +3359,12 @@ impl U8Ext for u8 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3091,20 +3372,24 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3112,8 +3397,8 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -3121,11 +3406,12 @@ impl U8Ext for u8 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -3133,12 +3419,12 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -3146,7 +3432,8 @@ impl U8Ext for u8 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -3154,10 +3441,12 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -3165,10 +3454,12 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -3176,10 +3467,12 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "u8"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -3187,13 +3480,13 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -3201,13 +3494,13 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -3215,10 +3508,12 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "u8"
             ))
+        })
     }
     ///Checked next multiple of `other`, returning an error if overflow occured or if `other` is zero.
     ///
@@ -3226,8 +3521,8 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cnext_multiple_of(self, other: Self) -> Result<Self> {
-        self.checked_next_multiple_of(other)
-            .ok_or_else(|| Error::new({
+        self.checked_next_multiple_of(other).ok_or_else(|| {
+            Error::new({
                 if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
@@ -3235,11 +3530,12 @@ impl U8Ext for u8 {
                     )
                 } else {
                     format!(
-                        "failed to compute next_multiple_of({:?}, {:?}): overflow", self,
-                        other
+                        "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
+                        self, other, "u8"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -3247,10 +3543,12 @@ impl U8Ext for u8 {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "u8"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`u16`]
@@ -3259,7 +3557,7 @@ pub trait U16Ext: Sealed {
     ///
     ///Wrapper for [`u16::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_add_signed`]
     fn cadd_signed(self, other: i16) -> Result<Self>;
@@ -3267,11 +3565,11 @@ pub trait U16Ext: Sealed {
     ///
     ///Wrapper for [`u16::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_sub_signed`]
     fn csub_signed(self, other: i16) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_signed_diff`]
     fn csigned_diff(self, other: Self) -> Result<i16>;
@@ -3340,25 +3638,27 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u16"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_add_signed`]
     #[inline]
     #[track_caller]
     fn cadd_signed(self, other: i16) -> Result<Self> {
-        self.checked_add_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_signed({:?}, {:?}): {} overflow",
+                self, other, "u16"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -3366,38 +3666,40 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u16"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_sub_signed`]
     #[inline]
     #[track_caller]
     fn csub_signed(self, other: i16) -> Result<Self> {
-        self.checked_sub_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_signed({:?}, {:?}): {} overflow",
+                self, other, "u16"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_signed_diff`]
     #[inline]
     #[track_caller]
     fn csigned_diff(self, other: Self) -> Result<i16> {
-        self.checked_signed_diff(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_signed_diff(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute signed_diff({:?}, {:?}): {} overflow",
+                self, other, "i16"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -3405,12 +3707,14 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u16"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3418,20 +3722,24 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3439,8 +3747,8 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -3448,11 +3756,12 @@ impl U16Ext for u16 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3460,20 +3769,24 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3481,8 +3794,8 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -3490,11 +3803,12 @@ impl U16Ext for u16 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -3502,12 +3816,12 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -3515,7 +3829,8 @@ impl U16Ext for u16 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -3523,10 +3838,12 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -3534,10 +3851,12 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -3545,10 +3864,12 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "u16"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -3556,13 +3877,13 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -3570,13 +3891,13 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -3584,10 +3905,12 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "u16"
             ))
+        })
     }
     ///Checked next multiple of `other`, returning an error if overflow occured or if `other` is zero.
     ///
@@ -3595,8 +3918,8 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cnext_multiple_of(self, other: Self) -> Result<Self> {
-        self.checked_next_multiple_of(other)
-            .ok_or_else(|| Error::new({
+        self.checked_next_multiple_of(other).ok_or_else(|| {
+            Error::new({
                 if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
@@ -3604,11 +3927,12 @@ impl U16Ext for u16 {
                     )
                 } else {
                     format!(
-                        "failed to compute next_multiple_of({:?}, {:?}): overflow", self,
-                        other
+                        "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
+                        self, other, "u16"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -3616,10 +3940,12 @@ impl U16Ext for u16 {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "u16"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`u32`]
@@ -3628,7 +3954,7 @@ pub trait U32Ext: Sealed {
     ///
     ///Wrapper for [`u32::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_add_signed`]
     fn cadd_signed(self, other: i32) -> Result<Self>;
@@ -3636,11 +3962,11 @@ pub trait U32Ext: Sealed {
     ///
     ///Wrapper for [`u32::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_sub_signed`]
     fn csub_signed(self, other: i32) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_signed_diff`]
     fn csigned_diff(self, other: Self) -> Result<i32>;
@@ -3709,25 +4035,27 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u32"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_add_signed`]
     #[inline]
     #[track_caller]
     fn cadd_signed(self, other: i32) -> Result<Self> {
-        self.checked_add_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_signed({:?}, {:?}): {} overflow",
+                self, other, "u32"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -3735,38 +4063,40 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u32"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_sub_signed`]
     #[inline]
     #[track_caller]
     fn csub_signed(self, other: i32) -> Result<Self> {
-        self.checked_sub_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_signed({:?}, {:?}): {} overflow",
+                self, other, "u32"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_signed_diff`]
     #[inline]
     #[track_caller]
     fn csigned_diff(self, other: Self) -> Result<i32> {
-        self.checked_signed_diff(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_signed_diff(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute signed_diff({:?}, {:?}): {} overflow",
+                self, other, "i32"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -3774,12 +4104,14 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u32"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3787,20 +4119,24 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3808,8 +4144,8 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -3817,11 +4153,12 @@ impl U32Ext for u32 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3829,20 +4166,24 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -3850,8 +4191,8 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -3859,11 +4200,12 @@ impl U32Ext for u32 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -3871,12 +4213,12 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -3884,7 +4226,8 @@ impl U32Ext for u32 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -3892,10 +4235,12 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -3903,10 +4248,12 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -3914,10 +4261,12 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "u32"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -3925,13 +4274,13 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -3939,13 +4288,13 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -3953,10 +4302,12 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "u32"
             ))
+        })
     }
     ///Checked next multiple of `other`, returning an error if overflow occured or if `other` is zero.
     ///
@@ -3964,8 +4315,8 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cnext_multiple_of(self, other: Self) -> Result<Self> {
-        self.checked_next_multiple_of(other)
-            .ok_or_else(|| Error::new({
+        self.checked_next_multiple_of(other).ok_or_else(|| {
+            Error::new({
                 if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
@@ -3973,11 +4324,12 @@ impl U32Ext for u32 {
                     )
                 } else {
                     format!(
-                        "failed to compute next_multiple_of({:?}, {:?}): overflow", self,
-                        other
+                        "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
+                        self, other, "u32"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -3985,10 +4337,12 @@ impl U32Ext for u32 {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "u32"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`u64`]
@@ -3997,7 +4351,7 @@ pub trait U64Ext: Sealed {
     ///
     ///Wrapper for [`u64::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_add_signed`]
     fn cadd_signed(self, other: i64) -> Result<Self>;
@@ -4005,11 +4359,11 @@ pub trait U64Ext: Sealed {
     ///
     ///Wrapper for [`u64::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_sub_signed`]
     fn csub_signed(self, other: i64) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_signed_diff`]
     fn csigned_diff(self, other: Self) -> Result<i64>;
@@ -4078,25 +4432,27 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u64"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_add_signed`]
     #[inline]
     #[track_caller]
     fn cadd_signed(self, other: i64) -> Result<Self> {
-        self.checked_add_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_signed({:?}, {:?}): {} overflow",
+                self, other, "u64"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -4104,38 +4460,40 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u64"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_sub_signed`]
     #[inline]
     #[track_caller]
     fn csub_signed(self, other: i64) -> Result<Self> {
-        self.checked_sub_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_signed({:?}, {:?}): {} overflow",
+                self, other, "u64"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_signed_diff`]
     #[inline]
     #[track_caller]
     fn csigned_diff(self, other: Self) -> Result<i64> {
-        self.checked_signed_diff(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_signed_diff(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute signed_diff({:?}, {:?}): {} overflow",
+                self, other, "i64"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -4143,12 +4501,14 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u64"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4156,20 +4516,24 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4177,8 +4541,8 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -4186,11 +4550,12 @@ impl U64Ext for u64 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4198,20 +4563,24 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4219,8 +4588,8 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -4228,11 +4597,12 @@ impl U64Ext for u64 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -4240,12 +4610,12 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -4253,7 +4623,8 @@ impl U64Ext for u64 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -4261,10 +4632,12 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -4272,10 +4645,12 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -4283,10 +4658,12 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "u64"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -4294,13 +4671,13 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -4308,13 +4685,13 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -4322,10 +4699,12 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "u64"
             ))
+        })
     }
     ///Checked next multiple of `other`, returning an error if overflow occured or if `other` is zero.
     ///
@@ -4333,8 +4712,8 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cnext_multiple_of(self, other: Self) -> Result<Self> {
-        self.checked_next_multiple_of(other)
-            .ok_or_else(|| Error::new({
+        self.checked_next_multiple_of(other).ok_or_else(|| {
+            Error::new({
                 if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
@@ -4342,11 +4721,12 @@ impl U64Ext for u64 {
                     )
                 } else {
                     format!(
-                        "failed to compute next_multiple_of({:?}, {:?}): overflow", self,
-                        other
+                        "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
+                        self, other, "u64"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -4354,10 +4734,12 @@ impl U64Ext for u64 {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "u64"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`u128`]
@@ -4366,7 +4748,7 @@ pub trait U128Ext: Sealed {
     ///
     ///Wrapper for [`u128::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_add_signed`]
     fn cadd_signed(self, other: i128) -> Result<Self>;
@@ -4374,11 +4756,11 @@ pub trait U128Ext: Sealed {
     ///
     ///Wrapper for [`u128::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_sub_signed`]
     fn csub_signed(self, other: i128) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_signed_diff`]
     fn csigned_diff(self, other: Self) -> Result<i128>;
@@ -4447,25 +4829,27 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u128"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_add_signed`]
     #[inline]
     #[track_caller]
     fn cadd_signed(self, other: i128) -> Result<Self> {
-        self.checked_add_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_signed({:?}, {:?}): {} overflow",
+                self, other, "u128"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -4473,38 +4857,40 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u128"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_sub_signed`]
     #[inline]
     #[track_caller]
     fn csub_signed(self, other: i128) -> Result<Self> {
-        self.checked_sub_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_signed({:?}, {:?}): {} overflow",
+                self, other, "u128"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_signed_diff`]
     #[inline]
     #[track_caller]
     fn csigned_diff(self, other: Self) -> Result<i128> {
-        self.checked_signed_diff(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_signed_diff(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute signed_diff({:?}, {:?}): {} overflow",
+                self, other, "i128"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -4512,12 +4898,14 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "u128"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4525,20 +4913,24 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4546,8 +4938,8 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -4555,11 +4947,12 @@ impl U128Ext for u128 {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4567,20 +4960,24 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "u128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4588,8 +4985,8 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -4597,11 +4994,12 @@ impl U128Ext for u128 {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "u128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -4609,12 +5007,12 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -4622,7 +5020,8 @@ impl U128Ext for u128 {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -4630,10 +5029,12 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -4641,10 +5042,12 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -4652,10 +5055,12 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "u128"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -4663,13 +5068,13 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -4677,13 +5082,13 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -4691,10 +5096,12 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "u128"
             ))
+        })
     }
     ///Checked next multiple of `other`, returning an error if overflow occured or if `other` is zero.
     ///
@@ -4702,8 +5109,8 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cnext_multiple_of(self, other: Self) -> Result<Self> {
-        self.checked_next_multiple_of(other)
-            .ok_or_else(|| Error::new({
+        self.checked_next_multiple_of(other).ok_or_else(|| {
+            Error::new({
                 if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
@@ -4711,11 +5118,12 @@ impl U128Ext for u128 {
                     )
                 } else {
                     format!(
-                        "failed to compute next_multiple_of({:?}, {:?}): overflow", self,
-                        other
+                        "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
+                        self, other, "u128"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -4723,10 +5131,12 @@ impl U128Ext for u128 {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "u128"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`usize`]
@@ -4735,7 +5145,7 @@ pub trait UsizeExt: Sealed {
     ///
     ///Wrapper for [`usize::checked_add`]
     fn cadd(self, other: Self) -> Result<Self>;
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_add_signed`]
     fn cadd_signed(self, other: isize) -> Result<Self>;
@@ -4743,11 +5153,11 @@ pub trait UsizeExt: Sealed {
     ///
     ///Wrapper for [`usize::checked_sub`]
     fn csub(self, other: Self) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_sub_signed`]
     fn csub_signed(self, other: isize) -> Result<Self>;
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_signed_diff`]
     fn csigned_diff(self, other: Self) -> Result<isize>;
@@ -4816,25 +5226,27 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Self) -> Result<Self> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "usize"
             ))
+        })
     }
-    ///Checked addition: computes `self + other`, returning an error if overflow occured.
+    ///Checked addition: computes `add_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_add_signed`]
     #[inline]
     #[track_caller]
     fn cadd_signed(self, other: isize) -> Result<Self> {
-        self.checked_add_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute add_signed({:?}, {:?}): {} overflow",
+                self, other, "usize"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -4842,38 +5254,40 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn csub(self, other: Self) -> Result<Self> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "usize"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `sub_signed(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_sub_signed`]
     #[inline]
     #[track_caller]
     fn csub_signed(self, other: isize) -> Result<Self> {
-        self.checked_sub_signed(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub_signed(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute sub_signed({:?}, {:?}): {} overflow",
+                self, other, "usize"
             ))
+        })
     }
-    ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
+    ///Checked subtraction:  computes `signed_diff(self, other)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_signed_diff`]
     #[inline]
     #[track_caller]
     fn csigned_diff(self, other: Self) -> Result<isize> {
-        self.checked_signed_diff(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_signed_diff(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute signed_diff({:?}, {:?}): {} overflow",
+                self, other, "isize"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -4881,12 +5295,14 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cmul(self, other: Self) -> Result<Self> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "usize"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4894,20 +5310,24 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: Self) -> Result<Self> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "usize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian division: computes `div_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4915,8 +5335,8 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cdiv_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_div_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
@@ -4924,11 +5344,12 @@ impl UsizeExt for usize {
                     )
                 } else {
                     format!(
-                        "failed to compute div_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute div_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "usize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked remainder: computes `self % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4936,20 +5357,24 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn crem(self, divisor: Self) -> Result<Self> {
-        self.checked_rem(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} % {:?}: division by zero", self,
+                        "failed to compute {:?} % {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} % {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} % {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "usize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked euclidian reminder: computes `rem_euclid(self, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -4957,8 +5382,8 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn crem_euclid(self, divisor: Self) -> Result<Self> {
-        self.checked_rem_euclid(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
@@ -4966,11 +5391,12 @@ impl UsizeExt for usize {
                     )
                 } else {
                     format!(
-                        "failed to compute rem_euclid({:?}, {:?}): overflow", self,
-                        divisor
+                        "failed to compute rem_euclid({:?}, {:?}): {} overflow",
+                        self, divisor, "usize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked logarithm: computes <code>log<sub>base</sub> self</code>, returning an error if `self` is negative or zero, or if `base` is less than 2.
     ///
@@ -4978,12 +5404,12 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cilog(self, base: Self) -> Result<u32> {
-        self.checked_ilog(base)
-            .ok_or_else(|| Error::new({
+        self.checked_ilog(base).ok_or_else(|| {
+            Error::new({
                 if base < 2 {
                     format!(
-                        "failed to compute ilog({:?}, {:?}): base is less than 2", self,
-                        base
+                        "failed to compute ilog({:?}, {:?}): base is less than 2",
+                        self, base
                     )
                 } else {
                     format!(
@@ -4991,7 +5417,8 @@ impl UsizeExt for usize {
                         self, base
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked base 2 logarithm: computes `ln self`, returning an error if `self` is negative or zero.
     ///
@@ -4999,10 +5426,12 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cilog2(self) -> Result<u32> {
-        self.checked_ilog2()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog2({:?}): argument is not positive", self),
+        self.checked_ilog2().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog2({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> self</code>, returning an error if `self` is negative or zero.
     ///
@@ -5010,10 +5439,12 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cilog10(self) -> Result<u32> {
-        self.checked_ilog10()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute ilog10({:?}): argument is not positive", self),
+        self.checked_ilog10().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute ilog10({:?}): argument is not positive",
+                self
             ))
+        })
     }
     ///Checked negation: computes `-self`, returning an error if overflow occured.
     ///
@@ -5021,10 +5452,12 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cneg(self) -> Result<Self> {
-        self.checked_neg()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute -({:?}): overflow", self),
+        self.checked_neg().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute -({:?}): {} overflow",
+                self, "usize"
             ))
+        })
     }
     ///Checked shift left: computes `self << other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -5032,13 +5465,13 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cshl(self, other: u32) -> Result<Self> {
-        self.checked_shl(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} << {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shl(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} << {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked shift right: computes `self >> other`, returning an error if `other` is greater or equal to the number of bits in the type.
     ///
@@ -5046,13 +5479,13 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cshr(self, other: u32) -> Result<Self> {
-        self.checked_shr(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} >> {:?}: shift amount is too large",
-                    MaybeParens(self), MaybeParens(other)
-                ),
+        self.checked_shr(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} >> {:?}: shift amount is too large",
+                MaybeParens(self),
+                MaybeParens(other)
             ))
+        })
     }
     ///Checked exponentiation: computes <code>self<sup>power</sup></code>, returning an error if overflow occured.
     ///
@@ -5060,10 +5493,12 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cpow(self, power: u32) -> Result<Self> {
-        self.checked_pow(power)
-            .ok_or_else(|| Error::new(
-                format!("failed to compute pow({:?}, {:?}): overflow", self, power),
+        self.checked_pow(power).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute pow({:?}, {:?}): {} overflow",
+                self, power, "usize"
             ))
+        })
     }
     ///Checked next multiple of `other`, returning an error if overflow occured or if `other` is zero.
     ///
@@ -5071,8 +5506,8 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cnext_multiple_of(self, other: Self) -> Result<Self> {
-        self.checked_next_multiple_of(other)
-            .ok_or_else(|| Error::new({
+        self.checked_next_multiple_of(other).ok_or_else(|| {
+            Error::new({
                 if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
@@ -5080,11 +5515,12 @@ impl UsizeExt for usize {
                     )
                 } else {
                     format!(
-                        "failed to compute next_multiple_of({:?}, {:?}): overflow", self,
-                        other
+                        "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
+                        self, other, "usize"
                     )
                 }
-            }))
+            })
+        })
     }
     ///Checked next power of 2, returning an error if overflow occured.
     ///
@@ -5092,10 +5528,12 @@ impl UsizeExt for usize {
     #[inline]
     #[track_caller]
     fn cnext_power_of_two(self) -> Result<Self> {
-        self.checked_next_power_of_two()
-            .ok_or_else(|| Error::new(
-                format!("failed to compute next_power_of_two({:?}): overflow", self),
+        self.checked_next_power_of_two().ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute next_power_of_two({:?}): {} overflow",
+                self, "usize"
             ))
+        })
     }
 }
 ///Enhanced checked arithmetics functions for [`Duration`]
@@ -5125,12 +5563,14 @@ impl DurationExt for Duration {
     #[inline]
     #[track_caller]
     fn cadd(self, other: Duration) -> Result<Duration> {
-        self.checked_add(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} + {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_add(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} + {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "Duration"
             ))
+        })
     }
     ///Checked subtraction:  computes `self - other`, returning an error if overflow occured.
     ///
@@ -5138,12 +5578,14 @@ impl DurationExt for Duration {
     #[inline]
     #[track_caller]
     fn csub(self, other: Duration) -> Result<Duration> {
-        self.checked_sub(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} - {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_sub(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} - {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "Duration"
             ))
+        })
     }
     ///Checked multiplication: computes `self * other`, returning an error if overflow occured.
     ///
@@ -5151,12 +5593,14 @@ impl DurationExt for Duration {
     #[inline]
     #[track_caller]
     fn cmul(self, other: u32) -> Result<Duration> {
-        self.checked_mul(other)
-            .ok_or_else(|| Error::new(
-                format!(
-                    "failed to compute {:?} * {:?}: overflow", self, MaybeParens(other)
-                ),
+        self.checked_mul(other).ok_or_else(|| {
+            Error::new(format!(
+                "failed to compute {:?} * {:?}: {} overflow",
+                self,
+                MaybeParens(other),
+                "Duration"
             ))
+        })
     }
     ///Checked division: computes `self / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
@@ -5164,19 +5608,23 @@ impl DurationExt for Duration {
     #[inline]
     #[track_caller]
     fn cdiv(self, divisor: u32) -> Result<Duration> {
-        self.checked_div(divisor)
-            .ok_or_else(|| Error::new({
+        self.checked_div(divisor).ok_or_else(|| {
+            Error::new({
                 if divisor == 0 {
                     format!(
-                        "failed to compute {:?} / {:?}: division by zero", self,
+                        "failed to compute {:?} / {:?}: division by zero",
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
-                        "failed to compute {:?} / {:?}: overflow", self,
-                        MaybeParens(divisor)
+                        "failed to compute {:?} / {:?}: {} overflow",
+                        self,
+                        MaybeParens(divisor),
+                        "Duration"
                     )
                 }
-            }))
+            })
+        })
     }
 }
