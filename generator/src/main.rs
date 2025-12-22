@@ -1,0 +1,995 @@
+use {
+    anyhow::{Context as _, bail, format_err},
+    convert_case::{Case, Casing},
+    proc_macro2::{Span, TokenStream},
+    quote::quote,
+    std::{
+        collections::BTreeMap,
+        env,
+        path::{Path, PathBuf},
+        process::Command,
+    },
+    syn::{GenericArgument, Ident, ImplItem, Item, PathArguments, ReturnType, Type, parse_quote},
+};
+
+fn main() -> anyhow::Result<()> {
+    let output_dir = PathBuf::from(env::args().nth(1).context("missing output dir arg")?);
+
+    let sysroot = Command::new("rustc")
+        .args(["--print", "sysroot"])
+        .output()?
+        .stdout;
+    let sysroot = String::from_utf8(sysroot)?;
+    let core_path = Path::new(sysroot.trim()).join("lib/rustlib/src/rust/library/core");
+    let core_expanded = Command::new("rustc")
+        .args(["--edition=2024", "-Zunpretty=expanded", "src/lib.rs"])
+        .current_dir(core_path)
+        .env("RUSTC_BOOTSTRAP", "1")
+        .output()?
+        .stdout;
+    let core_expanded = String::from_utf8(core_expanded)?.replace("const trait", "trait");
+
+    let file = syn::parse_file(&core_expanded)
+        .map_err(|err| format_err!("{err:?} at {:?}", err.span().start()))?;
+
+    let fns = find_fns(&file.items)?;
+    fs_err::write(output_dir.join("src/ext.rs"), generate_ext_traits(&fns)?)?;
+    fs_err::write(output_dir.join("src/ops.rs"), generate_ops_traits(&fns)?)?;
+    Ok(())
+}
+
+struct CheckedFn {
+    self_type: Type,
+    other_type: Option<Type>,
+    output_type: Type,
+    ident: Ident,
+    kind: FunctionKind,
+}
+
+fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {
+    let mut fns = Vec::new();
+    for item in items {
+        match item {
+            Item::Impl(item_impl) => {
+                if let Some((_neg, trait_, _for)) = &item_impl.trait_
+                    && trait_.is_ident("ReadNumberHelper")
+                {
+                    continue;
+                }
+                for item in &item_impl.items {
+                    let ImplItem::Fn(item_fn) = item else {
+                        continue;
+                    };
+                    let fn_name = item_fn.sig.ident.to_string();
+                    if !fn_name.starts_with("checked") {
+                        continue;
+                    }
+                    if item_fn
+                        .attrs
+                        .iter()
+                        .any(|attr| attr.path().is_ident("unstable"))
+                    {
+                        continue;
+                    }
+                    let other_type =
+                        if let Some(syn::FnArg::Typed(input)) = item_fn.sig.inputs.iter().nth(1) {
+                            Some((*input.ty).clone())
+                        } else {
+                            None
+                        };
+                    let ReturnType::Type(_, return_type) = &item_fn.sig.output else {
+                        bail!("unexpected checked function return type");
+                    };
+                    let Some(output_type) = unwrap_generic_type(return_type, "Option").cloned()
+                    else {
+                        bail!(
+                            "expected Option return type, got {}",
+                            quote! { #return_type }
+                        );
+                    };
+                    // let s = &item_impl.self_ty;
+                    // println!("item_impl.self_ty = {}", quote! { #s });
+                    fns.push(CheckedFn {
+                        self_type: (*item_impl.self_ty).clone(),
+                        other_type,
+                        output_type,
+                        ident: item_fn.sig.ident.clone(),
+                        kind: FunctionKind::from_impl_fn_name(&item_fn.sig.ident.to_string())?,
+                    });
+                }
+            }
+            Item::Mod(item_mod) => {
+                if let Some((_brace, content)) = &item_mod.content {
+                    fns.extend(find_fns(content)?);
+                }
+            }
+            _ => {}
+        }
+    }
+    Ok(fns)
+}
+
+fn unself<'a>(type_: &'a Type, self_type: &'a Type) -> &'a Type {
+    if let Type::Path(path) = type_
+        && path.path.is_ident("Self")
+    {
+        self_type
+    } else {
+        type_
+    }
+}
+
+fn unwrap_generic_type<'a>(type_: &'a Type, generic_name: &str) -> Option<&'a Type> {
+    let Type::Path(return_type) = type_ else {
+        return None;
+    };
+    if return_type.path.segments.len() != 1 || return_type.path.segments[0].ident != generic_name {
+        return None;
+    }
+    let PathArguments::AngleBracketed(args) = &return_type.path.segments[0].arguments else {
+        return None;
+    };
+    let arg = args.args.first()?;
+    if let GenericArgument::Type(t) = arg {
+        Some(t)
+    } else {
+        None
+    }
+}
+
+struct FunctionsPerSelfType<'a> {
+    self_type: &'a Type,
+    fns: Vec<&'a CheckedFn>,
+}
+
+fn use_parens(type_: &Type) -> bool {
+    if let Type::Path(type_) = type_
+        && type_.path.is_ident("NonZero")
+    {
+        false
+    } else {
+        true
+    }
+}
+
+fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<String> {
+    let mut fns_per_self_type = Vec::<FunctionsPerSelfType>::new();
+    for f in all_fns {
+        let index = if let Some(index) = fns_per_self_type
+            .iter()
+            .position(|item| item.self_type == &f.self_type)
+        {
+            index
+        } else {
+            fns_per_self_type.push(FunctionsPerSelfType {
+                self_type: &f.self_type,
+                fns: Vec::new(),
+            });
+            fns_per_self_type.len() - 1
+        };
+        assert_eq!(fns_per_self_type[index].self_type, &f.self_type);
+        fns_per_self_type[index].fns.push(f);
+    }
+
+    let traits = fns_per_self_type
+        .into_iter()
+        .map(|item| {
+            let self_type = item.self_type;
+            let trait_name = ident(&ext_trait_name(self_type)?);
+            // println!(
+            //     "trait_name={trait_name}, location={:?}",
+            //     item.fns[0].ident.span().start()
+            // );
+
+            let mut fn_declarations = Vec::new();
+            let mut fn_impls = Vec::new();
+            for f in &item.fns {
+                assert_eq!(item.self_type, &f.self_type);
+
+                let ext_fn_name = f.kind.ext_fn_name();
+                let ext_fn_ident = ident(ext_fn_name);
+                let fn_output = unself(&f.output_type, &f.self_type);
+                let fn_ident = &f.ident;
+                let other_arg_name = f.kind.other_arg_name();
+                let other_arg_ident = ident(other_arg_name);
+
+                let fn_docs = [
+                    f.kind.general_doc("self", Some(other_arg_name)),
+                    String::new(),
+                    format!(
+                        "Wrapper for [`{}`].",
+                        quote! { #self_type::#fn_ident }
+                            .to_string()
+                            .replace(" ", "")
+                    ),
+                ];
+
+                let other_arg_declaration = if let Some(other_type) = &f.other_type {
+                    let other_type = unself(other_type, &f.self_type);
+                    quote! { , #other_arg_ident: #other_type }
+                } else {
+                    quote! {}
+                };
+
+                let other_arg_use = if f.other_type.is_some() {
+                    quote! { #other_arg_ident }
+                } else {
+                    quote! {}
+                };
+
+                let map_err_code = f.kind.map_err_code(
+                    quote! { self },
+                    other_arg_use.clone(),
+                    use_parens(&f.self_type),
+                    &quote! { #fn_output }.to_string().replace(' ', ""),
+                );
+
+                fn_declarations.push(quote! {
+                    #(#[doc = #fn_docs])*
+                    fn #ext_fn_ident(self #other_arg_declaration) -> Result<#fn_output>;
+                });
+                fn_impls.push(quote! {
+                    #(#[doc = #fn_docs])*
+                    #[inline]
+                    #[track_caller]
+                    fn #ext_fn_ident(self #other_arg_declaration) -> Result<#fn_output> {
+                        self.#fn_ident(#other_arg_use).ok_or_else(|| #map_err_code)
+                    }
+                });
+                if f.kind.has_assign_method() {
+                    let ext_assign_fn_ident = ident(&format!("{ext_fn_name}_assign"));
+
+                    let assign_fn_docs = [
+                        f.kind.assign_doc("self", other_arg_name),
+                        String::new(),
+                        format!(
+                            "Wrapper for [`{}`].",
+                            quote! { #self_type::#fn_ident }
+                                .to_string()
+                                .replace(" ", "")
+                        ),
+                    ];
+
+                    fn_declarations.push(quote! {
+                        #(#[doc = #assign_fn_docs])*
+                        fn #ext_assign_fn_ident(&mut self #other_arg_declaration) -> Result<()>;
+                    });
+                    fn_impls.push(quote! {
+                        #(#[doc = #assign_fn_docs])*
+                        #[inline]
+                        #[track_caller]
+                        fn #ext_assign_fn_ident(&mut self #other_arg_declaration) -> Result<()> {
+                            *self = self.#ext_fn_ident(#other_arg_use)?;
+                            Ok(())
+                        }
+                    });
+                }
+            }
+
+            let trait_doc = format!(
+                "Enhanced checked arithmetics functions for [`{}`]",
+                quote! { #self_type }.to_string().replace(" ", "")
+            );
+
+            Ok(quote! {
+                #[doc = #trait_doc]
+                pub trait #trait_name: Sealed {
+                    #(#fn_declarations)*
+                }
+
+                impl Sealed for #self_type {}
+                impl #trait_name for #self_type {
+                    #(#fn_impls)*
+                }
+            })
+        })
+        .collect::<anyhow::Result<Vec<_>>>()?;
+
+    let file: syn::File = parse_quote! {
+        use {
+            crate::{Error, Result, MaybeParens, private::Sealed},
+            core::{num::NonZero, time::Duration},
+            alloc::format,
+        };
+        #(#traits)*
+    };
+    Ok(prettyplease::unparse(&file))
+}
+
+fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<String> {
+    let mut by_kind = BTreeMap::<_, Vec<_>>::new();
+    for f in all_fns {
+        by_kind.entry(f.kind).or_default().push(f);
+    }
+    let mut contents = Vec::new();
+    for (kind, fns) in by_kind {
+        let ext_trait_ident = ident(&kind.ext_trait_name());
+        let ext_fn_name = kind.ext_fn_name();
+        let ext_fn_ident = ident(ext_fn_name);
+
+        let (first_arg_name, second_arg_name) = kind.pair_arg_names();
+        let (first_param_name, second_param_name) = kind.pair_param_names();
+        let first_arg_ident = ident(first_arg_name);
+        let first_param_ident = ident(first_param_name);
+
+        let other_param_ident = ident(kind.other_param_name());
+
+        let impl_fn_name = kind.impl_fn_name();
+
+        let trait_docs = [
+            kind.general_doc(first_arg_name, second_arg_name),
+            String::new(),
+            format!(
+                "Instead of using this trait directly, it's recommended to \
+                use [`{}`] function or extension traits from the [`ext`](crate::ext) module.",
+                ext_fn_ident,
+            ),
+        ];
+
+        let trait_fn_docs = [
+            kind.general_doc(first_arg_name, second_arg_name),
+            String::new(),
+            format!("Wrapper for `{}`.", impl_fn_name),
+        ];
+
+        if let (Some(second_arg_name), Some(second_param_name)) =
+            (second_arg_name, second_param_name)
+        {
+            let second_arg_ident = ident(second_arg_name);
+            let second_param_ident = ident(second_param_name);
+            contents.push(quote! {
+                #(#[doc = #trait_docs])*
+                pub trait #ext_trait_ident<#other_param_ident = Self>: Sized {
+                    #[allow(missing_docs, reason = "no need for doc")]
+                    type Error;
+                    #[allow(missing_docs, reason = "no need for doc")]
+                    type Output;
+                    #(#[doc = #trait_fn_docs])*
+                    fn #ext_fn_ident(#first_arg_ident: Self, #second_arg_ident: #other_param_ident)
+                        -> Result<Self::Output, Self::Error>;
+                }
+
+                #(#[doc = #trait_fn_docs])*
+                #[doc(alias = #impl_fn_name)]
+                #[inline]
+                pub fn #ext_fn_ident<#first_param_ident, #second_param_ident>(
+                    #first_arg_ident: #first_param_ident,
+                    #second_arg_ident: #second_param_ident,
+                ) -> Result<#first_param_ident::Output, #first_param_ident::Error>
+                where
+                    #first_param_ident: #ext_trait_ident<#second_param_ident>,
+                {
+                    #ext_trait_ident::#ext_fn_ident(#first_arg_ident, #second_arg_ident)
+                }
+            });
+
+            for f in fns {
+                assert_eq!(kind, f.kind);
+                let self_type = &f.self_type;
+                let output_type = unself(&f.output_type, &f.self_type);
+                let other_type = unself(
+                    f.other_type.as_ref().context("expected other type")?,
+                    &f.self_type,
+                );
+                let fn_ident = &f.ident;
+                let map_err_code = kind.map_err_code(
+                    quote! { #first_arg_ident },
+                    quote! { #second_arg_ident },
+                    use_parens(&f.self_type),
+                    &quote! { #output_type }.to_string().replace(' ', ""),
+                );
+
+                let trait_param = if other_type == self_type {
+                    quote! {}
+                } else {
+                    quote! { <#other_type> }
+                };
+
+                let fn_docs = [
+                    f.kind.general_doc(first_arg_name, Some(second_arg_name)),
+                    String::new(),
+                    format!(
+                        "Wrapper for [`{}`].",
+                        quote! { #self_type::#fn_ident }
+                            .to_string()
+                            .replace(" ", "")
+                    ),
+                ];
+
+                contents.push(quote! {
+                    impl #ext_trait_ident #trait_param for #self_type {
+                        type Error = Error;
+                        type Output = #output_type;
+                        #(#[doc = #fn_docs])*
+                        fn #ext_fn_ident(#first_arg_ident: Self, #second_arg_ident: #other_type)
+                            -> Result<#output_type, Error>
+                        {
+                            #first_arg_ident.#fn_ident(#second_arg_ident).ok_or_else(|| #map_err_code)
+                        }
+                    }
+
+                });
+            }
+        } else {
+            contents.push(quote! {
+                #(#[doc = #trait_docs])*
+                pub trait #ext_trait_ident: Sized {
+                    #[allow(missing_docs, reason = "no need for doc")]
+                    type Error;
+                    #[allow(missing_docs, reason = "no need for doc")]
+                    type Output;
+                    #(#[doc = #trait_fn_docs])*
+                    fn #ext_fn_ident(#first_arg_ident: Self) -> Result<Self::Output, Self::Error>;
+                }
+
+                #(#[doc = #trait_fn_docs])*
+                #[doc(alias = #impl_fn_name)]
+                #[inline]
+                pub fn #ext_fn_ident<#first_param_ident>(#first_arg_ident: #first_param_ident)
+                    -> Result<#first_param_ident::Output, #first_param_ident::Error>
+                where
+                    #first_param_ident: #ext_trait_ident,
+                {
+                    #ext_trait_ident::#ext_fn_ident(#first_arg_ident)
+                }
+            });
+
+            for f in fns {
+                assert_eq!(kind, f.kind);
+                let self_type = &f.self_type;
+                let output_type = unself(&f.output_type, &f.self_type);
+                let fn_ident = &f.ident;
+                let map_err_code = kind.map_err_code(
+                    quote! { #first_arg_ident },
+                    quote! {},
+                    use_parens(&f.self_type),
+                    &quote! { #output_type }.to_string().replace(' ', ""),
+                );
+
+                let fn_docs = [
+                    f.kind.general_doc(first_arg_name, None),
+                    String::new(),
+                    format!(
+                        "Wrapper for [`{}`].",
+                        quote! { #self_type::#fn_ident }
+                            .to_string()
+                            .replace(" ", "")
+                    ),
+                ];
+
+                contents.push(quote! {
+                    impl #ext_trait_ident for #self_type {
+                        type Error = Error;
+                        type Output = #output_type;
+                        #(#[doc = #fn_docs])*
+                        fn #ext_fn_ident(#first_arg_ident: Self) -> Result<#output_type, Error> {
+                            #first_arg_ident.#fn_ident().ok_or_else(|| #map_err_code)
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    let file: syn::File = parse_quote! {
+        use {
+            crate::{Error, MaybeParens},
+            core::{num::NonZero, time::Duration},
+            alloc::format,
+        };
+        #(#contents)*
+    };
+    Ok(prettyplease::unparse(&file))
+}
+
+fn ext_trait_name(self_type: &Type) -> anyhow::Result<String> {
+    if let Some(arg) = unwrap_generic_type(self_type, "NonZero") {
+        let Type::Path(arg) = arg else {
+            bail!("expected path type in arg, got {}", quote! { arg });
+        };
+        let arg = arg
+            .path
+            .get_ident()
+            .with_context(|| format!("expected single ident in arg, got {}", quote! { arg }))?;
+        let arg_text = arg.to_string().to_case(Case::Pascal);
+        return Ok(format!("NonZero{arg_text}Ext"));
+    }
+
+    let Type::Path(type_path) = self_type else {
+        bail!("expected path type, got {}", quote! { self_type });
+    };
+
+    let type_name = type_path
+        .path
+        .get_ident()
+        .with_context(|| format!("expected single ident, got {}", quote! { type_path }))?;
+    let type_text = type_name.to_string().to_case(Case::Pascal);
+    Ok(format!("{type_text}Ext"))
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum FunctionKind {
+    Add,
+    AddUnsigned,
+    AddSigned,
+    Sub,
+    SubUnsigned,
+    SubSigned,
+    SignedDiff,
+    Neg,
+    Mul,
+    Div,
+    DivEuclid,
+    Rem,
+    RemEuclid,
+    Ilog,
+    Ilog2,
+    Ilog10,
+    Shl,
+    Shr,
+    Pow,
+    Abs,
+    Isqrt,
+    NextMultipleOf,
+    NextPowerOfTwo,
+}
+
+impl FunctionKind {
+    fn from_impl_fn_name(name: &str) -> anyhow::Result<Self> {
+        let kind = match name {
+            "checked_add" => Self::Add,
+            "checked_add_unsigned" => Self::AddUnsigned,
+            "checked_add_signed" => Self::AddSigned,
+            "checked_sub" => Self::Sub,
+            "checked_sub_unsigned" => Self::SubUnsigned,
+            "checked_sub_signed" => Self::SubSigned,
+            "checked_signed_diff" => Self::SignedDiff,
+            "checked_neg" => Self::Neg,
+            "checked_mul" => Self::Mul,
+            "checked_div" => Self::Div,
+            "checked_div_euclid" => Self::DivEuclid,
+            "checked_rem" => Self::Rem,
+            "checked_rem_euclid" => Self::RemEuclid,
+            "checked_ilog" => Self::Ilog,
+            "checked_ilog2" => Self::Ilog2,
+            "checked_ilog10" => Self::Ilog10,
+            "checked_shl" => Self::Shl,
+            "checked_shr" => Self::Shr,
+            "checked_pow" => Self::Pow,
+            "checked_abs" => Self::Abs,
+            "checked_isqrt" => Self::Isqrt,
+            "checked_next_multiple_of" => Self::NextMultipleOf,
+            "checked_next_power_of_two" => Self::NextPowerOfTwo,
+            _ => bail!("unknown fn: {name:?}"),
+        };
+        Ok(kind)
+    }
+
+    fn has_assign_method(self) -> bool {
+        matches!(
+            self,
+            FunctionKind::Add
+                | FunctionKind::Sub
+                | FunctionKind::Mul
+                | FunctionKind::Div
+                | FunctionKind::Rem
+                | FunctionKind::Shl
+                | FunctionKind::Shr
+        )
+    }
+
+    fn impl_fn_name(self) -> &'static str {
+        match self {
+            FunctionKind::Add => "checked_add",
+            FunctionKind::AddUnsigned => "checked_add_unsigned",
+            FunctionKind::AddSigned => "checked_add_signed",
+            FunctionKind::Sub => "checked_sub",
+            FunctionKind::SubUnsigned => "checked_sub_unsigned",
+            FunctionKind::SubSigned => "checked_sub_signed",
+            FunctionKind::SignedDiff => "checked_signed_diff",
+            FunctionKind::Neg => "checked_neg",
+            FunctionKind::Mul => "checked_mul",
+            FunctionKind::Div => "checked_div",
+            FunctionKind::DivEuclid => "checked_div_euclid",
+            FunctionKind::Rem => "checked_rem",
+            FunctionKind::RemEuclid => "checked_rem_euclid",
+            FunctionKind::Ilog => "checked_ilog",
+            FunctionKind::Ilog2 => "checked_ilog2",
+            FunctionKind::Ilog10 => "checked_ilog10",
+            FunctionKind::Shl => "checked_shl",
+            FunctionKind::Shr => "checked_shr",
+            FunctionKind::Pow => "checked_pow",
+            FunctionKind::Abs => "checked_abs",
+            FunctionKind::Isqrt => "checked_isqrt",
+            FunctionKind::NextMultipleOf => "checked_next_multiple_of",
+            FunctionKind::NextPowerOfTwo => "checked_next_power_of_two",
+        }
+    }
+
+    fn ext_fn_name(self) -> &'static str {
+        match self {
+            FunctionKind::Add => "cadd",
+            FunctionKind::AddUnsigned => "cadd_unsigned",
+            FunctionKind::AddSigned => "cadd_signed",
+            FunctionKind::Sub => "csub",
+            FunctionKind::SubUnsigned => "csub_unsigned",
+            FunctionKind::SubSigned => "csub_signed",
+            FunctionKind::SignedDiff => "csigned_diff",
+            FunctionKind::Neg => "cneg",
+            FunctionKind::Mul => "cmul",
+            FunctionKind::Div => "cdiv",
+            FunctionKind::DivEuclid => "cdiv_euclid",
+            FunctionKind::Rem => "crem",
+            FunctionKind::RemEuclid => "crem_euclid",
+            FunctionKind::Ilog => "cilog",
+            FunctionKind::Ilog2 => "cilog2",
+            FunctionKind::Ilog10 => "cilog10",
+            FunctionKind::Shl => "cshl",
+            FunctionKind::Shr => "cshr",
+            FunctionKind::Pow => "cpow",
+            FunctionKind::Abs => "cabs",
+            FunctionKind::Isqrt => "cisqrt",
+            FunctionKind::NextMultipleOf => "cnext_multiple_of",
+            FunctionKind::NextPowerOfTwo => "cnext_power_of_two",
+        }
+    }
+
+    fn ext_trait_name(self) -> String {
+        format!("C{}", format!("{:?}", self).to_case(Case::Camel))
+    }
+
+    fn general_doc(&self, first_arg: &str, second_arg: Option<&str>) -> String {
+        let a = first_arg;
+        let b = second_arg.unwrap_or("other");
+        match self {
+            FunctionKind::Add => {
+                format!(
+                    "Checked addition: computes `{a} + {b}`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::AddUnsigned => {
+                format!(
+                    "Checked addition: computes `add_unsigned({a}, {b})`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::AddSigned => {
+                format!(
+                    "Checked addition: computes `add_signed({a}, {b})`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Sub => {
+                format!(
+                    "Checked subtraction:  computes `{a} - {b}`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::SubUnsigned => {
+                format!(
+                    "Checked subtraction:  computes `sub_unsigned({a}, {b})`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::SubSigned => {
+                format!(
+                    "Checked subtraction:  computes `sub_signed({a}, {b})`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::SignedDiff => {
+                format!(
+                    "Checked subtraction:  computes `signed_diff({a}, {b})`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Neg => {
+                format!(
+                    "Checked negation: computes `-{a}`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Mul => {
+                format!(
+                    "Checked multiplication: computes `{a} * {b}`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Div => {
+                format!(
+                    "Checked division: computes `{a} / {b}`, returning an error if overflow occured or if `{b}` is zero."
+                )
+            }
+            FunctionKind::DivEuclid => {
+                format!(
+                    "Checked euclidian division: computes `div_euclid({a}, {b})`, returning an error if overflow occured or if `{b}` is zero."
+                )
+            }
+            FunctionKind::Rem => {
+                format!(
+                    "Checked remainder: computes `{a} % {b}`, returning an error if overflow occured or if `{b}` is zero."
+                )
+            }
+            FunctionKind::RemEuclid => {
+                format!(
+                    "Checked euclidian reminder: computes `rem_euclid({a}, {b})`, returning an error if overflow occured or if `{b}` is zero."
+                )
+            }
+            FunctionKind::Ilog => {
+                format!(
+                    "Checked logarithm: computes <code>log<sub>{b}</sub> {a}</code>, returning an error if `{a}` is negative or zero, or if `{b}` is less than 2."
+                )
+            }
+            FunctionKind::Ilog2 => {
+                format!(
+                    "Checked base 2 logarithm: computes `ln {a}`, returning an error if `{a}` is negative or zero."
+                )
+            }
+            FunctionKind::Ilog10 => {
+                format!(
+                    "Checked base 10 logarithm: computes <code>log<sub>10</sub> {a}</code>, returning an error if `{a}` is negative or zero."
+                )
+            }
+            FunctionKind::Shl => {
+                format!(
+                    "Checked shift left: computes `{a} << {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
+                )
+            }
+            FunctionKind::Shr => {
+                format!(
+                    "Checked shift right: computes `{a} >> {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
+                )
+            }
+            FunctionKind::Pow => {
+                format!(
+                    "Checked exponentiation: computes <code>{a}<sup>{b}</sup></code>, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Abs => {
+                format!(
+                    "Checked absolute value: computes `|{a}|`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Isqrt => {
+                format!(
+                    "Checked square root: computes `√{a}`, returning an error if `{a}` is negative."
+                )
+            }
+            FunctionKind::NextMultipleOf => {
+                format!(
+                    "Checked next multiple of `{b}`, returning an error if overflow occured or if `{b}` is zero."
+                )
+            }
+            FunctionKind::NextPowerOfTwo => {
+                "Checked next power of 2, returning an error if overflow occured.".into()
+            }
+        }
+    }
+
+    fn assign_doc(&self, first_arg: &str, second_arg: &str) -> String {
+        let a = first_arg;
+        let b = second_arg;
+        match self {
+            FunctionKind::Add => {
+                format!(
+                    "Checked addition assigement: executes `{a} += {b}`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Sub => {
+                format!(
+                    "Checked subtraction assigement:  executes `{a} -= {b}`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Mul => {
+                format!(
+                    "Checked multiplication assigement: executes `{a} *= {b}`, returning an error if overflow occured."
+                )
+            }
+            FunctionKind::Div => {
+                format!(
+                    "Checked division assigement: executes `{a} /= {b}`, returning an error if overflow occured or if `{b}` is zero."
+                )
+            }
+            FunctionKind::Rem => {
+                format!(
+                    "Checked remainder assigement: executes `{a} %= {b}`, returning an error if overflow occured or if `{b}` is zero."
+                )
+            }
+            FunctionKind::Shl => {
+                format!(
+                    "Checked shift left assigement: executes `{a} <<= {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
+                )
+            }
+            FunctionKind::Shr => {
+                format!(
+                    "Checked shift right assigement: executes `{a} >>= {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
+                )
+            }
+            _ => panic!("unexpected assign function for {:?}", self),
+        }
+    }
+
+    fn map_err_code(
+        self,
+        first_arg: TokenStream,
+        second_arg: TokenStream,
+        use_parens: bool,
+        type_name: &str,
+    ) -> TokenStream {
+        let a = first_arg;
+        let b = second_arg;
+        let maybe_parens_a = if use_parens {
+            quote! { MaybeParens(#a) }
+        } else {
+            quote! { #a }
+        };
+        let maybe_parens_b = if use_parens {
+            quote! { MaybeParens(#b) }
+        } else {
+            quote! { #b }
+        };
+        match self {
+            FunctionKind::Add => quote! {
+                Error::new(format!("failed to compute {:?} + {:?}: {} overflow", #a, #maybe_parens_b, #type_name))
+            },
+            FunctionKind::AddUnsigned => quote! {
+                Error::new(format!("failed to compute add_unsigned({:?}, {:?}): {} overflow", #a, #b, #type_name))
+            },
+            FunctionKind::AddSigned => quote! {
+                Error::new(format!("failed to compute add_signed({:?}, {:?}): {} overflow", #a, #b, #type_name))
+            },
+            FunctionKind::Sub => quote! {
+                Error::new(format!("failed to compute {:?} - {:?}: {} overflow", #a, #maybe_parens_b, #type_name))
+            },
+            FunctionKind::SubUnsigned => quote! {
+                Error::new(format!("failed to compute sub_unsigned({:?}, {:?}): {} overflow", #a, #b, #type_name))
+            },
+            FunctionKind::SubSigned => quote! {
+                Error::new(format!("failed to compute sub_signed({:?}, {:?}): {} overflow", #a, #b, #type_name))
+            },
+            FunctionKind::SignedDiff => quote! {
+                Error::new(format!("failed to compute signed_diff({:?}, {:?}): {} overflow", #a, #b, #type_name))
+            },
+            FunctionKind::Neg => quote! {
+                Error::new(format!("failed to compute -({:?}): {} overflow", #a, #type_name))
+            },
+            FunctionKind::Mul => quote! {
+                Error::new(format!("failed to compute {:?} * {:?}: {} overflow", #a, #maybe_parens_b, #type_name))
+            },
+            FunctionKind::Div => quote! {
+                Error::new({
+                    if #b == 0 {
+                        format!("failed to compute {:?} / {:?}: division by zero", #a, #maybe_parens_b)
+                    } else {
+                        format!("failed to compute {:?} / {:?}: {} overflow", #a, #maybe_parens_b, #type_name)
+                    }
+                })
+            },
+            FunctionKind::DivEuclid => quote! {
+                Error::new({
+                    if #b == 0 {
+                        format!("failed to compute div_euclid({:?}, {:?}): division by zero", #a, #b)
+                    } else {
+                        format!("failed to compute div_euclid({:?}, {:?}): {} overflow", #a, #b, #type_name)
+                    }
+                })
+            },
+            FunctionKind::Rem => quote! {
+                Error::new({
+                    if #b == 0 {
+                        format!("failed to compute {:?} % {:?}: division by zero", #a, #maybe_parens_b)
+                    } else {
+                        format!("failed to compute {:?} % {:?}: {} overflow", #a, #maybe_parens_b, #type_name)
+                    }
+                })
+            },
+            FunctionKind::RemEuclid => quote! {
+                Error::new({
+                    if #b == 0 {
+                        format!("failed to compute rem_euclid({:?}, {:?}): division by zero", #a, #b)
+                    } else {
+                        format!("failed to compute rem_euclid({:?}, {:?}): {} overflow", #a, #b, #type_name)
+                    }
+                })
+            },
+            FunctionKind::Ilog => quote! {
+                Error::new({
+                    if #b < 2 {
+                        format!("failed to compute ilog({:?}, {:?}): base is less than 2", #a, #b)
+                    } else {
+                        format!("failed to compute ilog({:?}, {:?}): first argument is not positive", #a, #b)
+                    }
+                })
+            },
+            FunctionKind::Ilog2 => quote! {
+                Error::new(format!("failed to compute ilog2({:?}): argument is not positive", #a))
+            },
+            FunctionKind::Ilog10 => quote! {
+                Error::new(format!("failed to compute ilog10({:?}): argument is not positive", #a))
+            },
+            FunctionKind::Shl => quote! {
+                Error::new(format!("failed to compute {:?} << {:?}: shift amount is too large", #maybe_parens_a, #maybe_parens_b))
+            },
+            FunctionKind::Shr => quote! {
+                Error::new(format!("failed to compute {:?} >> {:?}: shift amount is too large", #maybe_parens_a, #maybe_parens_b))
+            },
+            FunctionKind::Pow => quote! {
+                Error::new(format!("failed to compute pow({:?}, {:?}): {} overflow", #a, #b, #type_name))
+            },
+            FunctionKind::Abs => quote! {
+                Error::new(format!("failed to compute abs({:?}): {} overflow", #a, #type_name))
+            },
+            FunctionKind::Isqrt => quote! {
+                Error::new(format!("failed to compute isqrt({:?}): argument is negative", #a))
+            },
+            FunctionKind::NextMultipleOf => quote! {
+                Error::new({
+                    if #b < 2 {
+                        format!("failed to compute next_multiple_of({:?}, {:?}): multiplier is zero", #a, #b)
+                    } else {
+                        format!("failed to compute next_multiple_of({:?}, {:?}): {} overflow", #a, #b, #type_name)
+                    }
+                })
+            },
+            FunctionKind::NextPowerOfTwo => quote! {
+                Error::new(format!("failed to compute next_power_of_two({:?}): {} overflow", #a, #type_name))
+            },
+        }
+    }
+
+    fn other_arg_name(self) -> &'static str {
+        match self {
+            FunctionKind::Div
+            | FunctionKind::DivEuclid
+            | FunctionKind::Rem
+            | FunctionKind::RemEuclid => "divisor",
+            FunctionKind::Ilog => "base",
+            FunctionKind::Pow => "power",
+            _ => "other",
+        }
+    }
+
+    fn other_param_name(self) -> &'static str {
+        match self {
+            FunctionKind::Div
+            | FunctionKind::DivEuclid
+            | FunctionKind::Rem
+            | FunctionKind::RemEuclid => "Divisor",
+            FunctionKind::Ilog => "Base",
+            FunctionKind::Pow => "Power",
+            _ => "Other",
+        }
+    }
+
+    fn pair_arg_names(self) -> (&'static str, Option<&'static str>) {
+        match self {
+            FunctionKind::Div
+            | FunctionKind::DivEuclid
+            | FunctionKind::Rem
+            | FunctionKind::RemEuclid => ("value", Some("divisor")),
+            FunctionKind::Ilog => ("value", Some("base")),
+            FunctionKind::Pow => ("value", Some("power")),
+            FunctionKind::Neg
+            | FunctionKind::Abs
+            | FunctionKind::Isqrt
+            | FunctionKind::Ilog2
+            | FunctionKind::Ilog10
+            | FunctionKind::NextPowerOfTwo => ("value", None),
+            _ => ("a", Some("b")),
+        }
+    }
+
+    fn pair_param_names(self) -> (&'static str, Option<&'static str>) {
+        match self {
+            FunctionKind::Div
+            | FunctionKind::DivEuclid
+            | FunctionKind::Rem
+            | FunctionKind::RemEuclid => ("T", Some("Divisor")),
+            FunctionKind::Ilog => ("T", Some("Base")),
+            FunctionKind::Pow => ("T", Some("Power")),
+            FunctionKind::Neg
+            | FunctionKind::Abs
+            | FunctionKind::Isqrt
+            | FunctionKind::Ilog2
+            | FunctionKind::Ilog10
+            | FunctionKind::NextPowerOfTwo => ("T", None),
+            _ => ("T1", Some("T2")),
+        }
+    }
+}
+
+fn ident(ident: &str) -> Ident {
+    Ident::new(ident, Span::call_site())
+}

@@ -15,3 +15,6 @@ std = []
 [dev-dependencies]
 # only for tests
 anyhow = "1.0.98"
+
+[workspace]
+members = ["generator"]
