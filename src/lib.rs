@@ -4,8 +4,10 @@
 //! # `cadd`: painless checked arithmetics and conversions
 //!
 //! Features:
+//! * [`ext`](https://docs.rs/cadd/latest/cadd/ext/index.html):
+//!   checked arithmetics with `Result`, informative errors, and backtraces
 //! * [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html):
-//!   Checked arithmetics with `Result` and backtraces
+//!   generic functions for checked arithmetics
 //! * [`Cinto`](https://docs.rs/cadd/latest/cadd/convert/trait.Cinto.html):
 //!   `TryInto` with better error messages and backtraces for number conversions
 //! * [`SaturatingInto`](https://docs.rs/cadd/latest/cadd/convert/trait.SaturatingInto.html):
@@ -13,7 +15,7 @@
 //! * [`non_zero`](https://docs.rs/cadd/latest/cadd/convert/fn.non_zero.html)
 //!   and [`to_non_zero()`](https://docs.rs/cadd/latest/cadd/convert/trait.ToNonZero.html):
 //!   conversion to [`NonZero`](https://doc.rust-lang.org/nightly/core/num/struct.NonZero.html)
-//!   with `Result` and backtraces
+//!   with `Result`, informative errors, and backtraces
 //! * <code>.[into_type](https://docs.rs/cadd/latest/cadd/convert/trait.IntoType.html)::&lt;T&gt;()</code>
 //!   as an alternative to `into()` and `try_into()` without type inference errors
 //!
@@ -78,7 +80,7 @@
 //! #   async fn handle_request(&self) -> anyhow::Result<()> {
 //! #       let price: u32 = 0;
 //! #       let discount_rate: u32 = 0;
-//! use cadd::{ops::csub, ops_ext::U32Ext};
+//! use cadd::{ops::csub, ext::U32Ext};
 //!
 //! let amount = csub(
 //!     price,
@@ -158,7 +160,7 @@ pub mod convert;
 ///
 /// * They return `Result` instead of `Option`, enabling the use of `?` in functions returning `Result`.
 ///   ```
-///   use cadd::{ops::{Cpow, cmul}, ops_ext::U32Ext};
+///   use cadd::{ops::{Cpow, cmul}, ext::U32Ext};
 ///
 ///   fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
 ///       cmul(mass, velocity.cpow(2)?)?.cdiv(2)
@@ -166,7 +168,7 @@ pub mod convert;
 ///   ```
 /// * The error values they return provide a meaningful error message and a backtrace:
 ///   ```
-///   # use cadd::{ops::cmul, ops_ext::U32Ext};
+///   # use cadd::{ops::cmul, ext::U32Ext};
 ///   # fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
 ///   #     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
 ///   # }
@@ -199,7 +201,7 @@ pub mod convert;
 ///   ```
 ///   Method style may be preferred for better chaining:
 ///   ```
-///   # use cadd::ops_ext::U32Ext;
+///   # use cadd::ext::U32Ext;
 ///   fn f2(a1: u32, b1: u32, c1: u32, d1: u32) -> cadd::Result<u32> {
 ///       a1.cadd(b1)?
 ///          .cmul(c1)?

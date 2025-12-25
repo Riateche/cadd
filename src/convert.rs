@@ -97,7 +97,7 @@ pub trait IntoType {
 
 impl<T: ?Sized> IntoType for T {}
 
-/// Checked conversion from `F` to `Self`.
+/// Checked conversion from `Input` to `Self`.
 ///
 /// This is semantically the same as [`TryFrom`]. However, `Cfrom`
 /// aims to provide a rich error message, as opposed to many implementations of `TryFrom` in `std`
@@ -106,38 +106,63 @@ impl<T: ?Sized> IntoType for T {}
 /// [`Cinto`] trait provides an alternative way to do the same conversion.
 /// Similar to `TryFrom`, it's recommended to always implement `Cfrom` instead of [`Cinto`].
 /// The corresponding `Cinto` implementation will be covered by the blanket impl.
+///
+/// # Examples
+/// ```
+/// use cadd::convert::{Cfrom, Cinto, IntoType};
+///
+/// // Output type can be inferred from context:
+/// let a = 15_i32;
+/// let b: u32 = a.cinto().unwrap();
+/// assert_eq!(b, 15);
+///
+/// // It's also possible to specify output type explicitly:
+/// let c = a.cinto_type::<u32>().unwrap();
+/// assert_eq!(c, 15);
+///
+/// // The error contains the input value, input type and output type:
+/// let d = -15_i32;
+/// let err = d.cinto_type::<u32>().unwrap_err();
+/// assert!(err.to_string().contains(
+///     "failed to convert value -15 from i32 to u32: value is out of bounds"
+/// ));
+///
+/// // Using `Cfrom` directly:
+/// let e = u32::cfrom(a).unwrap();
+/// assert_eq!(e, 15);
+/// ```
 #[allow(missing_docs)]
-pub trait Cfrom<F>: Sized {
+pub trait Cfrom<Input>: Sized {
     type Error;
-    fn cfrom(from: F) -> Result<Self, Self::Error>;
+    fn cfrom(from: Input) -> Result<Self, Self::Error>;
 }
 
-/// Checked conversion from `Self` to `I`.
+/// Checked conversion from `Self` to `Output`.
 ///
-/// This trait is automatically implemented when `I` implements `Cfrom<Self>`.
+/// This trait is automatically implemented when `Output` implements `Cfrom<Self>`.
 ///
 /// See [`Cfrom`] for main documentation.
 ///
 /// In order to help with type inference,
 /// the [`IntoType`] extension trait provides `.cinto_type::<T>()` syntax.
 #[allow(missing_docs)]
-pub trait Cinto<I>: Sized {
+pub trait Cinto<Output>: Sized {
     type Error;
-    fn cinto(self) -> Result<I, Self::Error>;
+    fn cinto(self) -> Result<Output, Self::Error>;
 }
 
-impl<F, I> Cinto<I> for F
+impl<Input, Output> Cinto<Output> for Input
 where
-    I: Cfrom<F>,
+    Output: Cfrom<Input>,
 {
-    type Error = <I as Cfrom<F>>::Error;
+    type Error = <Output as Cfrom<Input>>::Error;
     #[inline]
-    fn cinto(self) -> Result<I, Self::Error> {
-        I::cfrom(self)
+    fn cinto(self) -> Result<Output, Self::Error> {
+        Output::cfrom(self)
     }
 }
 
-/// Saturating conversion of a number from `F` to `Self`.
+/// Saturating conversion of a number from `Input` to `Self`.
 ///
 /// If the value being converted is out of bounds for the target type,
 /// the closest representable value is returned. Consequently, if the value is out of bounds,
@@ -154,14 +179,14 @@ where
 /// Similar to [`TryFrom`], it's recommended to always implement
 /// `SaturatingFrom` instead of [`SaturatingInto`](Cinto).
 /// The corresponding `SaturatingInto` implementation will be covered by the blanket impl.
-pub trait SaturatingFrom<F>: Sized {
+pub trait SaturatingFrom<Input>: Sized {
     #[allow(missing_docs)]
-    fn saturating_from(from: F) -> Self;
+    fn saturating_from(from: Input) -> Self;
 }
 
-/// Saturating conversion of a number from `Self` to `I`.
+/// Saturating conversion of a number from `Self` to `Output`.
 ///
-/// This trait is automatically implemented when `I` implements `SaturatingFrom<Self>`.
+/// This trait is automatically implemented when `Output` implements `SaturatingFrom<Self>`.
 ///
 /// See [`SaturatingFrom`] for main documentation.
 ///
@@ -181,18 +206,18 @@ pub trait SaturatingFrom<F>: Sized {
 /// assert_eq!((-300_i32).saturating_into_type::<u8>(), 0);
 /// assert_eq!((-300_i32).saturating_into_type::<i8>(), -128);
 /// ```
-pub trait SaturatingInto<I>: Sized {
+pub trait SaturatingInto<Output>: Sized {
     #[allow(missing_docs)]
-    fn saturating_into(self) -> I;
+    fn saturating_into(self) -> Output;
 }
 
-impl<F, I> SaturatingInto<I> for F
+impl<Input, Output> SaturatingInto<Output> for Input
 where
-    I: SaturatingFrom<F>,
+    Output: SaturatingFrom<Input>,
 {
     #[inline]
-    fn saturating_into(self) -> I {
-        I::saturating_from(self)
+    fn saturating_into(self) -> Output {
+        Output::saturating_from(self)
     }
 }
 
