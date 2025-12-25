@@ -12,6 +12,27 @@ use {
     syn::{GenericArgument, Ident, ImplItem, Item, PathArguments, ReturnType, Type, parse_quote},
 };
 
+fn expand_lib(src_dir: &Path, lib_name: &str, output_dir: &Path) -> anyhow::Result<syn::File> {
+    let lib_path = src_dir.join(lib_name);
+    let rustc_output = Command::new("rustc")
+        .args(["--edition=2024", "-Zunpretty=expanded", "src/lib.rs"])
+        .current_dir(lib_path)
+        .env("RUSTC_BOOTSTRAP", "1")
+        .output()?
+        .stdout;
+    let expanded_source = String::from_utf8(rustc_output)?
+        .replace("const trait", "trait")
+        .replace("impl const", "impl")
+        .replace("is !null", "");
+    fs_err::write(
+        output_dir.join(format!("target/{lib_name}_expanded.rs")),
+        &expanded_source,
+    )?;
+    let file = syn::parse_file(&expanded_source)
+        .map_err(|err| format_err!("{err:?} at {:?}", err.span().start()))?;
+    Ok(file)
+}
+
 fn main() -> anyhow::Result<()> {
     let output_dir = PathBuf::from(env::args().nth(1).context("missing output dir arg")?);
 
@@ -19,20 +40,19 @@ fn main() -> anyhow::Result<()> {
         .args(["--print", "sysroot"])
         .output()?
         .stdout;
-    let sysroot = String::from_utf8(sysroot)?;
-    let core_path = Path::new(sysroot.trim()).join("lib/rustlib/src/rust/library/core");
-    let core_expanded = Command::new("rustc")
-        .args(["--edition=2024", "-Zunpretty=expanded", "src/lib.rs"])
-        .current_dir(core_path)
-        .env("RUSTC_BOOTSTRAP", "1")
-        .output()?
-        .stdout;
-    let core_expanded = String::from_utf8(core_expanded)?.replace("const trait", "trait");
+    let sysroot = PathBuf::from(String::from_utf8(sysroot)?.trim());
+    let src_dir = sysroot.join("lib/rustlib/src/rust/library");
+    let core_file = expand_lib(&src_dir, "core", &output_dir)?;
+    let alloc_file = expand_lib(&src_dir, "alloc", &output_dir)?;
+    let std_file = expand_lib(&src_dir, "std", &output_dir)?;
 
-    let file = syn::parse_file(&core_expanded)
-        .map_err(|err| format_err!("{err:?} at {:?}", err.span().start()))?;
-
-    let fns = find_fns(&file.items)?;
+    println!("core:");
+    find_try_from(&core_file.items)?;
+    println!("alloc:");
+    find_try_from(&alloc_file.items)?;
+    println!("std:");
+    find_try_from(&std_file.items)?;
+    let fns = find_fns(&core_file.items)?;
     write_file(&generate_ops_traits(&fns)?, &output_dir.join("src/ops.rs"))?;
     write_file(&generate_ext_traits(&fns)?, &output_dir.join("src/ext.rs"))?;
     Ok(())
@@ -51,6 +71,32 @@ struct CheckedFn {
     output_type: Type,
     ident: Ident,
     kind: FunctionKind,
+}
+
+fn find_try_from(items: &[Item]) -> anyhow::Result<()> {
+    for item in items {
+        match item {
+            Item::Impl(item_impl) => {
+                if let Some((_neg, trait_, _for)) = &item_impl.trait_
+                    && trait_
+                        .segments
+                        .last()
+                        .is_some_and(|seg| seg.ident == "TryFrom")
+                {
+                    let self_type = &item_impl.self_ty;
+                    let text = quote! { #trait_ for #self_type };
+                    println!("{text}");
+                }
+            }
+            Item::Mod(item_mod) => {
+                if let Some((_brace, content)) = &item_mod.content {
+                    find_try_from(content)?;
+                }
+            }
+            _ => {}
+        }
+    }
+    Ok(())
 }
 
 fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {

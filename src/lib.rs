@@ -229,12 +229,6 @@ use core::{fmt::Debug, num::NonZero};
 /// `Result` with error type defaulting to `cadd::Error`.
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
-// TODO: String <-> OsString conversions
-// TODO: &[u8] -> String utf8 conversions
-// TODO: Path conversions
-// TODO: ops for non-nan and finite floats (real_float crate?)
-// TODO: readme
-
 struct MaybeParens<T>(T);
 
 impl<T: Debug + IsNegative> Debug for MaybeParens<T> {

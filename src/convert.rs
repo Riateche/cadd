@@ -107,30 +107,59 @@ impl<T: ?Sized> IntoType for T {}
 /// Similar to `TryFrom`, it's recommended to always implement `Cfrom` instead of [`Cinto`].
 /// The corresponding `Cinto` implementation will be covered by the blanket impl.
 ///
-/// # Examples
-/// ```
-/// use cadd::convert::{Cfrom, Cinto, IntoType};
+/// Notable implementations:
 ///
-/// // Output type can be inferred from context:
-/// let a = 15_i32;
-/// let b: u32 = a.cinto().unwrap();
-/// assert_eq!(b, 15);
+/// * Fallible conversions between integer types:
+///   ```
+///   use cadd::convert::{Cfrom, Cinto, IntoType};
 ///
-/// // It's also possible to specify output type explicitly:
-/// let c = a.cinto_type::<u32>().unwrap();
-/// assert_eq!(c, 15);
+///   // Output type can be inferred from context:
+///   let a = 15_i32;
+///   let b: u32 = a.cinto().unwrap();
+///   assert_eq!(b, 15);
 ///
-/// // The error contains the input value, input type and output type:
-/// let d = -15_i32;
-/// let err = d.cinto_type::<u32>().unwrap_err();
-/// assert!(err.to_string().contains(
-///     "failed to convert value -15 from i32 to u32: value is out of bounds"
-/// ));
+///   // It's also possible to specify output type explicitly:
+///   let c = a.cinto_type::<u32>().unwrap();
+///   assert_eq!(c, 15);
 ///
-/// // Using `Cfrom` directly:
-/// let e = u32::cfrom(a).unwrap();
-/// assert_eq!(e, 15);
-/// ```
+///   // The error contains the input value, input type and output type:
+///   let d = -15_i32;
+///   let err = d.cinto_type::<u32>().unwrap_err();
+///   assert!(err.to_string().contains(
+///       "failed to convert value -15 from i32 to u32: value is out of bounds"
+///   ));
+///
+///   // Using `Cfrom` directly:
+///   let e = u32::cfrom(a).unwrap();
+///   assert_eq!(e, 15);
+///   ```
+/// * Conversions from slices to fixed arrays:
+///   ```
+///   # use cadd::convert::{Cfrom, Cinto, IntoType};
+///   let a: &[u32] = &[1, 2, 3, 4];
+///   let b: &[u32; 4] = a.cinto().unwrap();
+///   assert!(
+///       a.cinto_type::<&[u32; 5]>().unwrap_err().to_string().contains(
+///           "expected 5 items, got [1, 2, 3, 4] (4 items)"
+///       )
+///   );
+///   ```
+/// * Conversions from `CString`, `&CStr`, `OsString`, `&OsStr`, `PathBuf`, `&Path` to `String` and `&str`:
+///   ```
+///   # use {cadd::convert::{Cfrom, Cinto, IntoType}, std::ffi::CString};
+///   let a = CString::from_vec_with_nul(vec![104, 101, 108, 108, 111, 0]).unwrap();
+///   assert_eq!(a.cinto_type::<String>().unwrap(), "hello");
+///
+///   let a2 = CString::from_vec_with_nul(vec![104, 128, 108, 108, 111, 0]).unwrap();
+///   assert!(
+///       a2.clone().cinto_type::<String>().unwrap_err().to_string().contains(
+///           "failed to convert bytes to string: \
+///           invalid utf-8 sequence of 1 bytes from index 1; \
+///           input: [104, 128, 108, 108, 111] (5 bytes); \
+///           input as lossy utf-8: \"h�llo\""
+///       )
+///   );
+///   ```
 #[allow(missing_docs)]
 pub trait Cfrom<Input>: Sized {
     type Error;
