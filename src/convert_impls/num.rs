@@ -2,7 +2,7 @@ use core::num::NonZero;
 
 macro_rules! impl_nonzero_int_cfrom_nonzero_int {
     ($source:ty => $($target:ty),+) => {
-        super::impl_cfrom!(
+        super::impl_cfrom_int!(
             $((NonZero<$source>, NonZero<$target>),)*
         );
     };

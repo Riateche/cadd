@@ -1,30 +1,8 @@
 use {
-    crate::convert::Cfrom,
+    crate::{convert::Cfrom, convert_impls::LimitedSliceDebug},
     alloc::{boxed::Box, rc::Rc, sync::Arc, vec::Vec},
     core::fmt::Debug,
 };
-
-struct SliceLimitedDebug<'a, T>(&'a [T]);
-
-impl<'a, T: Debug> Debug for SliceLimitedDebug<'a, T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        const MAX_ITEMS: usize = 32;
-        if self.0.len() > MAX_ITEMS {
-            let mut list = f.debug_list();
-            for item in &self.0[0..MAX_ITEMS / 2] {
-                list.entry(item);
-            }
-            // TODO: avoid quotes in "..."
-            list.entry(&"...");
-            for item in &self.0[self.0.len() - MAX_ITEMS / 2..] {
-                list.entry(item);
-            }
-            list.finish()
-        } else {
-            write!(f, "{:?}", self.0)
-        }
-    }
-}
 
 impl<'a, T: Debug, const N: usize> Cfrom<&'a [T]> for &'a [T; N] {
     type Error = crate::Error;
@@ -88,10 +66,12 @@ macro_rules! impl_cfrom_owned_to_array {
 
 fn slice_to_array_error<T: Debug>(target_len: usize, value: &[T]) -> crate::Error {
     crate::Error::new(alloc::format!(
-        "expected slice of length {}, got length {}: {:?}",
+        "expected {} items, got {:?}",
         target_len,
-        value.len(),
-        SliceLimitedDebug(value),
+        LimitedSliceDebug {
+            data: value,
+            items_text: "items"
+        },
     ))
 }
 

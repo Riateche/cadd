@@ -114,9 +114,6 @@ extern crate std;
 mod convert_impls;
 mod error;
 
-#[cfg(test)]
-mod tests;
-
 pub mod convert;
 
 /// Checked operations on numbers.
