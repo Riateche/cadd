@@ -31,6 +31,7 @@ impl Cfrom<OsString> for String {
             // `OsString` doesn't expose API to get `Utf8Error`, but we can get it
             // using `impl TryFrom<&OsStr> for &str`.
             let mut text = format!("failed to convert OS string {from:?} to utf-8");
+            #[expect(clippy::unwrap_used, reason = "write to string never fails")]
             if let Err(err) = from.as_os_str().try_into_type::<&str>() {
                 write!(text, ": {err}").unwrap();
             }
@@ -62,6 +63,7 @@ impl Cfrom<PathBuf> for String {
                 // `OsString` doesn't expose API to get `Utf8Error`, but we can get it
                 // using `impl TryFrom<&OsStr> for &str`.
                 let mut text = format!("failed to convert OS path {from:?} to utf-8");
+                #[expect(clippy::unwrap_used, reason = "write to string never fails")]
                 if let Err(err) = from.as_os_str().try_into_type::<&str>() {
                     write!(text, ": {err}").unwrap();
                 }

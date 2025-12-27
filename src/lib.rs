@@ -1,5 +1,4 @@
 #![no_std]
-#![warn(missing_docs)]
 
 //! # `cadd`: painless checked arithmetics and conversions
 //!
@@ -227,21 +226,27 @@ pub mod convert;
 /// becomes known as well.
 ///
 /// See also: [crate level documentation](crate).
+#[expect(clippy::default_numeric_fallback, reason = "intentional")]
 pub mod ops;
 
 pub mod prelude;
 
 pub use crate::error::Error;
 
-use core::{fmt::Debug, num::NonZero};
+use core::{
+    fmt::{self, Debug, Formatter},
+    num::NonZero,
+    time::Duration,
+};
 
 /// `Result` with error type defaulting to `cadd::Error`.
+#[expect(clippy::absolute_paths, reason = "for clarity")]
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 struct MaybeParens<T>(T);
 
 impl<T: Debug + IsNegative> Debug for MaybeParens<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if self.0.is_negative() {
             write!(f, "({:?})", self.0)
         } else {
@@ -277,6 +282,11 @@ macro_rules! impl_is_negative_non_zero {
     ($t:ty) => {
         impl IsNegative for $t {
             fn is_negative(&self) -> bool {
+                #[allow(
+                    clippy::default_numeric_fallback,
+                    clippy::allow_attributes,
+                    reason = "intentional"
+                )]
                 const ONE: $t = <$t>::new(1).unwrap();
                 *self < ONE
             }
@@ -309,4 +319,4 @@ impl_is_negative_false!(NonZero<u32>);
 impl_is_negative_false!(NonZero<u64>);
 impl_is_negative_false!(NonZero<u128>);
 impl_is_negative_false!(NonZero<usize>);
-impl_is_negative_false!(core::time::Duration);
+impl_is_negative_false!(Duration);

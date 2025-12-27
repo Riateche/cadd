@@ -190,9 +190,10 @@ impl<T: ?Sized> IntoType for T {}
 ///       )
 ///   );
 ///   ```
-#[allow(missing_docs)]
 pub trait Cfrom<Input>: Sized {
+    #[expect(missing_docs, reason = "no need for doc")]
     type Error;
+    /// Attempts to convert `from` into `Self`.
     fn cfrom(from: Input) -> Result<Self, Self::Error>;
 }
 
@@ -204,9 +205,10 @@ pub trait Cfrom<Input>: Sized {
 /// the [`IntoType`] extension trait provides `.cinto_type::<T>()` syntax.
 ///
 /// **See [`Cfrom`] for main documentation.**
-#[allow(missing_docs)]
 pub trait Cinto<Output>: Sized {
+    #[expect(missing_docs, reason = "no need for doc")]
     type Error;
+    /// Attempts to convert `self` into `Output`.
     fn cinto(self) -> Result<Output, Self::Error>;
 }
 
@@ -307,7 +309,7 @@ where
 /// );
 /// ```
 pub trait ToNonZero {
-    #[allow(missing_docs)]
+    #[expect(missing_docs, reason = "no need for doc")]
     type Error;
     /// Output type, usually equal to `NonZero<Self>`.
     type NonZero;

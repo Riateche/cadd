@@ -1,3 +1,10 @@
+#![expect(
+    missing_docs,
+    clippy::tests_outside_test_module,
+    clippy::unwrap_used,
+    reason = "tests"
+)]
+
 use {
     crate::util::assert_err,
     cadd::ops::{

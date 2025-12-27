@@ -11,7 +11,7 @@ use {
     alloc::{ffi::CString, format, string::String, vec::Vec},
     core::{
         ffi::CStr,
-        fmt::{Debug, Write},
+        fmt::{self, Debug, Formatter, Write},
         num::NonZero,
         str::Utf8Error,
     },
@@ -73,13 +73,15 @@ struct LimitedSliceDebug<'a, T> {
 
 struct NonExhaustive;
 impl Debug for NonExhaustive {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "..")
     }
 }
 
-impl<'a, T: Debug> Debug for LimitedSliceDebug<'a, T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+impl<T: Debug> Debug for LimitedSliceDebug<'_, T> {
+    #[expect(clippy::indexing_slicing, reason = "safe to slice after length check")]
+    #[expect(clippy::arithmetic_side_effects, reason = "never overflows")]
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if self.data.len() <= MAX_PRINT_SLICE_ITEMS {
             write!(f, "{:?}", self.data)?;
         } else {
@@ -94,8 +96,10 @@ impl<'a, T: Debug> Debug for LimitedSliceDebug<'a, T> {
 }
 
 struct LimitedStrDebug<'a>(&'a str);
-impl<'a> Debug for LimitedStrDebug<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+impl Debug for LimitedStrDebug<'_> {
+    #[expect(clippy::indexing_slicing, reason = "safe to slice after length check")]
+    #[expect(clippy::arithmetic_side_effects, reason = "never overflows")]
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let chars: Vec<_> = self.0.chars().collect();
         if chars.len() <= MAX_PRINT_SLICE_ITEMS {
             write!(f, "{:?}", self.0)
@@ -109,6 +113,7 @@ impl<'a> Debug for LimitedStrDebug<'a> {
     }
 }
 
+#[expect(clippy::unwrap_used, reason = "write to string never fails")]
 fn bytes_to_str_error(input: &[u8], err: Utf8Error) -> Error {
     let mut text = format!(
         "failed to convert bytes to string: {}; input: {:?}",

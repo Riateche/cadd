@@ -1,7 +1,14 @@
+#![expect(
+    missing_docs,
+    clippy::tests_outside_test_module,
+    clippy::unwrap_used,
+    reason = "tests"
+)]
+
 use {
     crate::util::assert_err,
     cadd::prelude::{Cinto, IntoType},
-    std::ffi::CString,
+    std::{ffi::CString, iter},
 };
 
 mod util;
@@ -33,14 +40,13 @@ fn test_bytes_vec_to_string() {
         r#"failed to convert bytes to string: invalid utf-8 sequence of 1 bytes from index 1; input: [104, 128, 108, 108, 111] (5 bytes); input as lossy utf-8: "h�llo""#,
     );
 
-    let a3: Vec<u8> = [128].into_iter().chain(1..=100).collect();
+    let a3: Vec<u8> = iter::once(128).chain(1..=100).collect();
     assert_err(
         a3.cinto_type::<String>(),
         r#"failed to convert bytes to string: invalid utf-8 sequence of 1 bytes from index 0; input: [128, 1, 2, 3, 4, 5, 6, 7, 8, 9, .., 91, 92, 93, 94, 95, 96, 97, 98, 99, 100] (101 bytes); input as lossy utf-8: "�\u{1}\u{2}\u{3}\u{4}\u{5}\u{6}\u{7}\u{8}\t".."[\\]^_`abcd""#,
     );
 
-    let a4: Vec<u8> = [128]
-        .into_iter()
+    let a4: Vec<u8> = iter::once(128)
         .chain(1..=100)
         .chain(1..=100)
         .chain(1..=100)
@@ -63,14 +69,13 @@ fn test_bytes_slice_to_str() {
         r#"failed to convert bytes to string: invalid utf-8 sequence of 1 bytes from index 1; input: [104, 128, 108, 108, 111] (5 bytes); input as lossy utf-8: "h�llo""#,
     );
 
-    let a3: Vec<u8> = [128].into_iter().chain(1..=100).collect();
+    let a3: Vec<u8> = iter::once(128).chain(1..=100).collect();
     assert_err(
         (&*a3).cinto_type::<&str>(),
         r#"failed to convert bytes to string: invalid utf-8 sequence of 1 bytes from index 0; input: [128, 1, 2, 3, 4, 5, 6, 7, 8, 9, .., 91, 92, 93, 94, 95, 96, 97, 98, 99, 100] (101 bytes); input as lossy utf-8: "�\u{1}\u{2}\u{3}\u{4}\u{5}\u{6}\u{7}\u{8}\t".."[\\]^_`abcd""#,
     );
 
-    let a4: Vec<u8> = [128]
-        .into_iter()
+    let a4: Vec<u8> = iter::once(128)
         .chain(1..=100)
         .chain(1..=100)
         .chain(1..=100)
@@ -178,7 +183,7 @@ fn slice_to_array() {
         "expected 2 items, got [1, 2, 3, 4] (4 items)",
     );
 
-    let mut bufs2: Vec<String> = (1..=10).map(|i| format!("s{i}")).collect();
+    let mut bufs2: Vec<String> = (1_i32..=10_i32).map(|i| format!("s{i}")).collect();
     let mut refs2: Vec<&mut str> = bufs2.iter_mut().map(|s| &mut **s).collect();
     let a2: &mut [&mut str] = &mut refs2;
     assert_eq!(
@@ -190,7 +195,7 @@ fn slice_to_array() {
         r#"expected 20 items, got ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"] (10 items)"#,
     );
 
-    let bufs3: Vec<String> = (1..=30).map(|i| format!("s{i}")).collect();
+    let bufs3: Vec<String> = (1_i32..=30_i32).map(|i| format!("s{i}")).collect();
     let refs3: Vec<&str> = bufs3.iter().map(|s| s.as_str()).collect();
     let a3: &[&str] = &refs3;
     assert_err(

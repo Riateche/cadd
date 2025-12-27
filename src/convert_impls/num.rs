@@ -1,3 +1,11 @@
+#![expect(
+    clippy::as_conversions,
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
+    clippy::cast_sign_loss,
+    reason = "`as` is used where it's safe"
+)]
+
 use core::num::NonZero;
 
 macro_rules! impl_nonzero_int_cfrom_nonzero_int {

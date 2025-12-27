@@ -1,5 +1,7 @@
+//! Test utils.
+
 use {
-    cadd::Result,
+    cadd::{prelude::IntoType, Result},
     core::sync::atomic::{AtomicU8, Ordering},
     std::{env, fmt::Debug, string::ToString},
 };
@@ -21,10 +23,13 @@ fn backtrace_enabled() -> bool {
             Err(_) => false,
         },
     };
-    ENABLED.store(enabled as u8 + 1, Ordering::Relaxed);
+    #[expect(clippy::arithmetic_side_effects, reason = "never overflows")]
+    ENABLED.store(enabled.into_type::<u8>() + 1, Ordering::Relaxed);
     enabled
 }
 
+/// Checks that `value` is an expected error.
+#[expect(clippy::expect_used, reason = "tests")]
 #[track_caller]
 pub fn assert_err<T: Debug>(value: Result<T>, expected: &str) {
     let actual = value.expect_err("expected error").to_string();

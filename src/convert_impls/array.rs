@@ -9,7 +9,8 @@ impl<'a, T: Debug, const N: usize> Cfrom<&'a [T]> for &'a [T; N] {
 
     #[inline]
     fn cfrom(from: &'a [T]) -> Result<Self, Self::Error> {
-        from.try_into().map_err(|_| slice_to_array_error(N, from))
+        from.try_into()
+            .map_err(|_err| slice_to_array_error(N, from))
     }
 }
 
@@ -20,6 +21,11 @@ impl<'a, T: Debug, const N: usize> Cfrom<&'a mut [T]> for &'a mut [T; N] {
     fn cfrom(from: &'a mut [T]) -> Result<Self, Self::Error> {
         // We have to do it with an extra check because of borrow checker.
         if from.len() == N {
+            #[expect(
+                clippy::unwrap_used,
+                clippy::unwrap_in_result,
+                reason = "always succeeds after length check"
+            )]
             Ok(from.try_into().unwrap())
         } else {
             Err(slice_to_array_error(N, from))
@@ -32,7 +38,8 @@ impl<'a, T: Copy + Debug, const N: usize> Cfrom<&'a [T]> for [T; N] {
 
     #[inline]
     fn cfrom(from: &'a [T]) -> Result<Self, Self::Error> {
-        from.try_into().map_err(|_| slice_to_array_error(N, from))
+        from.try_into()
+            .map_err(|_err| slice_to_array_error(N, from))
     }
 }
 
@@ -41,7 +48,8 @@ impl<'a, T: Copy + Debug, const N: usize> Cfrom<&'a mut [T]> for [T; N] {
 
     #[inline]
     fn cfrom(from: &'a mut [T]) -> Result<Self, Self::Error> {
-        from.try_into().map_err(|_| slice_to_array_error(N, from))
+        from.try_into()
+            .map_err(|_err| slice_to_array_error(N, from))
     }
 }
 

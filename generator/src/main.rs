@@ -1,5 +1,11 @@
+//! Code generator for `cadd`.
+//!
+//! See `README.md` for usage instructions.
+
+#![expect(clippy::print_stdout, reason = "intentional")]
+
 use {
-    anyhow::{Context as _, bail, format_err},
+    anyhow::{Context as _, bail, ensure, format_err},
     convert_case::{Case, Casing},
     proc_macro2::{Span, TokenStream},
     quote::quote,
@@ -94,7 +100,21 @@ fn find_try_from(items: &[Item]) -> anyhow::Result<()> {
                     find_try_from(content)?;
                 }
             }
-            _ => {}
+            Item::Const(_)
+            | Item::Enum(_)
+            | Item::ExternCrate(_)
+            | Item::Fn(_)
+            | Item::ForeignMod(_)
+            | Item::Macro(_)
+            | Item::Static(_)
+            | Item::Struct(_)
+            | Item::Trait(_)
+            | Item::TraitAlias(_)
+            | Item::Type(_)
+            | Item::Union(_)
+            | Item::Use(_)
+            | Item::Verbatim(_)
+            | _ => {}
         }
     }
     Ok(())
@@ -110,8 +130,8 @@ fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {
                 {
                     continue;
                 }
-                for item in &item_impl.items {
-                    let ImplItem::Fn(item_fn) = item else {
+                for impl_item in &item_impl.items {
+                    let ImplItem::Fn(item_fn) = impl_item else {
                         continue;
                     };
                     let fn_name = item_fn.sig.ident.to_string();
@@ -157,7 +177,21 @@ fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {
                     fns.extend(find_fns(content)?);
                 }
             }
-            _ => {}
+            Item::Const(_)
+            | Item::Enum(_)
+            | Item::ExternCrate(_)
+            | Item::Fn(_)
+            | Item::ForeignMod(_)
+            | Item::Macro(_)
+            | Item::Static(_)
+            | Item::Struct(_)
+            | Item::Trait(_)
+            | Item::TraitAlias(_)
+            | Item::Type(_)
+            | Item::Union(_)
+            | Item::Use(_)
+            | Item::Verbatim(_)
+            | _ => {}
         }
     }
     Ok(fns)
@@ -177,9 +211,11 @@ fn unwrap_generic_type<'a>(type_: &'a Type, generic_name: &str) -> Option<&'a Ty
     let Type::Path(return_type) = type_ else {
         return None;
     };
+    #[expect(clippy::indexing_slicing, reason = "len checked")]
     if return_type.path.segments.len() != 1 || return_type.path.segments[0].ident != generic_name {
         return None;
     }
+    #[expect(clippy::indexing_slicing, reason = "len checked")]
     let PathArguments::AngleBracketed(args) = &return_type.path.segments[0].arguments else {
         return None;
     };
@@ -206,9 +242,11 @@ fn use_parens(type_: &Type) -> bool {
     }
 }
 
-#[expect(dead_code)]
+#[expect(dead_code, reason = "may be used later")]
 fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
     let mut fns_per_self_type = Vec::<FunctionsPerSelfType>::new();
+    #[expect(clippy::arithmetic_side_effects, reason = "never overflows after push")]
+    #[expect(clippy::indexing_slicing, reason = "index is always valid")]
     for f in all_fns {
         let index = if let Some(index) = fns_per_self_type
             .iter()
@@ -222,7 +260,7 @@ fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             });
             fns_per_self_type.len() - 1
         };
-        assert_eq!(fns_per_self_type[index].self_type, &f.self_type);
+        ensure!(fns_per_self_type[index].self_type == &f.self_type);
         fns_per_self_type[index].fns.push(f);
     }
 
@@ -239,7 +277,7 @@ fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             let mut fn_declarations = Vec::new();
             let mut fn_impls = Vec::new();
             for f in &item.fns {
-                assert_eq!(item.self_type, &f.self_type);
+                ensure!(item.self_type == &f.self_type);
 
                 let ext_fn_name = f.kind.ext_fn_name();
                 let ext_fn_ident = ident(ext_fn_name);
@@ -255,7 +293,7 @@ fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                         "Wrapper for [`{}`].",
                         quote! { #self_type::#fn_ident }
                             .to_string()
-                            .replace(" ", "")
+                            .replace(' ', "")
                     ),
                 ];
 
@@ -295,13 +333,13 @@ fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                     let ext_assign_fn_ident = ident(&format!("{ext_fn_name}_assign"));
 
                     let assign_fn_docs = [
-                        f.kind.assign_doc("self", other_arg_name),
+                        f.kind.assign_doc("self", other_arg_name)?,
                         String::new(),
                         format!(
                             "Wrapper for [`{}`].",
                             quote! { #self_type::#fn_ident }
                                 .to_string()
-                                .replace(" ", "")
+                                .replace(' ', "")
                         ),
                     ];
 
@@ -323,7 +361,7 @@ fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
 
             let trait_doc = format!(
                 "Enhanced checked arithmetics functions for [`{}`]",
-                quote! { #self_type }.to_string().replace(" ", "")
+                quote! { #self_type }.to_string().replace(' ', "")
             );
 
             Ok(quote! {
@@ -387,7 +425,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                 let ext_assign_fn_ident = ident(&format!("{ext_fn_name}_assign"));
 
                 let assign_fn_docs = [
-                    kind.assign_doc("self", other_arg_name),
+                    kind.assign_doc("self", other_arg_name)?,
                     String::new(),
                     format!("Wrapper for `{}`.", kind.impl_fn_name()),
                 ];
@@ -403,11 +441,11 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             contents.push(quote! {
                 #(#[doc = #trait_docs])*
                 pub trait #ext_trait_ident: Sized {
-                    #[allow(missing_docs, reason = "no need for doc")]
+                    #[expect(missing_docs, reason = "no need for doc")]
                     type #other_param_ident;
-                    #[allow(missing_docs, reason = "no need for doc")]
+                    #[expect(missing_docs, reason = "no need for doc")]
                     type Output;
-                    #[allow(missing_docs, reason = "no need for doc")]
+                    #[expect(missing_docs, reason = "no need for doc")]
                     type Error;
                     #(#[doc = #trait_fn_docs])*
                     fn #ext_fn_ident(self, #other_arg_ident: Self::#other_param_ident)
@@ -430,7 +468,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             });
 
             for f in fns {
-                assert_eq!(kind, f.kind);
+                ensure!(kind == f.kind);
                 let self_type = &f.self_type;
                 let output_type = unself(&f.output_type, &f.self_type);
                 let other_type = unself(
@@ -452,21 +490,21 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                         "Wrapper for [`{}`].",
                         quote! { #self_type::#fn_ident }
                             .to_string()
-                            .replace(" ", "")
+                            .replace(' ', "")
                     ),
                 ];
 
-                let assign_method = if kind.has_assign_method() {
+                let impl_assign_method = if kind.has_assign_method() {
                     let ext_assign_fn_ident = ident(&format!("{ext_fn_name}_assign"));
 
                     let assign_fn_docs = [
-                        kind.assign_doc("self", other_arg_name),
+                        kind.assign_doc("self", other_arg_name)?,
                         String::new(),
                         format!(
                             "Wrapper for [`{}`].",
                             quote! { #self_type::#fn_ident }
                                 .to_string()
-                                .replace(" ", "")
+                                .replace(' ', "")
                         ),
                     ];
 
@@ -488,13 +526,14 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                         type Output = #output_type;
                         type Error = Error;
                         #(#[doc = #fn_docs])*
+                        #[inline]
                         fn #ext_fn_ident(self, #other_arg_ident: #other_type)
                             -> Result<#output_type, Error>
                         {
                             self.#fn_ident(#other_arg_ident).ok_or_else(|| #map_err_code)
                         }
 
-                        #assign_method
+                        #impl_assign_method
                     }
 
                 });
@@ -503,9 +542,9 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             contents.push(quote! {
                 #(#[doc = #trait_docs])*
                 pub trait #ext_trait_ident: Sized {
-                    #[allow(missing_docs, reason = "no need for doc")]
+                    #[expect(missing_docs, reason = "no need for doc")]
                     type Output;
-                    #[allow(missing_docs, reason = "no need for doc")]
+                    #[expect(missing_docs, reason = "no need for doc")]
                     type Error;
                     #(#[doc = #trait_fn_docs])*
                     fn #ext_fn_ident(self) -> Result<Self::Output, Self::Error>;
@@ -524,7 +563,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             });
 
             for f in fns {
-                assert_eq!(kind, f.kind);
+                ensure!(kind == f.kind);
                 let self_type = &f.self_type;
                 let output_type = unself(&f.output_type, &f.self_type);
                 let fn_ident = &f.ident;
@@ -542,7 +581,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                         "Wrapper for [`{}`].",
                         quote! { #self_type::#fn_ident }
                             .to_string()
-                            .replace(" ", "")
+                            .replace(' ', "")
                     ),
                 ];
 
@@ -551,6 +590,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                         type Output = #output_type;
                         type Error = Error;
                         #(#[doc = #fn_docs])*
+                        #[inline]
                         fn #ext_fn_ident(self) -> Result<#output_type, Error> {
                             self.#fn_ident().ok_or_else(|| #map_err_code)
                         }
@@ -846,10 +886,10 @@ impl FunctionKind {
         }
     }
 
-    fn assign_doc(&self, first_arg: &str, second_arg: &str) -> String {
+    fn assign_doc(&self, first_arg: &str, second_arg: &str) -> anyhow::Result<String> {
         let a = first_arg;
         let b = second_arg;
-        match self {
+        let text = match self {
             FunctionKind::Add => {
                 format!(
                     "Checked addition assigement: executes `{a} += {b}`, returning an error if overflow occured."
@@ -885,8 +925,24 @@ impl FunctionKind {
                     "Checked shift right assigement: executes `{a} >>= {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
                 )
             }
-            _ => panic!("unexpected assign function for {:?}", self),
-        }
+            FunctionKind::AddUnsigned
+            | FunctionKind::AddSigned
+            | FunctionKind::SubUnsigned
+            | FunctionKind::SubSigned
+            | FunctionKind::SignedDiff
+            | FunctionKind::Neg
+            | FunctionKind::DivEuclid
+            | FunctionKind::RemEuclid
+            | FunctionKind::Ilog
+            | FunctionKind::Ilog2
+            | FunctionKind::Ilog10
+            | FunctionKind::Pow
+            | FunctionKind::Abs
+            | FunctionKind::Isqrt
+            | FunctionKind::NextMultipleOf
+            | FunctionKind::NextPowerOfTwo => bail!("unexpected assign function for {:?}", self),
+        };
+        Ok(text)
     }
 
     fn map_err_code(
@@ -1025,7 +1081,23 @@ impl FunctionKind {
             | FunctionKind::RemEuclid => "divisor",
             FunctionKind::Ilog => "base",
             FunctionKind::Pow => "power",
-            _ => "other",
+            FunctionKind::Add
+            | FunctionKind::AddUnsigned
+            | FunctionKind::AddSigned
+            | FunctionKind::Sub
+            | FunctionKind::SubUnsigned
+            | FunctionKind::SubSigned
+            | FunctionKind::SignedDiff
+            | FunctionKind::Neg
+            | FunctionKind::Mul
+            | FunctionKind::Ilog2
+            | FunctionKind::Ilog10
+            | FunctionKind::Shl
+            | FunctionKind::Shr
+            | FunctionKind::Abs
+            | FunctionKind::Isqrt
+            | FunctionKind::NextMultipleOf
+            | FunctionKind::NextPowerOfTwo => "other",
         }
     }
 
@@ -1037,7 +1109,23 @@ impl FunctionKind {
             | FunctionKind::RemEuclid => "Divisor",
             FunctionKind::Ilog => "Base",
             FunctionKind::Pow => "Power",
-            _ => "Other",
+            FunctionKind::Add
+            | FunctionKind::AddUnsigned
+            | FunctionKind::AddSigned
+            | FunctionKind::Sub
+            | FunctionKind::SubUnsigned
+            | FunctionKind::SubSigned
+            | FunctionKind::SignedDiff
+            | FunctionKind::Neg
+            | FunctionKind::Mul
+            | FunctionKind::Ilog2
+            | FunctionKind::Ilog10
+            | FunctionKind::Shl
+            | FunctionKind::Shr
+            | FunctionKind::Abs
+            | FunctionKind::Isqrt
+            | FunctionKind::NextMultipleOf
+            | FunctionKind::NextPowerOfTwo => "Other",
         }
     }
 
@@ -1055,7 +1143,17 @@ impl FunctionKind {
             | FunctionKind::Ilog2
             | FunctionKind::Ilog10
             | FunctionKind::NextPowerOfTwo => ("value", None),
-            _ => ("a", Some("b")),
+            FunctionKind::Add
+            | FunctionKind::AddUnsigned
+            | FunctionKind::AddSigned
+            | FunctionKind::Sub
+            | FunctionKind::SubUnsigned
+            | FunctionKind::SubSigned
+            | FunctionKind::SignedDiff
+            | FunctionKind::Mul
+            | FunctionKind::Shl
+            | FunctionKind::Shr
+            | FunctionKind::NextMultipleOf => ("a", Some("b")),
         }
     }
 }
