@@ -4,108 +4,115 @@
 //! # `cadd`: painless checked arithmetics and conversions
 //!
 //! Features:
-//! * [`ext`](https://docs.rs/cadd/latest/cadd/ext/index.html):
-//!   checked arithmetics with `Result`, informative errors, and backtraces
-//! * [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html):
-//!   generic functions for checked arithmetics
-//! * [`Cinto`](https://docs.rs/cadd/latest/cadd/convert/trait.Cinto.html):
-//!   `TryInto` with better error messages and backtraces for number conversions
-//! * [`SaturatingInto`](https://docs.rs/cadd/latest/cadd/convert/trait.SaturatingInto.html):
-//!   infallible number conversion that returns the closest valid value
-//! * [`non_zero`](https://docs.rs/cadd/latest/cadd/convert/fn.non_zero.html)
-//!   and [`to_non_zero()`](https://docs.rs/cadd/latest/cadd/convert/trait.ToNonZero.html):
-//!   conversion to [`NonZero`](https://doc.rust-lang.org/nightly/core/num/struct.NonZero.html)
-//!   with `Result`, informative errors, and backtraces
+//! * [`ext`]: checked arithmetics with `Result`, informative errors, and backtrace.
+//! * [`Cinto`](convert::Cinto): `TryInto` alternative for type conversions with better error messages and backtrace.
+//!   Works for integer types, other primitives, arrays, and string-like types.
+//! * [`SaturatingInto`](convert::SaturatingInto):
+//!   infallible number conversion that returns the closest valid value.
+//! * [`non_zero`](convert::non_zero) and [`to_non_zero()`](convert::ToNonZero):
+//!   conversion to [`NonZero`] with `Result`, informative errors, and backtrace.
 //! * <code>.[into_type](https://docs.rs/cadd/latest/cadd/convert/trait.IntoType.html)::&lt;T&gt;()</code>
-//!   as an alternative to `into()` and `try_into()` without type inference errors
+//!   as an alternative to `into()` and `try_into()` without type inference errors.
+//! * [`ops`]: generic functions for checked arithmetics.
+//! * `no_std` support (`alloc` is still required).
 //!
-//! ## Intro to checked and unchecked math
+//! # Introduction
 //!
-//! In Rust, most of the basic arithmetic operations (like `a + b`) are *unchecked* in Release mode.
-//! This means that they can silently overflow. This is great for performance, but may not be so great
-//! when your application bills the customer the wrong amount of money.
+//! Rust generally offers amazing capability to create safe, correct programs. However, since it is still
+//! a systems programming language, there are still a few aspects where the "default" or the easiest way
+//! to do something is the cheapest, but not always the correct one. One of the most ubiquitous example
+//! is the behavior of arithmetic operations on integer types and casts between them:
 //!
-//! In addition, some of the operations (like `a / b` and `a.ilog(b)`) will panic if their preconditions
-//! are unmet. This can bring down the whole process if you're not careful. If the inputs are untrusted,
-//! a checked alternative should be used.
+//! * Many arithmetic operators (`+`, `-`, `*`, ...) and some functions (like `.pow()`) are
+//!   *unchecked* in Release mode. This means that they can silently overflow and wrap, producing a value
+//!   that is not the true output of the operation.
+//! * Some of the operations (like `a / b` and `a.ilog(b)`) will panic if their preconditions
+//!   are unmet.
+//! * `as` conversion between integer types will silently truncate values as necessary to fit the output type.
+//!   It's also capable of reinterpreting signed values as unsigned and vice versa, producing a value that
+//!   is not equal to the input.
 //!
-//! Thankfully, Rust offers great capabilities for *checked* arithmetics.
-//! For every operation that can overflow or otherwise fail,
-//! the standard library contains a function with the `checked_` prefix that returns `Option`.
+//! Sometimes this behavior is fine. However, there are many cases where performance is not as important
+//! as correctness. For most high level applications, calculating the values precisely is much more important,
+//! as these values may represent things like amount of money or amount of physical goods.
+//! Arguably, **checked math and conversions should be the default**. A faster, but potentially wrapping or
+//! truncating alternative should only be chosen in specific cases, after ensuring that it will not cause
+//! a logic bug.
 //!
-//! Let's suppose we have some (almost) production-ready code:
+//! Rust's core library provides very good APIs for checked operations. The only problem with them is that
+//! they require much more verbose code. Compare a simple `a + b` with a properly done checked addition:
+//! `a.checked_add(b).ok_or(Error::Overflow)?`. Any non-trivial code quickly becomes a wall of checked
+//! calls and numerous error conversions.
+//!
+//! This is where `cadd` comes in. This crate aims to provide a set of APIs that are (almost)
+//! as easy to use as the basic operations, while being a safe, correct default. These functions
+//! never wrap, truncate, reinterpret, or panic.
+//!
+//! Any errors returned by `cadd` will contain as much information as possible (to a reasonable limit)
+//! and will also capture a backtrace if it's enabled. This makes it easy to integrate it into
+//! any error handling approach, be it custom error types or "catch-all" errors like `anyhow`.
+//!
+//! # Example
+//!
+//! The easiest, but error-prone approach:
 //! ```
-//! # struct S;
-//! # impl S {
-//! #   fn price(&self) -> anyhow::Result<u32> { todo!() }
-//! #   fn discount_rate(&self) -> u32 { todo!() }
-//! #   async fn bill_user(&self, amount: u32) -> anyhow::Result<()> { todo!() }
-//! async fn handle_request(&self) -> anyhow::Result<()> {
-//!     let price = self.price()?;
-//!     let discount_rate = self.discount_rate();
-//!     let amount = price - discount_rate * price / 100;
-//!     self.bill_user(amount).await?;
-//!     Ok(())
-//! }
+//! # let price = 1_u64;
+//! # let discount_rate = 1_u64;
+//! # let price = 1_u64;
+//! let amount = price - discount_rate * price / 100;
+//! let output = amount as u32;
+//! ```
+//! A safe approach that uses `std` checked functions and returns a non-informative error on overflow:
+//! ```
+//! # #[derive(Debug, thiserror::Error)]
+//! # enum Error { #[error("overflow")] Overflow }
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # let price = 1_u64;
+//! # let discount_rate = 1_u64;
+//! # let price = 1_u64;
+//! let amount = discount_rate
+//!     .checked_mul(price)
+//!     .and_then(|v| v.checked_div(100))
+//!     .and_then(|v| price.checked_sub(v))
+//!     .ok_or_else(|| Error::Overflow)?;
+//! let output: u32 = amount.try_into().map_err(|_| Error::Overflow)?;
+//! # Ok(())
 //! # }
 //! ```
-//! After it billed some user $18446744073709551596 by accident, we decided to use checked arithmetics in our business logic:
+//! A safe and concise approach with extension traits from [`cadd::ext`](ext)
+//! and functions from [`cadd::ops`](ops),
+//! returning an informative error:
 //! ```
-//! # struct S;
-//! # impl S {
-//! #   async fn handle_request(&self) -> anyhow::Result<()> {
-//! #       let price: u32 = 0;
-//! #       let discount_rate: u32 = 0;
-//!     use anyhow::Context as _;
+//! # #[derive(Debug, thiserror::Error)]
+//! # enum Error { #[error("overflow")] Overflow }
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # let price = 1_u64;
+//! # let discount_rate = 1_u64;
+//! # let price = 1_u64;
+//! use cadd::{ext::U64Ext, ops::csub, convert::IntoType};
 //!
-//!     let amount = discount_rate
-//!         .checked_mul(price)
-//!         .and_then(|v| v.checked_div(100))
-//!         .and_then(|v| price.checked_sub(v))
-//!         .context("amount overflow")?;
-//! #       Ok(())
-//! #   }
+//! let amount = csub(price, discount_rate.cmul(price)?.cdiv(100)?)?;
+//! let output = amount.cinto_type::<u32>()?;
+//! # Ok(())
 //! # }
 //! ```
-//! Now this is production ready! And also quite painful to look at.
-//!
-//! ## Checked operations with `cadd`
-//!
-//! `cadd` provides traits and functions that make checked arithmetics just as easy to do as
-//! unchecked ones. Just add "c" to the name of the corresponding unchecked function
-//! and import it:
-//! ```
-//! # struct S;
-//! # impl S {
-//! #   async fn handle_request(&self) -> anyhow::Result<()> {
-//! #       let price: u32 = 0;
-//! #       let discount_rate: u32 = 0;
-//! use cadd::{ops::csub, ext::U32Ext};
-//!
-//! let amount = csub(
-//!     price,
-//!     discount_rate.cmul(price)?.cdiv(100)?,
-//! )?;
-//! #       Ok(())
-//! #   }
-//! # }
-//! ```
-//! Not only it's much more consise, but it also returns a `Result` with an error type that contains
-//! the failed operation, its arguments, and a backtrace:
+//! Errors may look like this:
 //! ```text
-//! overflow: 100 - 200
+//! failed to compute 20 - 40: u64 overflow
 //! stack backtrace:
 //!    0: std::backtrace_rs::backtrace::libunwind::trace
 //! ...
 //! ```
-//! You can also freely choose between method form
-//! (<code>a.[cadd](https://docs.rs/cadd/latest/cadd/ops/trait.Cadd.html#tymethod.cadd)(b)</code>)
-//! and free function form (<code>[cadd](https://docs.rs/cadd/latest/cadd/ops/fn.cadd.html)(a, b)</code>)
-//! as you see fit.
-//! And it's not just operators (`+`, `-`, etc). For every `checked_*` function in `std`, there is a corresponding
-//! function in `cadd`: [`cdiv_euclid`](https://docs.rs/cadd/latest/cadd/ops/fn.cdiv_euclid.html),
-//! [`cilog2`](https://docs.rs/cadd/latest/cadd/ops/fn.cilog2.html), and so on.
-//! See [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html) module documentation for more information.
+//!
+//! # Recommended clippy lints
+//!
+//! In order to eliminate unintended side effects, wraps, truncations, and signed-vs-unsigned reinterpretation,
+//! it's recommended to set the following clippy lints to `warn` level:
+//!
+//! - `arithmetic_side_effects`
+//! - `cast_possible_wrap`
+//! - `cast_precision_loss`
+//! - `cast_sign_loss`
 
 extern crate alloc;
 #[cfg(any(test, feature = "std"))]
@@ -116,7 +123,11 @@ mod error;
 
 pub mod convert;
 
-/// Checked operations on numbers.
+/// Generic functions for checked arithmetics.
+///
+pub mod ops;
+
+/// Extension traits for enhanced checked arithmetics.
 ///
 /// Many operators on integer primitives (`a + b`, `a / b`, etc) and associated functions (`a.pow(b)`, `a.ilog(b)`, etc)
 /// can overflow or fail under certain conditions. With debug assertions enabled (default when building in debug mode),
@@ -186,7 +197,8 @@ pub mod convert;
 ///   }
 ///   ```
 /// * Both method style (`a.cadd(b)`) and function style (`cadd(a, b)`) APIs are available.
-///   Free functions can make expressions more readable when there are multiple levels of nesting:
+///   Free functions (available in the [`ops`] module)
+///   can make expressions more readable when there are multiple levels of nesting:
 ///   ```
 ///   # use cadd::ops::{cadd, cmul};
 ///   fn f1(a1: u32, b1: u32, a2: u32, b2: u32) -> cadd::Result<u32> {
@@ -207,13 +219,46 @@ pub mod convert;
 ///   ```
 /// * Function names are relatively short, so it's easier to keep the code readable.
 ///   The names may look a bit cryptic at first, but there is really only one rule to remember:
-///   every function name is just the name of the unchecked alternative ([`add`](std::ops::Add::add),
+///   every function name is just the name of the unchecked alternative ([`add`](core::ops::Add::add),
 ///   [`pow`](u32::pow), [`ilog`](u32::ilog), etc) with the "c" suffix that stands for "checked".
 ///
 /// See also: [crate level documentation](crate).
-pub mod ops;
-
-/// Extension traits for enhanced checked arithmetics
+///
+/// `cadd` provides traits and functions that make checked arithmetics just as easy to do as
+/// unchecked ones. Just add "c" to the name of the corresponding unchecked function
+/// and import it:
+/// ```
+/// # struct S;
+/// # impl S {
+/// #   async fn handle_request(&self) -> anyhow::Result<()> {
+/// #       let price: u32 = 0;
+/// #       let discount_rate: u32 = 0;
+/// use cadd::{ops::csub, ext::U32Ext};
+///
+/// let amount = csub(
+///     price,
+///     discount_rate.cmul(price)?.cdiv(100)?,
+/// )?;
+/// #       Ok(())
+/// #   }
+/// # }
+/// ```
+/// Not only it's much more consise, but it also returns a `Result` with an error type that contains
+/// the failed operation, its arguments, and a backtrace:
+/// ```text
+/// overflow: 100 - 200
+/// stack backtrace:
+///    0: std::backtrace_rs::backtrace::libunwind::trace
+/// ...
+/// ```
+/// You can also freely choose between method form
+/// (<code>a.[cadd](https://docs.rs/cadd/latest/cadd/ops/trait.Cadd.html#tymethod.cadd)(b)</code>)
+/// and free function form (<code>[cadd](https://docs.rs/cadd/latest/cadd/ops/fn.cadd.html)(a, b)</code>)
+/// as you see fit.
+/// And it's not just operators (`+`, `-`, etc). For every `checked_*` function in `std`, there is a corresponding
+/// function in `cadd`: [`cdiv_euclid`](https://docs.rs/cadd/latest/cadd/ops/fn.cdiv_euclid.html),
+/// [`cilog2`](https://docs.rs/cadd/latest/cadd/ops/fn.cilog2.html), and so on.
+/// See [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html) module documentation for more information.
 pub mod ext;
 
 pub mod prelude;
@@ -300,4 +345,4 @@ impl_is_negative_false!(NonZero<u32>);
 impl_is_negative_false!(NonZero<u64>);
 impl_is_negative_false!(NonZero<u128>);
 impl_is_negative_false!(NonZero<usize>);
-impl_is_negative_false!(std::time::Duration);
+impl_is_negative_false!(core::time::Duration);

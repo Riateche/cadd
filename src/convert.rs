@@ -40,7 +40,7 @@
 /// This trait is implemented for all types. However, each method has its own type bound that requires
 /// the corresponding conversion trait to be implemented.
 pub trait IntoType {
-    /// An alternative to [`.into()`](std::convert::Into) that allows specifying the target type.
+    /// An alternative to [`.into()`](core::convert::Into) that allows specifying the target type.
     /// ```
     /// use cadd::convert::IntoType;
     /// assert_eq!(2u32.into_type::<u64>(), 2);
@@ -53,7 +53,7 @@ pub trait IntoType {
         self.into()
     }
 
-    /// An alternative to [`.try_into()`](std::convert::TryInto) that allows specifying the target type.
+    /// An alternative to [`.try_into()`](core::convert::TryInto) that allows specifying the target type.
     /// ```
     /// use cadd::convert::IntoType;
     /// assert!((-2i32).try_into_type::<u32>().is_err());
@@ -107,7 +107,37 @@ impl<T: ?Sized> IntoType for T {}
 /// Similar to `TryFrom`, it's recommended to always implement `Cfrom` instead of [`Cinto`].
 /// The corresponding `Cinto` implementation will be covered by the blanket impl.
 ///
-/// Notable implementations:
+/// # Comparison with `std` alternatives
+/// ```
+/// # fn test1() -> Result<(), Box<dyn std::error::Error>> {
+/// let a: i32 = -50;
+/// // Reinterpretation cast: never fails, but produces a different value
+/// // when the input value is out of bounds.
+/// let b = a as u32;
+///
+/// // Returns an uninformative error: `TryFromIntError(())`;
+/// // requires type annotation on the left side.
+/// let b2: u32 = a.try_into()?;
+///
+/// // Returns an informative error:
+/// // `failed to convert value -50 from i32 to u32: value is out of bounds`.
+/// // Still requires type annotation on the left side.
+/// use cadd::convert::Cinto;
+///
+/// let b3: u32 = a.cinto()?;
+///
+/// // Same error as above, and output type can be specified in the call.
+/// use cadd::convert::IntoType;
+///
+/// let b4 = a.cinto_type::<u32>()?;
+/// # Ok(())
+/// # }
+/// # fn main() {
+/// #     test1().unwrap_err();
+/// # }
+/// ```
+///
+/// # Notable implementations
 ///
 /// * Fallible conversions between integer types:
 ///   ```
@@ -168,12 +198,12 @@ pub trait Cfrom<Input>: Sized {
 
 /// Checked conversion from `Self` to `Output`.
 ///
-/// This trait is automatically implemented when `Output` implements `Cfrom<Self>`.
-///
-/// See [`Cfrom`] for main documentation.
+/// This trait is automatically implemented when `Output` implements <code>[Cfrom]&lt;Self&gt;</code>.
 ///
 /// In order to help with type inference,
 /// the [`IntoType`] extension trait provides `.cinto_type::<T>()` syntax.
+///
+/// **See [`Cfrom`] for main documentation.**
 #[allow(missing_docs)]
 pub trait Cinto<Output>: Sized {
     type Error;
@@ -208,20 +238,26 @@ where
 /// Similar to [`TryFrom`], it's recommended to always implement
 /// `SaturatingFrom` instead of [`SaturatingInto`](Cinto).
 /// The corresponding `SaturatingInto` implementation will be covered by the blanket impl.
+///
+/// In order to help with type inference,
+/// the [`IntoType`] extension trait provides `.saturating_into_type::<T>()` syntax.
 pub trait SaturatingFrom<Input>: Sized {
-    #[allow(missing_docs)]
+    /// Returns the value of `Self` type that is the closest to `from`.
     fn saturating_from(from: Input) -> Self;
 }
 
 /// Saturating conversion of a number from `Self` to `Output`.
 ///
-/// This trait is automatically implemented when `Output` implements `SaturatingFrom<Self>`.
-///
-/// See [`SaturatingFrom`] for main documentation.
+/// This trait is automatically implemented when `Output` implements <code>[SaturatingFrom]&lt;Self&gt;</code>.
+/// Similar to [`TryInto`], it's recommended to always implement
+/// `SaturatingFrom` instead of [`SaturatingInto`](Cinto).
 ///
 /// In order to help with type inference,
 /// the [`IntoType`] extension trait provides `.saturating_into_type::<T>()` syntax.
 ///
+/// **See [`SaturatingFrom`] for main documentation.**
+///
+/// # Examples
 /// ```
 /// use cadd::convert::{SaturatingInto, IntoType};
 ///
@@ -236,7 +272,7 @@ pub trait SaturatingFrom<Input>: Sized {
 /// assert_eq!((-300_i32).saturating_into_type::<i8>(), -128);
 /// ```
 pub trait SaturatingInto<Output>: Sized {
-    #[allow(missing_docs)]
+    /// Returns the value of `Output` type that is the closest to `self`.
     fn saturating_into(self) -> Output;
 }
 
@@ -250,22 +286,41 @@ where
     }
 }
 
-/// Conversion from an integer type to the corresponding [`NonZero`](std::num::NonZero) type.
+/// Conversion from an integer type to the corresponding [`NonZero`](core::num::NonZero) type.
 ///
 /// If the value is zero, it returns an error with a backtrace.
-#[allow(missing_docs)]
+///
+/// [`non_zero`] provides an alternative way to do the same conversion.
+///
+/// # Examples
+/// ```
+/// use cadd::convert::ToNonZero;
+/// use std::num::NonZero;
+///
+/// let x: u32 = 5;
+/// let y = x.to_non_zero().unwrap();
+/// assert_eq!(y, NonZero::new(5).unwrap());
+///
+/// let x2: u32 = 0;
+/// assert!(
+///     x2.to_non_zero().unwrap_err().to_string().contains("unexpected zero value")
+/// );
+/// ```
 pub trait ToNonZero {
+    #[allow(missing_docs)]
     type Error;
+    /// Output type, usually equal to `NonZero<Self>`.
     type NonZero;
+    /// Returns `NonZero` value equal to `self`, returning an error if `self` is 0.
     fn to_non_zero(self) -> Result<Self::NonZero, Self::Error>;
 }
 
-/// Conversion from an integer type to the corresponding [`NonZero`](std::num::NonZero) type.
+/// Returns [`NonZero`](core::num::NonZero) value equal to `value`, returning an error if `value` is 0.
 ///
-/// If the value is zero, it returns an error with a backtrace.
+/// See also: [`ToNonZero`].
 #[inline]
-pub fn non_zero<T: ToNonZero>(a: T) -> crate::Result<T::NonZero, T::Error> {
-    a.to_non_zero()
+pub fn non_zero<T: ToNonZero>(value: T) -> crate::Result<T::NonZero, T::Error> {
+    value.to_non_zero()
 }
 
 macro_rules! impl_to_non_zero {
