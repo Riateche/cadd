@@ -1,4 +1,10 @@
-use {crate::util::assert_err, cadd::ext::U8Ext};
+use {
+    crate::util::assert_err,
+    cadd::ops::{
+        Cadd, CaddSigned, Cdiv, CdivEuclid, Cilog, Cilog10, Cilog2, Cmul, Cneg, CnextMultipleOf,
+        CnextPowerOfTwo, Cpow, Crem, CremEuclid, Cshl, Cshr, CsignedDiff, Csub, CsubSigned,
+    },
+};
 
 mod util;
 

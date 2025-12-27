@@ -1,8 +1,7 @@
 use {
     crate::util::assert_err,
     cadd::{
-        ext::U8Ext,
-        ops::cadd_unsigned,
+        ops::{cadd_unsigned, Cadd},
         prelude::{non_zero, Cinto, IntoType, ToNonZero},
     },
 };
@@ -27,4 +26,10 @@ fn test1() {
 fn _inference1(y: u32) -> cadd::Result<i32> {
     let x: i32 = y.cinto()?;
     cadd_unsigned(x, y)
+}
+
+fn _inference2(y: u8) -> cadd::Result<i32> {
+    let a: i32 = 0;
+    let x = y.into();
+    cadd_unsigned(a, x)
 }

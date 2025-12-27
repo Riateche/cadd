@@ -6,1179 +6,1503 @@ use {
     core::{num::NonZero, time::Duration},
 };
 ///Checked addition: computes `a + b`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cadd`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Cadd<Other = Self>: Sized {
+pub trait Cadd: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_add`.
-    fn cadd(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn cadd(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for `checked_add`.
+    fn cadd_assign(&mut self, other: Self::Other) -> Result<(), Self::Error>;
 }
 ///Checked addition: computes `a + b`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_add`.
 #[doc(alias = "checked_add")]
 #[inline]
-pub fn cadd<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn cadd<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: Cadd<T2>,
+    T: Cadd,
 {
-    Cadd::cadd(a, b)
+    a.cadd(b)
 }
-impl Cadd<u8> for NonZero<u8> {
-    type Error = Error;
+impl Cadd for NonZero<u8> {
+    type Other = u8;
     type Output = NonZero<u8>;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u8>::checked_add`].
-    fn cadd(a: Self, b: u8) -> Result<NonZero<u8>, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u8) -> Result<NonZero<u8>, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u8>"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u8>::checked_add`].
+    fn cadd_assign(&mut self, other: u8) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
-impl Cadd<u16> for NonZero<u16> {
-    type Error = Error;
+impl Cadd for NonZero<u16> {
+    type Other = u16;
     type Output = NonZero<u16>;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u16>::checked_add`].
-    fn cadd(a: Self, b: u16) -> Result<NonZero<u16>, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u16) -> Result<NonZero<u16>, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u16>"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u16>::checked_add`].
+    fn cadd_assign(&mut self, other: u16) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
-impl Cadd<u32> for NonZero<u32> {
-    type Error = Error;
+impl Cadd for NonZero<u32> {
+    type Other = u32;
     type Output = NonZero<u32>;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u32>::checked_add`].
-    fn cadd(a: Self, b: u32) -> Result<NonZero<u32>, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u32) -> Result<NonZero<u32>, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u32>"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u32>::checked_add`].
+    fn cadd_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
-impl Cadd<u64> for NonZero<u64> {
-    type Error = Error;
+impl Cadd for NonZero<u64> {
+    type Other = u64;
     type Output = NonZero<u64>;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u64>::checked_add`].
-    fn cadd(a: Self, b: u64) -> Result<NonZero<u64>, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u64) -> Result<NonZero<u64>, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u64>"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u64>::checked_add`].
+    fn cadd_assign(&mut self, other: u64) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
-impl Cadd<u128> for NonZero<u128> {
-    type Error = Error;
+impl Cadd for NonZero<u128> {
+    type Other = u128;
     type Output = NonZero<u128>;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u128>::checked_add`].
-    fn cadd(a: Self, b: u128) -> Result<NonZero<u128>, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u128) -> Result<NonZero<u128>, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u128>"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u128>::checked_add`].
+    fn cadd_assign(&mut self, other: u128) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
-impl Cadd<usize> for NonZero<usize> {
-    type Error = Error;
+impl Cadd for NonZero<usize> {
+    type Other = usize;
     type Output = NonZero<usize>;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<usize>::checked_add`].
-    fn cadd(a: Self, b: usize) -> Result<NonZero<usize>, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: usize) -> Result<NonZero<usize>, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<usize>"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<usize>::checked_add`].
+    fn cadd_assign(&mut self, other: usize) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for i8 {
-    type Error = Error;
+    type Other = i8;
     type Output = i8;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_add`].
-    fn cadd(a: Self, b: i8) -> Result<i8, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: i8) -> Result<i8, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i8"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_add`].
+    fn cadd_assign(&mut self, other: i8) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for i16 {
-    type Error = Error;
+    type Other = i16;
     type Output = i16;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_add`].
-    fn cadd(a: Self, b: i16) -> Result<i16, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: i16) -> Result<i16, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i16"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_add`].
+    fn cadd_assign(&mut self, other: i16) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for i32 {
-    type Error = Error;
+    type Other = i32;
     type Output = i32;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_add`].
-    fn cadd(a: Self, b: i32) -> Result<i32, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: i32) -> Result<i32, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i32"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_add`].
+    fn cadd_assign(&mut self, other: i32) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for i64 {
-    type Error = Error;
+    type Other = i64;
     type Output = i64;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_add`].
-    fn cadd(a: Self, b: i64) -> Result<i64, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: i64) -> Result<i64, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i64"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_add`].
+    fn cadd_assign(&mut self, other: i64) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for i128 {
-    type Error = Error;
+    type Other = i128;
     type Output = i128;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_add`].
-    fn cadd(a: Self, b: i128) -> Result<i128, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: i128) -> Result<i128, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i128"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_add`].
+    fn cadd_assign(&mut self, other: i128) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for isize {
-    type Error = Error;
+    type Other = isize;
     type Output = isize;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_add`].
-    fn cadd(a: Self, b: isize) -> Result<isize, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: isize) -> Result<isize, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "isize"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_add`].
+    fn cadd_assign(&mut self, other: isize) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for u8 {
-    type Error = Error;
+    type Other = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_add`].
-    fn cadd(a: Self, b: u8) -> Result<u8, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u8) -> Result<u8, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u8"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_add`].
+    fn cadd_assign(&mut self, other: u8) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for u16 {
-    type Error = Error;
+    type Other = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_add`].
-    fn cadd(a: Self, b: u16) -> Result<u16, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u16) -> Result<u16, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u16"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_add`].
+    fn cadd_assign(&mut self, other: u16) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for u32 {
-    type Error = Error;
+    type Other = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_add`].
-    fn cadd(a: Self, b: u32) -> Result<u32, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u32) -> Result<u32, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u32"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_add`].
+    fn cadd_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for u64 {
-    type Error = Error;
+    type Other = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_add`].
-    fn cadd(a: Self, b: u64) -> Result<u64, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u64) -> Result<u64, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u64"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_add`].
+    fn cadd_assign(&mut self, other: u64) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for u128 {
-    type Error = Error;
+    type Other = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_add`].
-    fn cadd(a: Self, b: u128) -> Result<u128, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: u128) -> Result<u128, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u128"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_add`].
+    fn cadd_assign(&mut self, other: u128) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for usize {
-    type Error = Error;
+    type Other = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_add`].
-    fn cadd(a: Self, b: usize) -> Result<usize, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: usize) -> Result<usize, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "usize"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_add`].
+    fn cadd_assign(&mut self, other: usize) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 impl Cadd for Duration {
-    type Error = Error;
+    type Other = Duration;
     type Output = Duration;
+    type Error = Error;
     ///Checked addition: computes `a + b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`Duration::checked_add`].
-    fn cadd(a: Self, b: Duration) -> Result<Duration, Error> {
-        a.checked_add(b).ok_or_else(|| {
+    fn cadd(self, other: Duration) -> Result<Duration, Error> {
+        self.checked_add(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} + {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "Duration"
             ))
         })
     }
+    #[inline]
+    ///Checked addition assigement: executes `self += other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_add`].
+    fn cadd_assign(&mut self, other: Duration) -> Result<(), Self::Error> {
+        *self = self.cadd(other)?;
+        Ok(())
+    }
 }
 ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cadd_unsigned`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CaddUnsigned<Other = Self>: Sized {
+pub trait CaddUnsigned: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_add_unsigned`.
-    fn cadd_unsigned(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn cadd_unsigned(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
 }
 ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_add_unsigned`.
 #[doc(alias = "checked_add_unsigned")]
 #[inline]
-pub fn cadd_unsigned<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn cadd_unsigned<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: CaddUnsigned<T2>,
+    T: CaddUnsigned,
 {
-    CaddUnsigned::cadd_unsigned(a, b)
+    a.cadd_unsigned(b)
 }
-impl CaddUnsigned<u8> for i8 {
-    type Error = Error;
+impl CaddUnsigned for i8 {
+    type Other = u8;
     type Output = i8;
+    type Error = Error;
     ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_add_unsigned`].
-    fn cadd_unsigned(a: Self, b: u8) -> Result<i8, Error> {
-        a.checked_add_unsigned(b).ok_or_else(|| {
+    fn cadd_unsigned(self, other: u8) -> Result<i8, Error> {
+        self.checked_add_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i8"
+                self, other, "i8"
             ))
         })
     }
 }
-impl CaddUnsigned<u16> for i16 {
-    type Error = Error;
+impl CaddUnsigned for i16 {
+    type Other = u16;
     type Output = i16;
+    type Error = Error;
     ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_add_unsigned`].
-    fn cadd_unsigned(a: Self, b: u16) -> Result<i16, Error> {
-        a.checked_add_unsigned(b).ok_or_else(|| {
+    fn cadd_unsigned(self, other: u16) -> Result<i16, Error> {
+        self.checked_add_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i16"
+                self, other, "i16"
             ))
         })
     }
 }
-impl CaddUnsigned<u32> for i32 {
-    type Error = Error;
+impl CaddUnsigned for i32 {
+    type Other = u32;
     type Output = i32;
+    type Error = Error;
     ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_add_unsigned`].
-    fn cadd_unsigned(a: Self, b: u32) -> Result<i32, Error> {
-        a.checked_add_unsigned(b).ok_or_else(|| {
+    fn cadd_unsigned(self, other: u32) -> Result<i32, Error> {
+        self.checked_add_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i32"
+                self, other, "i32"
             ))
         })
     }
 }
-impl CaddUnsigned<u64> for i64 {
-    type Error = Error;
+impl CaddUnsigned for i64 {
+    type Other = u64;
     type Output = i64;
+    type Error = Error;
     ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_add_unsigned`].
-    fn cadd_unsigned(a: Self, b: u64) -> Result<i64, Error> {
-        a.checked_add_unsigned(b).ok_or_else(|| {
+    fn cadd_unsigned(self, other: u64) -> Result<i64, Error> {
+        self.checked_add_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i64"
+                self, other, "i64"
             ))
         })
     }
 }
-impl CaddUnsigned<u128> for i128 {
-    type Error = Error;
+impl CaddUnsigned for i128 {
+    type Other = u128;
     type Output = i128;
+    type Error = Error;
     ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_add_unsigned`].
-    fn cadd_unsigned(a: Self, b: u128) -> Result<i128, Error> {
-        a.checked_add_unsigned(b).ok_or_else(|| {
+    fn cadd_unsigned(self, other: u128) -> Result<i128, Error> {
+        self.checked_add_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i128"
+                self, other, "i128"
             ))
         })
     }
 }
-impl CaddUnsigned<usize> for isize {
-    type Error = Error;
+impl CaddUnsigned for isize {
+    type Other = usize;
     type Output = isize;
+    type Error = Error;
     ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_add_unsigned`].
-    fn cadd_unsigned(a: Self, b: usize) -> Result<isize, Error> {
-        a.checked_add_unsigned(b).ok_or_else(|| {
+    fn cadd_unsigned(self, other: usize) -> Result<isize, Error> {
+        self.checked_add_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_unsigned({:?}, {:?}): {} overflow",
-                a, b, "isize"
+                self, other, "isize"
             ))
         })
     }
 }
 ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cadd_signed`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CaddSigned<Other = Self>: Sized {
+pub trait CaddSigned: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_add_signed`.
-    fn cadd_signed(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn cadd_signed(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
 }
 ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_add_signed`.
 #[doc(alias = "checked_add_signed")]
 #[inline]
-pub fn cadd_signed<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn cadd_signed<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: CaddSigned<T2>,
+    T: CaddSigned,
 {
-    CaddSigned::cadd_signed(a, b)
+    a.cadd_signed(b)
 }
-impl CaddSigned<i8> for u8 {
-    type Error = Error;
+impl CaddSigned for u8 {
+    type Other = i8;
     type Output = u8;
+    type Error = Error;
     ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_add_signed`].
-    fn cadd_signed(a: Self, b: i8) -> Result<u8, Error> {
-        a.checked_add_signed(b).ok_or_else(|| {
+    fn cadd_signed(self, other: i8) -> Result<u8, Error> {
+        self.checked_add_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_signed({:?}, {:?}): {} overflow",
-                a, b, "u8"
+                self, other, "u8"
             ))
         })
     }
 }
-impl CaddSigned<i16> for u16 {
-    type Error = Error;
+impl CaddSigned for u16 {
+    type Other = i16;
     type Output = u16;
+    type Error = Error;
     ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_add_signed`].
-    fn cadd_signed(a: Self, b: i16) -> Result<u16, Error> {
-        a.checked_add_signed(b).ok_or_else(|| {
+    fn cadd_signed(self, other: i16) -> Result<u16, Error> {
+        self.checked_add_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_signed({:?}, {:?}): {} overflow",
-                a, b, "u16"
+                self, other, "u16"
             ))
         })
     }
 }
-impl CaddSigned<i32> for u32 {
-    type Error = Error;
+impl CaddSigned for u32 {
+    type Other = i32;
     type Output = u32;
+    type Error = Error;
     ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_add_signed`].
-    fn cadd_signed(a: Self, b: i32) -> Result<u32, Error> {
-        a.checked_add_signed(b).ok_or_else(|| {
+    fn cadd_signed(self, other: i32) -> Result<u32, Error> {
+        self.checked_add_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_signed({:?}, {:?}): {} overflow",
-                a, b, "u32"
+                self, other, "u32"
             ))
         })
     }
 }
-impl CaddSigned<i64> for u64 {
-    type Error = Error;
+impl CaddSigned for u64 {
+    type Other = i64;
     type Output = u64;
+    type Error = Error;
     ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_add_signed`].
-    fn cadd_signed(a: Self, b: i64) -> Result<u64, Error> {
-        a.checked_add_signed(b).ok_or_else(|| {
+    fn cadd_signed(self, other: i64) -> Result<u64, Error> {
+        self.checked_add_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_signed({:?}, {:?}): {} overflow",
-                a, b, "u64"
+                self, other, "u64"
             ))
         })
     }
 }
-impl CaddSigned<i128> for u128 {
-    type Error = Error;
+impl CaddSigned for u128 {
+    type Other = i128;
     type Output = u128;
+    type Error = Error;
     ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_add_signed`].
-    fn cadd_signed(a: Self, b: i128) -> Result<u128, Error> {
-        a.checked_add_signed(b).ok_or_else(|| {
+    fn cadd_signed(self, other: i128) -> Result<u128, Error> {
+        self.checked_add_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_signed({:?}, {:?}): {} overflow",
-                a, b, "u128"
+                self, other, "u128"
             ))
         })
     }
 }
-impl CaddSigned<isize> for usize {
-    type Error = Error;
+impl CaddSigned for usize {
+    type Other = isize;
     type Output = usize;
+    type Error = Error;
     ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_add_signed`].
-    fn cadd_signed(a: Self, b: isize) -> Result<usize, Error> {
-        a.checked_add_signed(b).ok_or_else(|| {
+    fn cadd_signed(self, other: isize) -> Result<usize, Error> {
+        self.checked_add_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute add_signed({:?}, {:?}): {} overflow",
-                a, b, "usize"
+                self, other, "usize"
             ))
         })
     }
 }
 ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`csub`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Csub<Other = Self>: Sized {
+pub trait Csub: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_sub`.
-    fn csub(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn csub(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for `checked_sub`.
+    fn csub_assign(&mut self, other: Self::Other) -> Result<(), Self::Error>;
 }
 ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_sub`.
 #[doc(alias = "checked_sub")]
 #[inline]
-pub fn csub<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn csub<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: Csub<T2>,
+    T: Csub,
 {
-    Csub::csub(a, b)
+    a.csub(b)
 }
 impl Csub for i8 {
-    type Error = Error;
+    type Other = i8;
     type Output = i8;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_sub`].
-    fn csub(a: Self, b: i8) -> Result<i8, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: i8) -> Result<i8, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i8"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_sub`].
+    fn csub_assign(&mut self, other: i8) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for i16 {
-    type Error = Error;
+    type Other = i16;
     type Output = i16;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_sub`].
-    fn csub(a: Self, b: i16) -> Result<i16, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: i16) -> Result<i16, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i16"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_sub`].
+    fn csub_assign(&mut self, other: i16) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for i32 {
-    type Error = Error;
+    type Other = i32;
     type Output = i32;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_sub`].
-    fn csub(a: Self, b: i32) -> Result<i32, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: i32) -> Result<i32, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i32"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_sub`].
+    fn csub_assign(&mut self, other: i32) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for i64 {
-    type Error = Error;
+    type Other = i64;
     type Output = i64;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_sub`].
-    fn csub(a: Self, b: i64) -> Result<i64, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: i64) -> Result<i64, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i64"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_sub`].
+    fn csub_assign(&mut self, other: i64) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for i128 {
-    type Error = Error;
+    type Other = i128;
     type Output = i128;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_sub`].
-    fn csub(a: Self, b: i128) -> Result<i128, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: i128) -> Result<i128, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i128"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_sub`].
+    fn csub_assign(&mut self, other: i128) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for isize {
-    type Error = Error;
+    type Other = isize;
     type Output = isize;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_sub`].
-    fn csub(a: Self, b: isize) -> Result<isize, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: isize) -> Result<isize, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "isize"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_sub`].
+    fn csub_assign(&mut self, other: isize) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for u8 {
-    type Error = Error;
+    type Other = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_sub`].
-    fn csub(a: Self, b: u8) -> Result<u8, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: u8) -> Result<u8, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u8"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_sub`].
+    fn csub_assign(&mut self, other: u8) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for u16 {
-    type Error = Error;
+    type Other = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_sub`].
-    fn csub(a: Self, b: u16) -> Result<u16, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: u16) -> Result<u16, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u16"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_sub`].
+    fn csub_assign(&mut self, other: u16) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for u32 {
-    type Error = Error;
+    type Other = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_sub`].
-    fn csub(a: Self, b: u32) -> Result<u32, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: u32) -> Result<u32, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u32"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_sub`].
+    fn csub_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for u64 {
-    type Error = Error;
+    type Other = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_sub`].
-    fn csub(a: Self, b: u64) -> Result<u64, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: u64) -> Result<u64, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u64"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_sub`].
+    fn csub_assign(&mut self, other: u64) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for u128 {
-    type Error = Error;
+    type Other = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_sub`].
-    fn csub(a: Self, b: u128) -> Result<u128, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: u128) -> Result<u128, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u128"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_sub`].
+    fn csub_assign(&mut self, other: u128) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for usize {
-    type Error = Error;
+    type Other = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_sub`].
-    fn csub(a: Self, b: usize) -> Result<usize, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: usize) -> Result<usize, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "usize"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_sub`].
+    fn csub_assign(&mut self, other: usize) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 impl Csub for Duration {
-    type Error = Error;
+    type Other = Duration;
     type Output = Duration;
+    type Error = Error;
     ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`Duration::checked_sub`].
-    fn csub(a: Self, b: Duration) -> Result<Duration, Error> {
-        a.checked_sub(b).ok_or_else(|| {
+    fn csub(self, other: Duration) -> Result<Duration, Error> {
+        self.checked_sub(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} - {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "Duration"
             ))
         })
     }
+    #[inline]
+    ///Checked subtraction assigement:  executes `self -= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_sub`].
+    fn csub_assign(&mut self, other: Duration) -> Result<(), Self::Error> {
+        *self = self.csub(other)?;
+        Ok(())
+    }
 }
 ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`csub_unsigned`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CsubUnsigned<Other = Self>: Sized {
+pub trait CsubUnsigned: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_sub_unsigned`.
-    fn csub_unsigned(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn csub_unsigned(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
 }
 ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_sub_unsigned`.
 #[doc(alias = "checked_sub_unsigned")]
 #[inline]
-pub fn csub_unsigned<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn csub_unsigned<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: CsubUnsigned<T2>,
+    T: CsubUnsigned,
 {
-    CsubUnsigned::csub_unsigned(a, b)
+    a.csub_unsigned(b)
 }
-impl CsubUnsigned<u8> for i8 {
-    type Error = Error;
+impl CsubUnsigned for i8 {
+    type Other = u8;
     type Output = i8;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_sub_unsigned`].
-    fn csub_unsigned(a: Self, b: u8) -> Result<i8, Error> {
-        a.checked_sub_unsigned(b).ok_or_else(|| {
+    fn csub_unsigned(self, other: u8) -> Result<i8, Error> {
+        self.checked_sub_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i8"
+                self, other, "i8"
             ))
         })
     }
 }
-impl CsubUnsigned<u16> for i16 {
-    type Error = Error;
+impl CsubUnsigned for i16 {
+    type Other = u16;
     type Output = i16;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_sub_unsigned`].
-    fn csub_unsigned(a: Self, b: u16) -> Result<i16, Error> {
-        a.checked_sub_unsigned(b).ok_or_else(|| {
+    fn csub_unsigned(self, other: u16) -> Result<i16, Error> {
+        self.checked_sub_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i16"
+                self, other, "i16"
             ))
         })
     }
 }
-impl CsubUnsigned<u32> for i32 {
-    type Error = Error;
+impl CsubUnsigned for i32 {
+    type Other = u32;
     type Output = i32;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_sub_unsigned`].
-    fn csub_unsigned(a: Self, b: u32) -> Result<i32, Error> {
-        a.checked_sub_unsigned(b).ok_or_else(|| {
+    fn csub_unsigned(self, other: u32) -> Result<i32, Error> {
+        self.checked_sub_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i32"
+                self, other, "i32"
             ))
         })
     }
 }
-impl CsubUnsigned<u64> for i64 {
-    type Error = Error;
+impl CsubUnsigned for i64 {
+    type Other = u64;
     type Output = i64;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_sub_unsigned`].
-    fn csub_unsigned(a: Self, b: u64) -> Result<i64, Error> {
-        a.checked_sub_unsigned(b).ok_or_else(|| {
+    fn csub_unsigned(self, other: u64) -> Result<i64, Error> {
+        self.checked_sub_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i64"
+                self, other, "i64"
             ))
         })
     }
 }
-impl CsubUnsigned<u128> for i128 {
-    type Error = Error;
+impl CsubUnsigned for i128 {
+    type Other = u128;
     type Output = i128;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_sub_unsigned`].
-    fn csub_unsigned(a: Self, b: u128) -> Result<i128, Error> {
-        a.checked_sub_unsigned(b).ok_or_else(|| {
+    fn csub_unsigned(self, other: u128) -> Result<i128, Error> {
+        self.checked_sub_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
-                a, b, "i128"
+                self, other, "i128"
             ))
         })
     }
 }
-impl CsubUnsigned<usize> for isize {
-    type Error = Error;
+impl CsubUnsigned for isize {
+    type Other = usize;
     type Output = isize;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_sub_unsigned`].
-    fn csub_unsigned(a: Self, b: usize) -> Result<isize, Error> {
-        a.checked_sub_unsigned(b).ok_or_else(|| {
+    fn csub_unsigned(self, other: usize) -> Result<isize, Error> {
+        self.checked_sub_unsigned(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_unsigned({:?}, {:?}): {} overflow",
-                a, b, "isize"
+                self, other, "isize"
             ))
         })
     }
 }
 ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`csub_signed`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CsubSigned<Other = Self>: Sized {
+pub trait CsubSigned: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_sub_signed`.
-    fn csub_signed(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn csub_signed(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
 }
 ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_sub_signed`.
 #[doc(alias = "checked_sub_signed")]
 #[inline]
-pub fn csub_signed<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn csub_signed<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: CsubSigned<T2>,
+    T: CsubSigned,
 {
-    CsubSigned::csub_signed(a, b)
+    a.csub_signed(b)
 }
-impl CsubSigned<i8> for u8 {
-    type Error = Error;
+impl CsubSigned for u8 {
+    type Other = i8;
     type Output = u8;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_sub_signed`].
-    fn csub_signed(a: Self, b: i8) -> Result<u8, Error> {
-        a.checked_sub_signed(b).ok_or_else(|| {
+    fn csub_signed(self, other: i8) -> Result<u8, Error> {
+        self.checked_sub_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_signed({:?}, {:?}): {} overflow",
-                a, b, "u8"
+                self, other, "u8"
             ))
         })
     }
 }
-impl CsubSigned<i16> for u16 {
-    type Error = Error;
+impl CsubSigned for u16 {
+    type Other = i16;
     type Output = u16;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_sub_signed`].
-    fn csub_signed(a: Self, b: i16) -> Result<u16, Error> {
-        a.checked_sub_signed(b).ok_or_else(|| {
+    fn csub_signed(self, other: i16) -> Result<u16, Error> {
+        self.checked_sub_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_signed({:?}, {:?}): {} overflow",
-                a, b, "u16"
+                self, other, "u16"
             ))
         })
     }
 }
-impl CsubSigned<i32> for u32 {
-    type Error = Error;
+impl CsubSigned for u32 {
+    type Other = i32;
     type Output = u32;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_sub_signed`].
-    fn csub_signed(a: Self, b: i32) -> Result<u32, Error> {
-        a.checked_sub_signed(b).ok_or_else(|| {
+    fn csub_signed(self, other: i32) -> Result<u32, Error> {
+        self.checked_sub_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_signed({:?}, {:?}): {} overflow",
-                a, b, "u32"
+                self, other, "u32"
             ))
         })
     }
 }
-impl CsubSigned<i64> for u64 {
-    type Error = Error;
+impl CsubSigned for u64 {
+    type Other = i64;
     type Output = u64;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_sub_signed`].
-    fn csub_signed(a: Self, b: i64) -> Result<u64, Error> {
-        a.checked_sub_signed(b).ok_or_else(|| {
+    fn csub_signed(self, other: i64) -> Result<u64, Error> {
+        self.checked_sub_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_signed({:?}, {:?}): {} overflow",
-                a, b, "u64"
+                self, other, "u64"
             ))
         })
     }
 }
-impl CsubSigned<i128> for u128 {
-    type Error = Error;
+impl CsubSigned for u128 {
+    type Other = i128;
     type Output = u128;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_sub_signed`].
-    fn csub_signed(a: Self, b: i128) -> Result<u128, Error> {
-        a.checked_sub_signed(b).ok_or_else(|| {
+    fn csub_signed(self, other: i128) -> Result<u128, Error> {
+        self.checked_sub_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_signed({:?}, {:?}): {} overflow",
-                a, b, "u128"
+                self, other, "u128"
             ))
         })
     }
 }
-impl CsubSigned<isize> for usize {
-    type Error = Error;
+impl CsubSigned for usize {
+    type Other = isize;
     type Output = usize;
+    type Error = Error;
     ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_sub_signed`].
-    fn csub_signed(a: Self, b: isize) -> Result<usize, Error> {
-        a.checked_sub_signed(b).ok_or_else(|| {
+    fn csub_signed(self, other: isize) -> Result<usize, Error> {
+        self.checked_sub_signed(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute sub_signed({:?}, {:?}): {} overflow",
-                a, b, "usize"
+                self, other, "usize"
             ))
         })
     }
 }
 ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`csigned_diff`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CsignedDiff<Other = Self>: Sized {
+pub trait CsignedDiff: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_signed_diff`.
-    fn csigned_diff(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn csigned_diff(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
 }
 ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_signed_diff`.
 #[doc(alias = "checked_signed_diff")]
 #[inline]
-pub fn csigned_diff<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn csigned_diff<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: CsignedDiff<T2>,
+    T: CsignedDiff,
 {
-    CsignedDiff::csigned_diff(a, b)
+    a.csigned_diff(b)
 }
 impl CsignedDiff for u8 {
-    type Error = Error;
+    type Other = u8;
     type Output = i8;
+    type Error = Error;
     ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_signed_diff`].
-    fn csigned_diff(a: Self, b: u8) -> Result<i8, Error> {
-        a.checked_signed_diff(b).ok_or_else(|| {
+    fn csigned_diff(self, other: u8) -> Result<i8, Error> {
+        self.checked_signed_diff(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute signed_diff({:?}, {:?}): {} overflow",
-                a, b, "i8"
+                self, other, "i8"
             ))
         })
     }
 }
 impl CsignedDiff for u16 {
-    type Error = Error;
+    type Other = u16;
     type Output = i16;
+    type Error = Error;
     ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_signed_diff`].
-    fn csigned_diff(a: Self, b: u16) -> Result<i16, Error> {
-        a.checked_signed_diff(b).ok_or_else(|| {
+    fn csigned_diff(self, other: u16) -> Result<i16, Error> {
+        self.checked_signed_diff(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute signed_diff({:?}, {:?}): {} overflow",
-                a, b, "i16"
+                self, other, "i16"
             ))
         })
     }
 }
 impl CsignedDiff for u32 {
-    type Error = Error;
+    type Other = u32;
     type Output = i32;
+    type Error = Error;
     ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_signed_diff`].
-    fn csigned_diff(a: Self, b: u32) -> Result<i32, Error> {
-        a.checked_signed_diff(b).ok_or_else(|| {
+    fn csigned_diff(self, other: u32) -> Result<i32, Error> {
+        self.checked_signed_diff(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute signed_diff({:?}, {:?}): {} overflow",
-                a, b, "i32"
+                self, other, "i32"
             ))
         })
     }
 }
 impl CsignedDiff for u64 {
-    type Error = Error;
+    type Other = u64;
     type Output = i64;
+    type Error = Error;
     ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_signed_diff`].
-    fn csigned_diff(a: Self, b: u64) -> Result<i64, Error> {
-        a.checked_signed_diff(b).ok_or_else(|| {
+    fn csigned_diff(self, other: u64) -> Result<i64, Error> {
+        self.checked_signed_diff(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute signed_diff({:?}, {:?}): {} overflow",
-                a, b, "i64"
+                self, other, "i64"
             ))
         })
     }
 }
 impl CsignedDiff for u128 {
-    type Error = Error;
+    type Other = u128;
     type Output = i128;
+    type Error = Error;
     ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_signed_diff`].
-    fn csigned_diff(a: Self, b: u128) -> Result<i128, Error> {
-        a.checked_signed_diff(b).ok_or_else(|| {
+    fn csigned_diff(self, other: u128) -> Result<i128, Error> {
+        self.checked_signed_diff(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute signed_diff({:?}, {:?}): {} overflow",
-                a, b, "i128"
+                self, other, "i128"
             ))
         })
     }
 }
 impl CsignedDiff for usize {
-    type Error = Error;
+    type Other = usize;
     type Output = isize;
+    type Error = Error;
     ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_signed_diff`].
-    fn csigned_diff(a: Self, b: usize) -> Result<isize, Error> {
-        a.checked_signed_diff(b).ok_or_else(|| {
+    fn csigned_diff(self, other: usize) -> Result<isize, Error> {
+        self.checked_signed_diff(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute signed_diff({:?}, {:?}): {} overflow",
-                a, b, "isize"
+                self, other, "isize"
             ))
         })
     }
 }
 ///Checked negation: computes `-value`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cneg`] function or extension traits from the [`ext`](crate::ext) module.
 pub trait Cneg: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
-    #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_neg`.
-    fn cneg(value: Self) -> Result<Self::Output, Self::Error>;
+    fn cneg(self) -> Result<Self::Output, Self::Error>;
 }
 ///Checked negation: computes `-value`, returning an error if overflow occured.
 ///
@@ -1192,767 +1516,1001 @@ where
     Cneg::cneg(value)
 }
 impl Cneg for NonZero<i8> {
-    type Error = Error;
     type Output = NonZero<i8>;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i8>::checked_neg`].
-    fn cneg(value: Self) -> Result<NonZero<i8>, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<NonZero<i8>, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "NonZero<i8>"
+                self, "NonZero<i8>"
             ))
         })
     }
 }
 impl Cneg for NonZero<i16> {
-    type Error = Error;
     type Output = NonZero<i16>;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i16>::checked_neg`].
-    fn cneg(value: Self) -> Result<NonZero<i16>, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<NonZero<i16>, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "NonZero<i16>"
+                self, "NonZero<i16>"
             ))
         })
     }
 }
 impl Cneg for NonZero<i32> {
-    type Error = Error;
     type Output = NonZero<i32>;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i32>::checked_neg`].
-    fn cneg(value: Self) -> Result<NonZero<i32>, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<NonZero<i32>, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "NonZero<i32>"
+                self, "NonZero<i32>"
             ))
         })
     }
 }
 impl Cneg for NonZero<i64> {
-    type Error = Error;
     type Output = NonZero<i64>;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i64>::checked_neg`].
-    fn cneg(value: Self) -> Result<NonZero<i64>, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<NonZero<i64>, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "NonZero<i64>"
+                self, "NonZero<i64>"
             ))
         })
     }
 }
 impl Cneg for NonZero<i128> {
-    type Error = Error;
     type Output = NonZero<i128>;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i128>::checked_neg`].
-    fn cneg(value: Self) -> Result<NonZero<i128>, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<NonZero<i128>, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "NonZero<i128>"
+                self, "NonZero<i128>"
             ))
         })
     }
 }
 impl Cneg for NonZero<isize> {
-    type Error = Error;
     type Output = NonZero<isize>;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<isize>::checked_neg`].
-    fn cneg(value: Self) -> Result<NonZero<isize>, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<NonZero<isize>, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "NonZero<isize>"
+                self, "NonZero<isize>"
             ))
         })
     }
 }
 impl Cneg for i8 {
-    type Error = Error;
     type Output = i8;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_neg`].
-    fn cneg(value: Self) -> Result<i8, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<i8, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "i8"
+                self, "i8"
             ))
         })
     }
 }
 impl Cneg for i16 {
-    type Error = Error;
     type Output = i16;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_neg`].
-    fn cneg(value: Self) -> Result<i16, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<i16, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "i16"
+                self, "i16"
             ))
         })
     }
 }
 impl Cneg for i32 {
-    type Error = Error;
     type Output = i32;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_neg`].
-    fn cneg(value: Self) -> Result<i32, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<i32, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "i32"
+                self, "i32"
             ))
         })
     }
 }
 impl Cneg for i64 {
-    type Error = Error;
     type Output = i64;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_neg`].
-    fn cneg(value: Self) -> Result<i64, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<i64, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "i64"
+                self, "i64"
             ))
         })
     }
 }
 impl Cneg for i128 {
-    type Error = Error;
     type Output = i128;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_neg`].
-    fn cneg(value: Self) -> Result<i128, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<i128, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "i128"
+                self, "i128"
             ))
         })
     }
 }
 impl Cneg for isize {
-    type Error = Error;
     type Output = isize;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_neg`].
-    fn cneg(value: Self) -> Result<isize, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<isize, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "isize"
+                self, "isize"
             ))
         })
     }
 }
 impl Cneg for u8 {
-    type Error = Error;
     type Output = u8;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_neg`].
-    fn cneg(value: Self) -> Result<u8, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<u8, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "u8"
+                self, "u8"
             ))
         })
     }
 }
 impl Cneg for u16 {
-    type Error = Error;
     type Output = u16;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_neg`].
-    fn cneg(value: Self) -> Result<u16, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<u16, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "u16"
+                self, "u16"
             ))
         })
     }
 }
 impl Cneg for u32 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_neg`].
-    fn cneg(value: Self) -> Result<u32, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<u32, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "u32"
+                self, "u32"
             ))
         })
     }
 }
 impl Cneg for u64 {
-    type Error = Error;
     type Output = u64;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_neg`].
-    fn cneg(value: Self) -> Result<u64, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<u64, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "u64"
+                self, "u64"
             ))
         })
     }
 }
 impl Cneg for u128 {
-    type Error = Error;
     type Output = u128;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_neg`].
-    fn cneg(value: Self) -> Result<u128, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<u128, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "u128"
+                self, "u128"
             ))
         })
     }
 }
 impl Cneg for usize {
-    type Error = Error;
     type Output = usize;
+    type Error = Error;
     ///Checked negation: computes `-value`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_neg`].
-    fn cneg(value: Self) -> Result<usize, Error> {
-        value.checked_neg().ok_or_else(|| {
+    fn cneg(self) -> Result<usize, Error> {
+        self.checked_neg().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute -({:?}): {} overflow",
-                value, "usize"
+                self, "usize"
             ))
         })
     }
 }
 ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cmul`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Cmul<Other = Self>: Sized {
+pub trait Cmul: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_mul`.
-    fn cmul(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn cmul(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for `checked_mul`.
+    fn cmul_assign(&mut self, other: Self::Other) -> Result<(), Self::Error>;
 }
 ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_mul`.
 #[doc(alias = "checked_mul")]
 #[inline]
-pub fn cmul<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn cmul<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: Cmul<T2>,
+    T: Cmul,
 {
-    Cmul::cmul(a, b)
+    a.cmul(b)
 }
 impl Cmul for NonZero<u8> {
-    type Error = Error;
+    type Other = NonZero<u8>;
     type Output = NonZero<u8>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u8>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<u8>) -> Result<NonZero<u8>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<u8>) -> Result<NonZero<u8>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u8>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u8>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<u8>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<u16> {
-    type Error = Error;
+    type Other = NonZero<u16>;
     type Output = NonZero<u16>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u16>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<u16>) -> Result<NonZero<u16>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<u16>) -> Result<NonZero<u16>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u16>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u16>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<u16>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<u32> {
-    type Error = Error;
+    type Other = NonZero<u32>;
     type Output = NonZero<u32>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u32>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<u32>) -> Result<NonZero<u32>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<u32>) -> Result<NonZero<u32>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u32>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u32>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<u32>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<u64> {
-    type Error = Error;
+    type Other = NonZero<u64>;
     type Output = NonZero<u64>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u64>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<u64>) -> Result<NonZero<u64>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<u64>) -> Result<NonZero<u64>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u64>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u64>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<u64>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<u128> {
-    type Error = Error;
+    type Other = NonZero<u128>;
     type Output = NonZero<u128>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u128>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<u128>) -> Result<NonZero<u128>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<u128>) -> Result<NonZero<u128>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<u128>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<u128>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<u128>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<usize> {
-    type Error = Error;
+    type Other = NonZero<usize>;
     type Output = NonZero<usize>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<usize>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<usize>) -> Result<NonZero<usize>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<usize>) -> Result<NonZero<usize>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<usize>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<usize>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<usize>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<i8> {
-    type Error = Error;
+    type Other = NonZero<i8>;
     type Output = NonZero<i8>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i8>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<i8>) -> Result<NonZero<i8>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<i8>) -> Result<NonZero<i8>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<i8>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i8>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<i8>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<i16> {
-    type Error = Error;
+    type Other = NonZero<i16>;
     type Output = NonZero<i16>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i16>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<i16>) -> Result<NonZero<i16>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<i16>) -> Result<NonZero<i16>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<i16>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i16>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<i16>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<i32> {
-    type Error = Error;
+    type Other = NonZero<i32>;
     type Output = NonZero<i32>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i32>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<i32>) -> Result<NonZero<i32>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<i32>) -> Result<NonZero<i32>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<i32>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i32>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<i32>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<i64> {
-    type Error = Error;
+    type Other = NonZero<i64>;
     type Output = NonZero<i64>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i64>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<i64>) -> Result<NonZero<i64>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<i64>) -> Result<NonZero<i64>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<i64>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i64>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<i64>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<i128> {
-    type Error = Error;
+    type Other = NonZero<i128>;
     type Output = NonZero<i128>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i128>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<i128>) -> Result<NonZero<i128>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<i128>) -> Result<NonZero<i128>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<i128>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<i128>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<i128>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for NonZero<isize> {
-    type Error = Error;
+    type Other = NonZero<isize>;
     type Output = NonZero<isize>;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<isize>::checked_mul`].
-    fn cmul(a: Self, b: NonZero<isize>) -> Result<NonZero<isize>, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: NonZero<isize>) -> Result<NonZero<isize>, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "NonZero<isize>"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`NonZero<isize>::checked_mul`].
+    fn cmul_assign(&mut self, other: NonZero<isize>) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for i8 {
-    type Error = Error;
+    type Other = i8;
     type Output = i8;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_mul`].
-    fn cmul(a: Self, b: i8) -> Result<i8, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: i8) -> Result<i8, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i8"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i8::checked_mul`].
+    fn cmul_assign(&mut self, other: i8) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for i16 {
-    type Error = Error;
+    type Other = i16;
     type Output = i16;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_mul`].
-    fn cmul(a: Self, b: i16) -> Result<i16, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: i16) -> Result<i16, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i16"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i16::checked_mul`].
+    fn cmul_assign(&mut self, other: i16) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for i32 {
-    type Error = Error;
+    type Other = i32;
     type Output = i32;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_mul`].
-    fn cmul(a: Self, b: i32) -> Result<i32, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: i32) -> Result<i32, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i32"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i32::checked_mul`].
+    fn cmul_assign(&mut self, other: i32) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for i64 {
-    type Error = Error;
+    type Other = i64;
     type Output = i64;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_mul`].
-    fn cmul(a: Self, b: i64) -> Result<i64, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: i64) -> Result<i64, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i64"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i64::checked_mul`].
+    fn cmul_assign(&mut self, other: i64) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for i128 {
-    type Error = Error;
+    type Other = i128;
     type Output = i128;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_mul`].
-    fn cmul(a: Self, b: i128) -> Result<i128, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: i128) -> Result<i128, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "i128"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`i128::checked_mul`].
+    fn cmul_assign(&mut self, other: i128) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for isize {
-    type Error = Error;
+    type Other = isize;
     type Output = isize;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_mul`].
-    fn cmul(a: Self, b: isize) -> Result<isize, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: isize) -> Result<isize, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "isize"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`isize::checked_mul`].
+    fn cmul_assign(&mut self, other: isize) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for u8 {
-    type Error = Error;
+    type Other = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_mul`].
-    fn cmul(a: Self, b: u8) -> Result<u8, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: u8) -> Result<u8, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u8"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u8::checked_mul`].
+    fn cmul_assign(&mut self, other: u8) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for u16 {
-    type Error = Error;
+    type Other = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_mul`].
-    fn cmul(a: Self, b: u16) -> Result<u16, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: u16) -> Result<u16, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u16"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u16::checked_mul`].
+    fn cmul_assign(&mut self, other: u16) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for u32 {
-    type Error = Error;
+    type Other = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_mul`].
-    fn cmul(a: Self, b: u32) -> Result<u32, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: u32) -> Result<u32, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u32"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u32::checked_mul`].
+    fn cmul_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for u64 {
-    type Error = Error;
+    type Other = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_mul`].
-    fn cmul(a: Self, b: u64) -> Result<u64, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: u64) -> Result<u64, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u64"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u64::checked_mul`].
+    fn cmul_assign(&mut self, other: u64) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for u128 {
-    type Error = Error;
+    type Other = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_mul`].
-    fn cmul(a: Self, b: u128) -> Result<u128, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: u128) -> Result<u128, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "u128"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`u128::checked_mul`].
+    fn cmul_assign(&mut self, other: u128) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 impl Cmul for usize {
-    type Error = Error;
+    type Other = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_mul`].
-    fn cmul(a: Self, b: usize) -> Result<usize, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: usize) -> Result<usize, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "usize"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`usize::checked_mul`].
+    fn cmul_assign(&mut self, other: usize) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
-impl Cmul<u32> for Duration {
-    type Error = Error;
+impl Cmul for Duration {
+    type Other = u32;
     type Output = Duration;
+    type Error = Error;
     ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
     ///
     ///Wrapper for [`Duration::checked_mul`].
-    fn cmul(a: Self, b: u32) -> Result<Duration, Error> {
-        a.checked_mul(b).ok_or_else(|| {
+    fn cmul(self, other: u32) -> Result<Duration, Error> {
+        self.checked_mul(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} * {:?}: {} overflow",
-                a,
-                MaybeParens(b),
+                self,
+                MaybeParens(other),
                 "Duration"
             ))
         })
     }
+    #[inline]
+    ///Checked multiplication assigement: executes `self *= other`, returning an error if overflow occured.
+    ///
+    ///Wrapper for [`Duration::checked_mul`].
+    fn cmul_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cmul(other)?;
+        Ok(())
+    }
 }
 ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
-///
-///Instead of using this trait directly, it's recommended to use [`cdiv`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Cdiv<Divisor = Self>: Sized {
+pub trait Cdiv: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Divisor;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for `checked_div`.
-    fn cdiv(value: Self, divisor: Divisor) -> Result<Self::Output, Self::Error>;
+    fn cdiv(self, divisor: Self::Divisor) -> Result<Self::Output, Self::Error>;
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for `checked_div`.
+    fn cdiv_assign(&mut self, divisor: Self::Divisor) -> Result<(), Self::Error>;
 }
 ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_div`.
 #[doc(alias = "checked_div")]
 #[inline]
-pub fn cdiv<T, Divisor>(value: T, divisor: Divisor) -> Result<T::Output, T::Error>
+pub fn cdiv<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
 where
-    T: Cdiv<Divisor>,
+    T: Cdiv,
 {
-    Cdiv::cdiv(value, divisor)
+    value.cdiv(divisor)
 }
 impl Cdiv for i8 {
-    type Error = Error;
+    type Divisor = i8;
     type Output = i8;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_div`].
-    fn cdiv(value: Self, divisor: i8) -> Result<i8, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: i8) -> Result<i8, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i8"
                     )
@@ -1960,26 +2518,35 @@ impl Cdiv for i8 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i8::checked_div`].
+    fn cdiv_assign(&mut self, divisor: i8) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for i16 {
-    type Error = Error;
+    type Divisor = i16;
     type Output = i16;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_div`].
-    fn cdiv(value: Self, divisor: i16) -> Result<i16, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: i16) -> Result<i16, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i16"
                     )
@@ -1987,26 +2554,35 @@ impl Cdiv for i16 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i16::checked_div`].
+    fn cdiv_assign(&mut self, divisor: i16) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for i32 {
-    type Error = Error;
+    type Divisor = i32;
     type Output = i32;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_div`].
-    fn cdiv(value: Self, divisor: i32) -> Result<i32, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: i32) -> Result<i32, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i32"
                     )
@@ -2014,26 +2590,35 @@ impl Cdiv for i32 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i32::checked_div`].
+    fn cdiv_assign(&mut self, divisor: i32) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for i64 {
-    type Error = Error;
+    type Divisor = i64;
     type Output = i64;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_div`].
-    fn cdiv(value: Self, divisor: i64) -> Result<i64, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: i64) -> Result<i64, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i64"
                     )
@@ -2041,26 +2626,35 @@ impl Cdiv for i64 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i64::checked_div`].
+    fn cdiv_assign(&mut self, divisor: i64) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for i128 {
-    type Error = Error;
+    type Divisor = i128;
     type Output = i128;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_div`].
-    fn cdiv(value: Self, divisor: i128) -> Result<i128, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: i128) -> Result<i128, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i128"
                     )
@@ -2068,26 +2662,35 @@ impl Cdiv for i128 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i128::checked_div`].
+    fn cdiv_assign(&mut self, divisor: i128) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for isize {
-    type Error = Error;
+    type Divisor = isize;
     type Output = isize;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_div`].
-    fn cdiv(value: Self, divisor: isize) -> Result<isize, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: isize) -> Result<isize, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "isize"
                     )
@@ -2095,26 +2698,35 @@ impl Cdiv for isize {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`isize::checked_div`].
+    fn cdiv_assign(&mut self, divisor: isize) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for u8 {
-    type Error = Error;
+    type Divisor = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_div`].
-    fn cdiv(value: Self, divisor: u8) -> Result<u8, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: u8) -> Result<u8, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u8"
                     )
@@ -2122,26 +2734,35 @@ impl Cdiv for u8 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u8::checked_div`].
+    fn cdiv_assign(&mut self, divisor: u8) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for u16 {
-    type Error = Error;
+    type Divisor = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_div`].
-    fn cdiv(value: Self, divisor: u16) -> Result<u16, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: u16) -> Result<u16, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u16"
                     )
@@ -2149,26 +2770,35 @@ impl Cdiv for u16 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u16::checked_div`].
+    fn cdiv_assign(&mut self, divisor: u16) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for u32 {
-    type Error = Error;
+    type Divisor = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_div`].
-    fn cdiv(value: Self, divisor: u32) -> Result<u32, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: u32) -> Result<u32, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u32"
                     )
@@ -2176,26 +2806,35 @@ impl Cdiv for u32 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u32::checked_div`].
+    fn cdiv_assign(&mut self, divisor: u32) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for u64 {
-    type Error = Error;
+    type Divisor = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_div`].
-    fn cdiv(value: Self, divisor: u64) -> Result<u64, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: u64) -> Result<u64, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u64"
                     )
@@ -2203,26 +2842,35 @@ impl Cdiv for u64 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u64::checked_div`].
+    fn cdiv_assign(&mut self, divisor: u64) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for u128 {
-    type Error = Error;
+    type Divisor = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_div`].
-    fn cdiv(value: Self, divisor: u128) -> Result<u128, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: u128) -> Result<u128, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u128"
                     )
@@ -2230,26 +2878,35 @@ impl Cdiv for u128 {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u128::checked_div`].
+    fn cdiv_assign(&mut self, divisor: u128) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 impl Cdiv for usize {
-    type Error = Error;
+    type Divisor = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_div`].
-    fn cdiv(value: Self, divisor: usize) -> Result<usize, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: usize) -> Result<usize, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "usize"
                     )
@@ -2257,26 +2914,35 @@ impl Cdiv for usize {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`usize::checked_div`].
+    fn cdiv_assign(&mut self, divisor: usize) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
-impl Cdiv<u32> for Duration {
-    type Error = Error;
+impl Cdiv for Duration {
+    type Divisor = u32;
     type Output = Duration;
+    type Error = Error;
     ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`Duration::checked_div`].
-    fn cdiv(value: Self, divisor: u32) -> Result<Duration, Error> {
-        value.checked_div(divisor).ok_or_else(|| {
+    fn cdiv(self, divisor: u32) -> Result<Duration, Error> {
+        self.checked_div(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} / {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} / {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "Duration"
                     )
@@ -2284,49 +2950,58 @@ impl Cdiv<u32> for Duration {
             })
         })
     }
+    #[inline]
+    ///Checked division assigement: executes `self /= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`Duration::checked_div`].
+    fn cdiv_assign(&mut self, divisor: u32) -> Result<(), Self::Error> {
+        *self = self.cdiv(divisor)?;
+        Ok(())
+    }
 }
 ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
-///
-///Instead of using this trait directly, it's recommended to use [`cdiv_euclid`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CdivEuclid<Divisor = Self>: Sized {
+pub trait CdivEuclid: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Divisor;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for `checked_div_euclid`.
-    fn cdiv_euclid(value: Self, divisor: Divisor) -> Result<Self::Output, Self::Error>;
+    fn cdiv_euclid(self, divisor: Self::Divisor) -> Result<Self::Output, Self::Error>;
 }
 ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_div_euclid`.
 #[doc(alias = "checked_div_euclid")]
 #[inline]
-pub fn cdiv_euclid<T, Divisor>(value: T, divisor: Divisor) -> Result<T::Output, T::Error>
+pub fn cdiv_euclid<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
 where
-    T: CdivEuclid<Divisor>,
+    T: CdivEuclid,
 {
-    CdivEuclid::cdiv_euclid(value, divisor)
+    value.cdiv_euclid(divisor)
 }
 impl CdivEuclid for i8 {
-    type Error = Error;
+    type Divisor = i8;
     type Output = i8;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: i8) -> Result<i8, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: i8) -> Result<i8, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i8"
+                        self, divisor, "i8"
                     )
                 }
             })
@@ -2334,23 +3009,24 @@ impl CdivEuclid for i8 {
     }
 }
 impl CdivEuclid for i16 {
-    type Error = Error;
+    type Divisor = i16;
     type Output = i16;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: i16) -> Result<i16, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: i16) -> Result<i16, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i16"
+                        self, divisor, "i16"
                     )
                 }
             })
@@ -2358,23 +3034,24 @@ impl CdivEuclid for i16 {
     }
 }
 impl CdivEuclid for i32 {
-    type Error = Error;
+    type Divisor = i32;
     type Output = i32;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: i32) -> Result<i32, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: i32) -> Result<i32, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i32"
+                        self, divisor, "i32"
                     )
                 }
             })
@@ -2382,23 +3059,24 @@ impl CdivEuclid for i32 {
     }
 }
 impl CdivEuclid for i64 {
-    type Error = Error;
+    type Divisor = i64;
     type Output = i64;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: i64) -> Result<i64, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: i64) -> Result<i64, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i64"
+                        self, divisor, "i64"
                     )
                 }
             })
@@ -2406,23 +3084,24 @@ impl CdivEuclid for i64 {
     }
 }
 impl CdivEuclid for i128 {
-    type Error = Error;
+    type Divisor = i128;
     type Output = i128;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: i128) -> Result<i128, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: i128) -> Result<i128, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i128"
+                        self, divisor, "i128"
                     )
                 }
             })
@@ -2430,23 +3109,24 @@ impl CdivEuclid for i128 {
     }
 }
 impl CdivEuclid for isize {
-    type Error = Error;
+    type Divisor = isize;
     type Output = isize;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: isize) -> Result<isize, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: isize) -> Result<isize, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "isize"
+                        self, divisor, "isize"
                     )
                 }
             })
@@ -2454,23 +3134,24 @@ impl CdivEuclid for isize {
     }
 }
 impl CdivEuclid for u8 {
-    type Error = Error;
+    type Divisor = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: u8) -> Result<u8, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: u8) -> Result<u8, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u8"
+                        self, divisor, "u8"
                     )
                 }
             })
@@ -2478,23 +3159,24 @@ impl CdivEuclid for u8 {
     }
 }
 impl CdivEuclid for u16 {
-    type Error = Error;
+    type Divisor = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: u16) -> Result<u16, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: u16) -> Result<u16, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u16"
+                        self, divisor, "u16"
                     )
                 }
             })
@@ -2502,23 +3184,24 @@ impl CdivEuclid for u16 {
     }
 }
 impl CdivEuclid for u32 {
-    type Error = Error;
+    type Divisor = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: u32) -> Result<u32, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: u32) -> Result<u32, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u32"
+                        self, divisor, "u32"
                     )
                 }
             })
@@ -2526,23 +3209,24 @@ impl CdivEuclid for u32 {
     }
 }
 impl CdivEuclid for u64 {
-    type Error = Error;
+    type Divisor = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: u64) -> Result<u64, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: u64) -> Result<u64, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u64"
+                        self, divisor, "u64"
                     )
                 }
             })
@@ -2550,23 +3234,24 @@ impl CdivEuclid for u64 {
     }
 }
 impl CdivEuclid for u128 {
-    type Error = Error;
+    type Divisor = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: u128) -> Result<u128, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: u128) -> Result<u128, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u128"
+                        self, divisor, "u128"
                     )
                 }
             })
@@ -2574,23 +3259,24 @@ impl CdivEuclid for u128 {
     }
 }
 impl CdivEuclid for usize {
-    type Error = Error;
+    type Divisor = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_div_euclid`].
-    fn cdiv_euclid(value: Self, divisor: usize) -> Result<usize, Error> {
-        value.checked_div_euclid(divisor).ok_or_else(|| {
+    fn cdiv_euclid(self, divisor: usize) -> Result<usize, Error> {
+        self.checked_div_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute div_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "usize"
+                        self, divisor, "usize"
                     )
                 }
             })
@@ -2598,48 +3284,53 @@ impl CdivEuclid for usize {
     }
 }
 ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
-///
-///Instead of using this trait directly, it's recommended to use [`crem`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Crem<Divisor = Self>: Sized {
+pub trait Crem: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Divisor;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for `checked_rem`.
-    fn crem(value: Self, divisor: Divisor) -> Result<Self::Output, Self::Error>;
+    fn crem(self, divisor: Self::Divisor) -> Result<Self::Output, Self::Error>;
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for `checked_rem`.
+    fn crem_assign(&mut self, divisor: Self::Divisor) -> Result<(), Self::Error>;
 }
 ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_rem`.
 #[doc(alias = "checked_rem")]
 #[inline]
-pub fn crem<T, Divisor>(value: T, divisor: Divisor) -> Result<T::Output, T::Error>
+pub fn crem<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
 where
-    T: Crem<Divisor>,
+    T: Crem,
 {
-    Crem::crem(value, divisor)
+    value.crem(divisor)
 }
 impl Crem for i8 {
-    type Error = Error;
+    type Divisor = i8;
     type Output = i8;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_rem`].
-    fn crem(value: Self, divisor: i8) -> Result<i8, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: i8) -> Result<i8, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i8"
                     )
@@ -2647,26 +3338,35 @@ impl Crem for i8 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i8::checked_rem`].
+    fn crem_assign(&mut self, divisor: i8) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for i16 {
-    type Error = Error;
+    type Divisor = i16;
     type Output = i16;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_rem`].
-    fn crem(value: Self, divisor: i16) -> Result<i16, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: i16) -> Result<i16, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i16"
                     )
@@ -2674,26 +3374,35 @@ impl Crem for i16 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i16::checked_rem`].
+    fn crem_assign(&mut self, divisor: i16) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for i32 {
-    type Error = Error;
+    type Divisor = i32;
     type Output = i32;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_rem`].
-    fn crem(value: Self, divisor: i32) -> Result<i32, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: i32) -> Result<i32, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i32"
                     )
@@ -2701,26 +3410,35 @@ impl Crem for i32 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i32::checked_rem`].
+    fn crem_assign(&mut self, divisor: i32) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for i64 {
-    type Error = Error;
+    type Divisor = i64;
     type Output = i64;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_rem`].
-    fn crem(value: Self, divisor: i64) -> Result<i64, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: i64) -> Result<i64, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i64"
                     )
@@ -2728,26 +3446,35 @@ impl Crem for i64 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i64::checked_rem`].
+    fn crem_assign(&mut self, divisor: i64) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for i128 {
-    type Error = Error;
+    type Divisor = i128;
     type Output = i128;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_rem`].
-    fn crem(value: Self, divisor: i128) -> Result<i128, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: i128) -> Result<i128, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "i128"
                     )
@@ -2755,26 +3482,35 @@ impl Crem for i128 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`i128::checked_rem`].
+    fn crem_assign(&mut self, divisor: i128) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for isize {
-    type Error = Error;
+    type Divisor = isize;
     type Output = isize;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_rem`].
-    fn crem(value: Self, divisor: isize) -> Result<isize, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: isize) -> Result<isize, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "isize"
                     )
@@ -2782,26 +3518,35 @@ impl Crem for isize {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`isize::checked_rem`].
+    fn crem_assign(&mut self, divisor: isize) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for u8 {
-    type Error = Error;
+    type Divisor = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_rem`].
-    fn crem(value: Self, divisor: u8) -> Result<u8, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: u8) -> Result<u8, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u8"
                     )
@@ -2809,26 +3554,35 @@ impl Crem for u8 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u8::checked_rem`].
+    fn crem_assign(&mut self, divisor: u8) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for u16 {
-    type Error = Error;
+    type Divisor = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_rem`].
-    fn crem(value: Self, divisor: u16) -> Result<u16, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: u16) -> Result<u16, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u16"
                     )
@@ -2836,26 +3590,35 @@ impl Crem for u16 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u16::checked_rem`].
+    fn crem_assign(&mut self, divisor: u16) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for u32 {
-    type Error = Error;
+    type Divisor = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_rem`].
-    fn crem(value: Self, divisor: u32) -> Result<u32, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: u32) -> Result<u32, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u32"
                     )
@@ -2863,26 +3626,35 @@ impl Crem for u32 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u32::checked_rem`].
+    fn crem_assign(&mut self, divisor: u32) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for u64 {
-    type Error = Error;
+    type Divisor = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_rem`].
-    fn crem(value: Self, divisor: u64) -> Result<u64, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: u64) -> Result<u64, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u64"
                     )
@@ -2890,26 +3662,35 @@ impl Crem for u64 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u64::checked_rem`].
+    fn crem_assign(&mut self, divisor: u64) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for u128 {
-    type Error = Error;
+    type Divisor = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_rem`].
-    fn crem(value: Self, divisor: u128) -> Result<u128, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: u128) -> Result<u128, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "u128"
                     )
@@ -2917,26 +3698,35 @@ impl Crem for u128 {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`u128::checked_rem`].
+    fn crem_assign(&mut self, divisor: u128) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 impl Crem for usize {
-    type Error = Error;
+    type Divisor = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_rem`].
-    fn crem(value: Self, divisor: usize) -> Result<usize, Error> {
-        value.checked_rem(divisor).ok_or_else(|| {
+    fn crem(self, divisor: usize) -> Result<usize, Error> {
+        self.checked_rem(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute {:?} % {:?}: division by zero",
-                        value,
+                        self,
                         MaybeParens(divisor)
                     )
                 } else {
                     format!(
                         "failed to compute {:?} % {:?}: {} overflow",
-                        value,
+                        self,
                         MaybeParens(divisor),
                         "usize"
                     )
@@ -2944,49 +3734,58 @@ impl Crem for usize {
             })
         })
     }
+    #[inline]
+    ///Checked remainder assigement: executes `self %= divisor`, returning an error if overflow occured or if `divisor` is zero.
+    ///
+    ///Wrapper for [`usize::checked_rem`].
+    fn crem_assign(&mut self, divisor: usize) -> Result<(), Self::Error> {
+        *self = self.crem(divisor)?;
+        Ok(())
+    }
 }
 ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
-///
-///Instead of using this trait directly, it's recommended to use [`crem_euclid`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CremEuclid<Divisor = Self>: Sized {
+pub trait CremEuclid: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Divisor;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for `checked_rem_euclid`.
-    fn crem_euclid(value: Self, divisor: Divisor) -> Result<Self::Output, Self::Error>;
+    fn crem_euclid(self, divisor: Self::Divisor) -> Result<Self::Output, Self::Error>;
 }
 ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_rem_euclid`.
 #[doc(alias = "checked_rem_euclid")]
 #[inline]
-pub fn crem_euclid<T, Divisor>(value: T, divisor: Divisor) -> Result<T::Output, T::Error>
+pub fn crem_euclid<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
 where
-    T: CremEuclid<Divisor>,
+    T: CremEuclid,
 {
-    CremEuclid::crem_euclid(value, divisor)
+    value.crem_euclid(divisor)
 }
 impl CremEuclid for i8 {
-    type Error = Error;
+    type Divisor = i8;
     type Output = i8;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i8::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: i8) -> Result<i8, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: i8) -> Result<i8, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i8"
+                        self, divisor, "i8"
                     )
                 }
             })
@@ -2994,23 +3793,24 @@ impl CremEuclid for i8 {
     }
 }
 impl CremEuclid for i16 {
-    type Error = Error;
+    type Divisor = i16;
     type Output = i16;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i16::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: i16) -> Result<i16, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: i16) -> Result<i16, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i16"
+                        self, divisor, "i16"
                     )
                 }
             })
@@ -3018,23 +3818,24 @@ impl CremEuclid for i16 {
     }
 }
 impl CremEuclid for i32 {
-    type Error = Error;
+    type Divisor = i32;
     type Output = i32;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i32::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: i32) -> Result<i32, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: i32) -> Result<i32, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i32"
+                        self, divisor, "i32"
                     )
                 }
             })
@@ -3042,23 +3843,24 @@ impl CremEuclid for i32 {
     }
 }
 impl CremEuclid for i64 {
-    type Error = Error;
+    type Divisor = i64;
     type Output = i64;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i64::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: i64) -> Result<i64, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: i64) -> Result<i64, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i64"
+                        self, divisor, "i64"
                     )
                 }
             })
@@ -3066,23 +3868,24 @@ impl CremEuclid for i64 {
     }
 }
 impl CremEuclid for i128 {
-    type Error = Error;
+    type Divisor = i128;
     type Output = i128;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`i128::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: i128) -> Result<i128, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: i128) -> Result<i128, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "i128"
+                        self, divisor, "i128"
                     )
                 }
             })
@@ -3090,23 +3893,24 @@ impl CremEuclid for i128 {
     }
 }
 impl CremEuclid for isize {
-    type Error = Error;
+    type Divisor = isize;
     type Output = isize;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`isize::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: isize) -> Result<isize, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: isize) -> Result<isize, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "isize"
+                        self, divisor, "isize"
                     )
                 }
             })
@@ -3114,23 +3918,24 @@ impl CremEuclid for isize {
     }
 }
 impl CremEuclid for u8 {
-    type Error = Error;
+    type Divisor = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u8::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: u8) -> Result<u8, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: u8) -> Result<u8, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u8"
+                        self, divisor, "u8"
                     )
                 }
             })
@@ -3138,23 +3943,24 @@ impl CremEuclid for u8 {
     }
 }
 impl CremEuclid for u16 {
-    type Error = Error;
+    type Divisor = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u16::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: u16) -> Result<u16, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: u16) -> Result<u16, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u16"
+                        self, divisor, "u16"
                     )
                 }
             })
@@ -3162,23 +3968,24 @@ impl CremEuclid for u16 {
     }
 }
 impl CremEuclid for u32 {
-    type Error = Error;
+    type Divisor = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u32::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: u32) -> Result<u32, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: u32) -> Result<u32, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u32"
+                        self, divisor, "u32"
                     )
                 }
             })
@@ -3186,23 +3993,24 @@ impl CremEuclid for u32 {
     }
 }
 impl CremEuclid for u64 {
-    type Error = Error;
+    type Divisor = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u64::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: u64) -> Result<u64, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: u64) -> Result<u64, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u64"
+                        self, divisor, "u64"
                     )
                 }
             })
@@ -3210,23 +4018,24 @@ impl CremEuclid for u64 {
     }
 }
 impl CremEuclid for u128 {
-    type Error = Error;
+    type Divisor = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`u128::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: u128) -> Result<u128, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: u128) -> Result<u128, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "u128"
+                        self, divisor, "u128"
                     )
                 }
             })
@@ -3234,23 +4043,24 @@ impl CremEuclid for u128 {
     }
 }
 impl CremEuclid for usize {
-    type Error = Error;
+    type Divisor = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
     ///
     ///Wrapper for [`usize::checked_rem_euclid`].
-    fn crem_euclid(value: Self, divisor: usize) -> Result<usize, Error> {
-        value.checked_rem_euclid(divisor).ok_or_else(|| {
+    fn crem_euclid(self, divisor: usize) -> Result<usize, Error> {
+        self.checked_rem_euclid(divisor).ok_or_else(|| {
             Error::new({
                 if divisor == 0 {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): division by zero",
-                        value, divisor
+                        self, divisor
                     )
                 } else {
                     format!(
                         "failed to compute rem_euclid({:?}, {:?}): {} overflow",
-                        value, divisor, "usize"
+                        self, divisor, "usize"
                     )
                 }
             })
@@ -3258,47 +4068,48 @@ impl CremEuclid for usize {
     }
 }
 ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
-///
-///Instead of using this trait directly, it's recommended to use [`cilog`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Cilog<Base = Self>: Sized {
+pub trait Cilog: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Base;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for `checked_ilog`.
-    fn cilog(value: Self, base: Base) -> Result<Self::Output, Self::Error>;
+    fn cilog(self, base: Self::Base) -> Result<Self::Output, Self::Error>;
 }
 ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
 ///
 ///Wrapper for `checked_ilog`.
 #[doc(alias = "checked_ilog")]
 #[inline]
-pub fn cilog<T, Base>(value: T, base: Base) -> Result<T::Output, T::Error>
+pub fn cilog<T>(value: T, base: T::Base) -> Result<T::Output, T::Error>
 where
-    T: Cilog<Base>,
+    T: Cilog,
 {
-    Cilog::cilog(value, base)
+    value.cilog(base)
 }
 impl Cilog for i8 {
-    type Error = Error;
+    type Base = i8;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`i8::checked_ilog`].
-    fn cilog(value: Self, base: i8) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: i8) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3306,23 +4117,24 @@ impl Cilog for i8 {
     }
 }
 impl Cilog for i16 {
-    type Error = Error;
+    type Base = i16;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`i16::checked_ilog`].
-    fn cilog(value: Self, base: i16) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: i16) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3330,23 +4142,24 @@ impl Cilog for i16 {
     }
 }
 impl Cilog for i32 {
-    type Error = Error;
+    type Base = i32;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`i32::checked_ilog`].
-    fn cilog(value: Self, base: i32) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: i32) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3354,23 +4167,24 @@ impl Cilog for i32 {
     }
 }
 impl Cilog for i64 {
-    type Error = Error;
+    type Base = i64;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`i64::checked_ilog`].
-    fn cilog(value: Self, base: i64) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: i64) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3378,23 +4192,24 @@ impl Cilog for i64 {
     }
 }
 impl Cilog for i128 {
-    type Error = Error;
+    type Base = i128;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`i128::checked_ilog`].
-    fn cilog(value: Self, base: i128) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: i128) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3402,23 +4217,24 @@ impl Cilog for i128 {
     }
 }
 impl Cilog for isize {
-    type Error = Error;
+    type Base = isize;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`isize::checked_ilog`].
-    fn cilog(value: Self, base: isize) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: isize) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3426,23 +4242,24 @@ impl Cilog for isize {
     }
 }
 impl Cilog for u8 {
-    type Error = Error;
+    type Base = u8;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`u8::checked_ilog`].
-    fn cilog(value: Self, base: u8) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: u8) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3450,23 +4267,24 @@ impl Cilog for u8 {
     }
 }
 impl Cilog for u16 {
-    type Error = Error;
+    type Base = u16;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`u16::checked_ilog`].
-    fn cilog(value: Self, base: u16) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: u16) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3474,23 +4292,24 @@ impl Cilog for u16 {
     }
 }
 impl Cilog for u32 {
-    type Error = Error;
+    type Base = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`u32::checked_ilog`].
-    fn cilog(value: Self, base: u32) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: u32) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3498,23 +4317,24 @@ impl Cilog for u32 {
     }
 }
 impl Cilog for u64 {
-    type Error = Error;
+    type Base = u64;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`u64::checked_ilog`].
-    fn cilog(value: Self, base: u64) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: u64) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3522,23 +4342,24 @@ impl Cilog for u64 {
     }
 }
 impl Cilog for u128 {
-    type Error = Error;
+    type Base = u128;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`u128::checked_ilog`].
-    fn cilog(value: Self, base: u128) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: u128) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3546,23 +4367,24 @@ impl Cilog for u128 {
     }
 }
 impl Cilog for usize {
-    type Error = Error;
+    type Base = usize;
     type Output = u32;
+    type Error = Error;
     ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
     ///
     ///Wrapper for [`usize::checked_ilog`].
-    fn cilog(value: Self, base: usize) -> Result<u32, Error> {
-        value.checked_ilog(base).ok_or_else(|| {
+    fn cilog(self, base: usize) -> Result<u32, Error> {
+        self.checked_ilog(base).ok_or_else(|| {
             Error::new({
                 if base < 2 {
                     format!(
                         "failed to compute ilog({:?}, {:?}): base is less than 2",
-                        value, base
+                        self, base
                     )
                 } else {
                     format!(
                         "failed to compute ilog({:?}, {:?}): first argument is not positive",
-                        value, base
+                        self, base
                     )
                 }
             })
@@ -3570,17 +4392,15 @@ impl Cilog for usize {
     }
 }
 ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
-///
-///Instead of using this trait directly, it's recommended to use [`cilog2`] function or extension traits from the [`ext`](crate::ext) module.
 pub trait Cilog2: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
-    #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for `checked_ilog2`.
-    fn cilog2(value: Self) -> Result<Self::Output, Self::Error>;
+    fn cilog2(self) -> Result<Self::Output, Self::Error>;
 }
 ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
 ///
@@ -3594,197 +4414,195 @@ where
     Cilog2::cilog2(value)
 }
 impl Cilog2 for i8 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i8::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for i16 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i16::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for i32 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i32::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for i64 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i64::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for i128 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i128::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for isize {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`isize::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for u8 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u8::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for u16 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u16::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for u32 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u32::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for u64 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u64::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for u128 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u128::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog2 for usize {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`usize::checked_ilog2`].
-    fn cilog2(value: Self) -> Result<u32, Error> {
-        value.checked_ilog2().ok_or_else(|| {
+    fn cilog2(self) -> Result<u32, Error> {
+        self.checked_ilog2().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog2({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
-///
-///Instead of using this trait directly, it's recommended to use [`cilog10`] function or extension traits from the [`ext`](crate::ext) module.
 pub trait Cilog10: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
-    #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for `checked_ilog10`.
-    fn cilog10(value: Self) -> Result<Self::Output, Self::Error>;
+    fn cilog10(self) -> Result<Self::Output, Self::Error>;
 }
 ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
 ///
@@ -3798,1013 +4616,1259 @@ where
     Cilog10::cilog10(value)
 }
 impl Cilog10 for i8 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i8::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for i16 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i16::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for i32 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i32::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for i64 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i64::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for i128 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`i128::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for isize {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`isize::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for u8 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u8::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for u16 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u16::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for u32 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u32::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for u64 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u64::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for u128 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`u128::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 impl Cilog10 for usize {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
     ///
     ///Wrapper for [`usize::checked_ilog10`].
-    fn cilog10(value: Self) -> Result<u32, Error> {
-        value.checked_ilog10().ok_or_else(|| {
+    fn cilog10(self) -> Result<u32, Error> {
+        self.checked_ilog10().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute ilog10({:?}): argument is not positive",
-                value
+                self
             ))
         })
     }
 }
 ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
-///
-///Instead of using this trait directly, it's recommended to use [`cshl`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Cshl<Other = Self>: Sized {
+pub trait Cshl: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for `checked_shl`.
-    fn cshl(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn cshl(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for `checked_shl`.
+    fn cshl_assign(&mut self, other: Self::Other) -> Result<(), Self::Error>;
 }
 ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
 ///
 ///Wrapper for `checked_shl`.
 #[doc(alias = "checked_shl")]
 #[inline]
-pub fn cshl<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn cshl<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: Cshl<T2>,
+    T: Cshl,
 {
-    Cshl::cshl(a, b)
+    a.cshl(b)
 }
-impl Cshl<u32> for i8 {
-    type Error = Error;
+impl Cshl for i8 {
+    type Other = u32;
     type Output = i8;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i8::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<i8, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<i8, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i8::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for i16 {
-    type Error = Error;
+impl Cshl for i16 {
+    type Other = u32;
     type Output = i16;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i16::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<i16, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<i16, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i16::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for i32 {
-    type Error = Error;
+impl Cshl for i32 {
+    type Other = u32;
     type Output = i32;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i32::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<i32, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<i32, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i32::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for i64 {
-    type Error = Error;
+impl Cshl for i64 {
+    type Other = u32;
     type Output = i64;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i64::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<i64, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<i64, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i64::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for i128 {
-    type Error = Error;
+impl Cshl for i128 {
+    type Other = u32;
     type Output = i128;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i128::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<i128, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<i128, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i128::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for isize {
-    type Error = Error;
+impl Cshl for isize {
+    type Other = u32;
     type Output = isize;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`isize::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<isize, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<isize, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`isize::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for u8 {
-    type Error = Error;
+impl Cshl for u8 {
+    type Other = u32;
     type Output = u8;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u8::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<u8, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<u8, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u8::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for u16 {
-    type Error = Error;
+impl Cshl for u16 {
+    type Other = u32;
     type Output = u16;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u16::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<u16, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<u16, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
+    }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u16::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
     }
 }
 impl Cshl for u32 {
-    type Error = Error;
+    type Other = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u32::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<u32, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<u32, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u32::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for u64 {
-    type Error = Error;
+impl Cshl for u64 {
+    type Other = u32;
     type Output = u64;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u64::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<u64, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<u64, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u64::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for u128 {
-    type Error = Error;
+impl Cshl for u128 {
+    type Other = u32;
     type Output = u128;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u128::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<u128, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<u128, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u128::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
-impl Cshl<u32> for usize {
-    type Error = Error;
+impl Cshl for usize {
+    type Other = u32;
     type Output = usize;
+    type Error = Error;
     ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`usize::checked_shl`].
-    fn cshl(a: Self, b: u32) -> Result<usize, Error> {
-        a.checked_shl(b).ok_or_else(|| {
+    fn cshl(self, other: u32) -> Result<usize, Error> {
+        self.checked_shl(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} << {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift left assigement: executes `self <<= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`usize::checked_shl`].
+    fn cshl_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshl(other)?;
+        Ok(())
+    }
 }
 ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
-///
-///Instead of using this trait directly, it's recommended to use [`cshr`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Cshr<Other = Self>: Sized {
+pub trait Cshr: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for `checked_shr`.
-    fn cshr(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn cshr(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for `checked_shr`.
+    fn cshr_assign(&mut self, other: Self::Other) -> Result<(), Self::Error>;
 }
 ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
 ///
 ///Wrapper for `checked_shr`.
 #[doc(alias = "checked_shr")]
 #[inline]
-pub fn cshr<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn cshr<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: Cshr<T2>,
+    T: Cshr,
 {
-    Cshr::cshr(a, b)
+    a.cshr(b)
 }
-impl Cshr<u32> for i8 {
-    type Error = Error;
+impl Cshr for i8 {
+    type Other = u32;
     type Output = i8;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i8::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<i8, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<i8, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i8::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for i16 {
-    type Error = Error;
+impl Cshr for i16 {
+    type Other = u32;
     type Output = i16;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i16::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<i16, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<i16, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i16::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for i32 {
-    type Error = Error;
+impl Cshr for i32 {
+    type Other = u32;
     type Output = i32;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i32::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<i32, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<i32, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i32::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for i64 {
-    type Error = Error;
+impl Cshr for i64 {
+    type Other = u32;
     type Output = i64;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i64::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<i64, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<i64, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i64::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for i128 {
-    type Error = Error;
+impl Cshr for i128 {
+    type Other = u32;
     type Output = i128;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`i128::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<i128, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<i128, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`i128::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for isize {
-    type Error = Error;
+impl Cshr for isize {
+    type Other = u32;
     type Output = isize;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`isize::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<isize, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<isize, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`isize::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for u8 {
-    type Error = Error;
+impl Cshr for u8 {
+    type Other = u32;
     type Output = u8;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u8::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<u8, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<u8, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u8::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for u16 {
-    type Error = Error;
+impl Cshr for u16 {
+    type Other = u32;
     type Output = u16;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u16::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<u16, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<u16, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
+    }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u16::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
     }
 }
 impl Cshr for u32 {
-    type Error = Error;
+    type Other = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u32::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<u32, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<u32, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u32::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for u64 {
-    type Error = Error;
+impl Cshr for u64 {
+    type Other = u32;
     type Output = u64;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u64::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<u64, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<u64, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u64::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for u128 {
-    type Error = Error;
+impl Cshr for u128 {
+    type Other = u32;
     type Output = u128;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`u128::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<u128, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<u128, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`u128::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
-impl Cshr<u32> for usize {
-    type Error = Error;
+impl Cshr for usize {
+    type Other = u32;
     type Output = usize;
+    type Error = Error;
     ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
     ///
     ///Wrapper for [`usize::checked_shr`].
-    fn cshr(a: Self, b: u32) -> Result<usize, Error> {
-        a.checked_shr(b).ok_or_else(|| {
+    fn cshr(self, other: u32) -> Result<usize, Error> {
+        self.checked_shr(other).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute {:?} >> {:?}: shift amount is too large",
-                MaybeParens(a),
-                MaybeParens(b)
+                MaybeParens(self),
+                MaybeParens(other)
             ))
         })
     }
+    #[inline]
+    ///Checked shift right assigement: executes `self >>= other`, returning an error if `other` is greater or equal to the number of bits in the type.
+    ///
+    ///Wrapper for [`usize::checked_shr`].
+    fn cshr_assign(&mut self, other: u32) -> Result<(), Self::Error> {
+        *self = self.cshr(other)?;
+        Ok(())
+    }
 }
 ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cpow`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait Cpow<Power = Self>: Sized {
+pub trait Cpow: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Power;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_pow`.
-    fn cpow(value: Self, power: Power) -> Result<Self::Output, Self::Error>;
+    fn cpow(self, power: Self::Power) -> Result<Self::Output, Self::Error>;
 }
 ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_pow`.
 #[doc(alias = "checked_pow")]
 #[inline]
-pub fn cpow<T, Power>(value: T, power: Power) -> Result<T::Output, T::Error>
+pub fn cpow<T>(value: T, power: T::Power) -> Result<T::Output, T::Error>
 where
-    T: Cpow<Power>,
+    T: Cpow,
 {
-    Cpow::cpow(value, power)
+    value.cpow(power)
 }
-impl Cpow<u32> for NonZero<u8> {
-    type Error = Error;
+impl Cpow for NonZero<u8> {
+    type Power = u32;
     type Output = NonZero<u8>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u8>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<u8>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<u8>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<u8>"
+                self, power, "NonZero<u8>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<u16> {
-    type Error = Error;
+impl Cpow for NonZero<u16> {
+    type Power = u32;
     type Output = NonZero<u16>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u16>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<u16>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<u16>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<u16>"
+                self, power, "NonZero<u16>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<u32> {
-    type Error = Error;
+impl Cpow for NonZero<u32> {
+    type Power = u32;
     type Output = NonZero<u32>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u32>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<u32>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<u32>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<u32>"
+                self, power, "NonZero<u32>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<u64> {
-    type Error = Error;
+impl Cpow for NonZero<u64> {
+    type Power = u32;
     type Output = NonZero<u64>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u64>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<u64>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<u64>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<u64>"
+                self, power, "NonZero<u64>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<u128> {
-    type Error = Error;
+impl Cpow for NonZero<u128> {
+    type Power = u32;
     type Output = NonZero<u128>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u128>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<u128>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<u128>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<u128>"
+                self, power, "NonZero<u128>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<usize> {
-    type Error = Error;
+impl Cpow for NonZero<usize> {
+    type Power = u32;
     type Output = NonZero<usize>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<usize>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<usize>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<usize>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<usize>"
+                self, power, "NonZero<usize>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<i8> {
-    type Error = Error;
+impl Cpow for NonZero<i8> {
+    type Power = u32;
     type Output = NonZero<i8>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i8>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<i8>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<i8>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<i8>"
+                self, power, "NonZero<i8>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<i16> {
-    type Error = Error;
+impl Cpow for NonZero<i16> {
+    type Power = u32;
     type Output = NonZero<i16>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i16>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<i16>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<i16>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<i16>"
+                self, power, "NonZero<i16>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<i32> {
-    type Error = Error;
+impl Cpow for NonZero<i32> {
+    type Power = u32;
     type Output = NonZero<i32>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i32>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<i32>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<i32>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<i32>"
+                self, power, "NonZero<i32>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<i64> {
-    type Error = Error;
+impl Cpow for NonZero<i64> {
+    type Power = u32;
     type Output = NonZero<i64>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i64>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<i64>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<i64>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<i64>"
+                self, power, "NonZero<i64>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<i128> {
-    type Error = Error;
+impl Cpow for NonZero<i128> {
+    type Power = u32;
     type Output = NonZero<i128>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i128>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<i128>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<i128>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<i128>"
+                self, power, "NonZero<i128>"
             ))
         })
     }
 }
-impl Cpow<u32> for NonZero<isize> {
-    type Error = Error;
+impl Cpow for NonZero<isize> {
+    type Power = u32;
     type Output = NonZero<isize>;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<isize>::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<NonZero<isize>, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<NonZero<isize>, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "NonZero<isize>"
+                self, power, "NonZero<isize>"
             ))
         })
     }
 }
-impl Cpow<u32> for i8 {
-    type Error = Error;
+impl Cpow for i8 {
+    type Power = u32;
     type Output = i8;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<i8, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<i8, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "i8"
+                self, power, "i8"
             ))
         })
     }
 }
-impl Cpow<u32> for i16 {
-    type Error = Error;
+impl Cpow for i16 {
+    type Power = u32;
     type Output = i16;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<i16, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<i16, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "i16"
+                self, power, "i16"
             ))
         })
     }
 }
-impl Cpow<u32> for i32 {
-    type Error = Error;
+impl Cpow for i32 {
+    type Power = u32;
     type Output = i32;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<i32, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<i32, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "i32"
+                self, power, "i32"
             ))
         })
     }
 }
-impl Cpow<u32> for i64 {
-    type Error = Error;
+impl Cpow for i64 {
+    type Power = u32;
     type Output = i64;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<i64, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<i64, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "i64"
+                self, power, "i64"
             ))
         })
     }
 }
-impl Cpow<u32> for i128 {
-    type Error = Error;
+impl Cpow for i128 {
+    type Power = u32;
     type Output = i128;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<i128, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<i128, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "i128"
+                self, power, "i128"
             ))
         })
     }
 }
-impl Cpow<u32> for isize {
-    type Error = Error;
+impl Cpow for isize {
+    type Power = u32;
     type Output = isize;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<isize, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<isize, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "isize"
+                self, power, "isize"
             ))
         })
     }
 }
-impl Cpow<u32> for u8 {
-    type Error = Error;
+impl Cpow for u8 {
+    type Power = u32;
     type Output = u8;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<u8, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<u8, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "u8"
+                self, power, "u8"
             ))
         })
     }
 }
-impl Cpow<u32> for u16 {
-    type Error = Error;
+impl Cpow for u16 {
+    type Power = u32;
     type Output = u16;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<u16, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<u16, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "u16"
+                self, power, "u16"
             ))
         })
     }
 }
 impl Cpow for u32 {
-    type Error = Error;
+    type Power = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<u32, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<u32, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "u32"
+                self, power, "u32"
             ))
         })
     }
 }
-impl Cpow<u32> for u64 {
-    type Error = Error;
+impl Cpow for u64 {
+    type Power = u32;
     type Output = u64;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<u64, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<u64, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "u64"
+                self, power, "u64"
             ))
         })
     }
 }
-impl Cpow<u32> for u128 {
-    type Error = Error;
+impl Cpow for u128 {
+    type Power = u32;
     type Output = u128;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<u128, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<u128, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "u128"
+                self, power, "u128"
             ))
         })
     }
 }
-impl Cpow<u32> for usize {
-    type Error = Error;
+impl Cpow for usize {
+    type Power = u32;
     type Output = usize;
+    type Error = Error;
     ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_pow`].
-    fn cpow(value: Self, power: u32) -> Result<usize, Error> {
-        value.checked_pow(power).ok_or_else(|| {
+    fn cpow(self, power: u32) -> Result<usize, Error> {
+        self.checked_pow(power).ok_or_else(|| {
             Error::new(format!(
                 "failed to compute pow({:?}, {:?}): {} overflow",
-                value, power, "usize"
+                self, power, "usize"
             ))
         })
     }
 }
 ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cabs`] function or extension traits from the [`ext`](crate::ext) module.
 pub trait Cabs: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
-    #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_abs`.
-    fn cabs(value: Self) -> Result<Self::Output, Self::Error>;
+    fn cabs(self) -> Result<Self::Output, Self::Error>;
 }
 ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
 ///
@@ -4818,197 +5882,195 @@ where
     Cabs::cabs(value)
 }
 impl Cabs for NonZero<i8> {
-    type Error = Error;
     type Output = NonZero<i8>;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i8>::checked_abs`].
-    fn cabs(value: Self) -> Result<NonZero<i8>, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<NonZero<i8>, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "NonZero<i8>"
+                self, "NonZero<i8>"
             ))
         })
     }
 }
 impl Cabs for NonZero<i16> {
-    type Error = Error;
     type Output = NonZero<i16>;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i16>::checked_abs`].
-    fn cabs(value: Self) -> Result<NonZero<i16>, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<NonZero<i16>, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "NonZero<i16>"
+                self, "NonZero<i16>"
             ))
         })
     }
 }
 impl Cabs for NonZero<i32> {
-    type Error = Error;
     type Output = NonZero<i32>;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i32>::checked_abs`].
-    fn cabs(value: Self) -> Result<NonZero<i32>, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<NonZero<i32>, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "NonZero<i32>"
+                self, "NonZero<i32>"
             ))
         })
     }
 }
 impl Cabs for NonZero<i64> {
-    type Error = Error;
     type Output = NonZero<i64>;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i64>::checked_abs`].
-    fn cabs(value: Self) -> Result<NonZero<i64>, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<NonZero<i64>, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "NonZero<i64>"
+                self, "NonZero<i64>"
             ))
         })
     }
 }
 impl Cabs for NonZero<i128> {
-    type Error = Error;
     type Output = NonZero<i128>;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<i128>::checked_abs`].
-    fn cabs(value: Self) -> Result<NonZero<i128>, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<NonZero<i128>, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "NonZero<i128>"
+                self, "NonZero<i128>"
             ))
         })
     }
 }
 impl Cabs for NonZero<isize> {
-    type Error = Error;
     type Output = NonZero<isize>;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<isize>::checked_abs`].
-    fn cabs(value: Self) -> Result<NonZero<isize>, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<NonZero<isize>, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "NonZero<isize>"
+                self, "NonZero<isize>"
             ))
         })
     }
 }
 impl Cabs for i8 {
-    type Error = Error;
     type Output = i8;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i8::checked_abs`].
-    fn cabs(value: Self) -> Result<i8, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<i8, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "i8"
+                self, "i8"
             ))
         })
     }
 }
 impl Cabs for i16 {
-    type Error = Error;
     type Output = i16;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i16::checked_abs`].
-    fn cabs(value: Self) -> Result<i16, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<i16, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "i16"
+                self, "i16"
             ))
         })
     }
 }
 impl Cabs for i32 {
-    type Error = Error;
     type Output = i32;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i32::checked_abs`].
-    fn cabs(value: Self) -> Result<i32, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<i32, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "i32"
+                self, "i32"
             ))
         })
     }
 }
 impl Cabs for i64 {
-    type Error = Error;
     type Output = i64;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i64::checked_abs`].
-    fn cabs(value: Self) -> Result<i64, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<i64, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "i64"
+                self, "i64"
             ))
         })
     }
 }
 impl Cabs for i128 {
-    type Error = Error;
     type Output = i128;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`i128::checked_abs`].
-    fn cabs(value: Self) -> Result<i128, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<i128, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "i128"
+                self, "i128"
             ))
         })
     }
 }
 impl Cabs for isize {
-    type Error = Error;
     type Output = isize;
+    type Error = Error;
     ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
     ///
     ///Wrapper for [`isize::checked_abs`].
-    fn cabs(value: Self) -> Result<isize, Error> {
-        value.checked_abs().ok_or_else(|| {
+    fn cabs(self) -> Result<isize, Error> {
+        self.checked_abs().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute abs({:?}): {} overflow",
-                value, "isize"
+                self, "isize"
             ))
         })
     }
 }
 ///Checked square root: computes `√value`, returning an error if `value` is negative.
-///
-///Instead of using this trait directly, it's recommended to use [`cisqrt`] function or extension traits from the [`ext`](crate::ext) module.
 pub trait Cisqrt: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
-    #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked square root: computes `√value`, returning an error if `value` is negative.
     ///
     ///Wrapper for `checked_isqrt`.
-    fn cisqrt(value: Self) -> Result<Self::Output, Self::Error>;
+    fn cisqrt(self) -> Result<Self::Output, Self::Error>;
 }
 ///Checked square root: computes `√value`, returning an error if `value` is negative.
 ///
@@ -5022,137 +6084,138 @@ where
     Cisqrt::cisqrt(value)
 }
 impl Cisqrt for i8 {
-    type Error = Error;
     type Output = i8;
+    type Error = Error;
     ///Checked square root: computes `√value`, returning an error if `value` is negative.
     ///
     ///Wrapper for [`i8::checked_isqrt`].
-    fn cisqrt(value: Self) -> Result<i8, Error> {
-        value.checked_isqrt().ok_or_else(|| {
+    fn cisqrt(self) -> Result<i8, Error> {
+        self.checked_isqrt().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute isqrt({:?}): argument is negative",
-                value
+                self
             ))
         })
     }
 }
 impl Cisqrt for i16 {
-    type Error = Error;
     type Output = i16;
+    type Error = Error;
     ///Checked square root: computes `√value`, returning an error if `value` is negative.
     ///
     ///Wrapper for [`i16::checked_isqrt`].
-    fn cisqrt(value: Self) -> Result<i16, Error> {
-        value.checked_isqrt().ok_or_else(|| {
+    fn cisqrt(self) -> Result<i16, Error> {
+        self.checked_isqrt().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute isqrt({:?}): argument is negative",
-                value
+                self
             ))
         })
     }
 }
 impl Cisqrt for i32 {
-    type Error = Error;
     type Output = i32;
+    type Error = Error;
     ///Checked square root: computes `√value`, returning an error if `value` is negative.
     ///
     ///Wrapper for [`i32::checked_isqrt`].
-    fn cisqrt(value: Self) -> Result<i32, Error> {
-        value.checked_isqrt().ok_or_else(|| {
+    fn cisqrt(self) -> Result<i32, Error> {
+        self.checked_isqrt().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute isqrt({:?}): argument is negative",
-                value
+                self
             ))
         })
     }
 }
 impl Cisqrt for i64 {
-    type Error = Error;
     type Output = i64;
+    type Error = Error;
     ///Checked square root: computes `√value`, returning an error if `value` is negative.
     ///
     ///Wrapper for [`i64::checked_isqrt`].
-    fn cisqrt(value: Self) -> Result<i64, Error> {
-        value.checked_isqrt().ok_or_else(|| {
+    fn cisqrt(self) -> Result<i64, Error> {
+        self.checked_isqrt().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute isqrt({:?}): argument is negative",
-                value
+                self
             ))
         })
     }
 }
 impl Cisqrt for i128 {
-    type Error = Error;
     type Output = i128;
+    type Error = Error;
     ///Checked square root: computes `√value`, returning an error if `value` is negative.
     ///
     ///Wrapper for [`i128::checked_isqrt`].
-    fn cisqrt(value: Self) -> Result<i128, Error> {
-        value.checked_isqrt().ok_or_else(|| {
+    fn cisqrt(self) -> Result<i128, Error> {
+        self.checked_isqrt().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute isqrt({:?}): argument is negative",
-                value
+                self
             ))
         })
     }
 }
 impl Cisqrt for isize {
-    type Error = Error;
     type Output = isize;
+    type Error = Error;
     ///Checked square root: computes `√value`, returning an error if `value` is negative.
     ///
     ///Wrapper for [`isize::checked_isqrt`].
-    fn cisqrt(value: Self) -> Result<isize, Error> {
-        value.checked_isqrt().ok_or_else(|| {
+    fn cisqrt(self) -> Result<isize, Error> {
+        self.checked_isqrt().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute isqrt({:?}): argument is negative",
-                value
+                self
             ))
         })
     }
 }
 ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
-///
-///Instead of using this trait directly, it's recommended to use [`cnext_multiple_of`] function or extension traits from the [`ext`](crate::ext) module.
-pub trait CnextMultipleOf<Other = Self>: Sized {
+pub trait CnextMultipleOf: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
+    type Other;
     #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
     ///
     ///Wrapper for `checked_next_multiple_of`.
-    fn cnext_multiple_of(a: Self, b: Other) -> Result<Self::Output, Self::Error>;
+    fn cnext_multiple_of(self, other: Self::Other) -> Result<Self::Output, Self::Error>;
 }
 ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
 ///
 ///Wrapper for `checked_next_multiple_of`.
 #[doc(alias = "checked_next_multiple_of")]
 #[inline]
-pub fn cnext_multiple_of<T1, T2>(a: T1, b: T2) -> Result<T1::Output, T1::Error>
+pub fn cnext_multiple_of<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
 where
-    T1: CnextMultipleOf<T2>,
+    T: CnextMultipleOf,
 {
-    CnextMultipleOf::cnext_multiple_of(a, b)
+    a.cnext_multiple_of(b)
 }
 impl CnextMultipleOf for u8 {
-    type Error = Error;
+    type Other = u8;
     type Output = u8;
+    type Error = Error;
     ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
     ///
     ///Wrapper for [`u8::checked_next_multiple_of`].
-    fn cnext_multiple_of(a: Self, b: u8) -> Result<u8, Error> {
-        a.checked_next_multiple_of(b).ok_or_else(|| {
+    fn cnext_multiple_of(self, other: u8) -> Result<u8, Error> {
+        self.checked_next_multiple_of(other).ok_or_else(|| {
             Error::new({
-                if b < 2 {
+                if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
-                        a, b
+                        self, other
                     )
                 } else {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
-                        a, b, "u8"
+                        self, other, "u8"
                     )
                 }
             })
@@ -5160,23 +6223,24 @@ impl CnextMultipleOf for u8 {
     }
 }
 impl CnextMultipleOf for u16 {
-    type Error = Error;
+    type Other = u16;
     type Output = u16;
+    type Error = Error;
     ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
     ///
     ///Wrapper for [`u16::checked_next_multiple_of`].
-    fn cnext_multiple_of(a: Self, b: u16) -> Result<u16, Error> {
-        a.checked_next_multiple_of(b).ok_or_else(|| {
+    fn cnext_multiple_of(self, other: u16) -> Result<u16, Error> {
+        self.checked_next_multiple_of(other).ok_or_else(|| {
             Error::new({
-                if b < 2 {
+                if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
-                        a, b
+                        self, other
                     )
                 } else {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
-                        a, b, "u16"
+                        self, other, "u16"
                     )
                 }
             })
@@ -5184,23 +6248,24 @@ impl CnextMultipleOf for u16 {
     }
 }
 impl CnextMultipleOf for u32 {
-    type Error = Error;
+    type Other = u32;
     type Output = u32;
+    type Error = Error;
     ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
     ///
     ///Wrapper for [`u32::checked_next_multiple_of`].
-    fn cnext_multiple_of(a: Self, b: u32) -> Result<u32, Error> {
-        a.checked_next_multiple_of(b).ok_or_else(|| {
+    fn cnext_multiple_of(self, other: u32) -> Result<u32, Error> {
+        self.checked_next_multiple_of(other).ok_or_else(|| {
             Error::new({
-                if b < 2 {
+                if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
-                        a, b
+                        self, other
                     )
                 } else {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
-                        a, b, "u32"
+                        self, other, "u32"
                     )
                 }
             })
@@ -5208,23 +6273,24 @@ impl CnextMultipleOf for u32 {
     }
 }
 impl CnextMultipleOf for u64 {
-    type Error = Error;
+    type Other = u64;
     type Output = u64;
+    type Error = Error;
     ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
     ///
     ///Wrapper for [`u64::checked_next_multiple_of`].
-    fn cnext_multiple_of(a: Self, b: u64) -> Result<u64, Error> {
-        a.checked_next_multiple_of(b).ok_or_else(|| {
+    fn cnext_multiple_of(self, other: u64) -> Result<u64, Error> {
+        self.checked_next_multiple_of(other).ok_or_else(|| {
             Error::new({
-                if b < 2 {
+                if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
-                        a, b
+                        self, other
                     )
                 } else {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
-                        a, b, "u64"
+                        self, other, "u64"
                     )
                 }
             })
@@ -5232,23 +6298,24 @@ impl CnextMultipleOf for u64 {
     }
 }
 impl CnextMultipleOf for u128 {
-    type Error = Error;
+    type Other = u128;
     type Output = u128;
+    type Error = Error;
     ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
     ///
     ///Wrapper for [`u128::checked_next_multiple_of`].
-    fn cnext_multiple_of(a: Self, b: u128) -> Result<u128, Error> {
-        a.checked_next_multiple_of(b).ok_or_else(|| {
+    fn cnext_multiple_of(self, other: u128) -> Result<u128, Error> {
+        self.checked_next_multiple_of(other).ok_or_else(|| {
             Error::new({
-                if b < 2 {
+                if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
-                        a, b
+                        self, other
                     )
                 } else {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
-                        a, b, "u128"
+                        self, other, "u128"
                     )
                 }
             })
@@ -5256,23 +6323,24 @@ impl CnextMultipleOf for u128 {
     }
 }
 impl CnextMultipleOf for usize {
-    type Error = Error;
+    type Other = usize;
     type Output = usize;
+    type Error = Error;
     ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
     ///
     ///Wrapper for [`usize::checked_next_multiple_of`].
-    fn cnext_multiple_of(a: Self, b: usize) -> Result<usize, Error> {
-        a.checked_next_multiple_of(b).ok_or_else(|| {
+    fn cnext_multiple_of(self, other: usize) -> Result<usize, Error> {
+        self.checked_next_multiple_of(other).ok_or_else(|| {
             Error::new({
-                if b < 2 {
+                if other < 2 {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): multiplier is zero",
-                        a, b
+                        self, other
                     )
                 } else {
                     format!(
                         "failed to compute next_multiple_of({:?}, {:?}): {} overflow",
-                        a, b, "usize"
+                        self, other, "usize"
                     )
                 }
             })
@@ -5280,17 +6348,15 @@ impl CnextMultipleOf for usize {
     }
 }
 ///Checked next power of 2, returning an error if overflow occured.
-///
-///Instead of using this trait directly, it's recommended to use [`cnext_power_of_two`] function or extension traits from the [`ext`](crate::ext) module.
 pub trait CnextPowerOfTwo: Sized {
     #[allow(missing_docs, reason = "no need for doc")]
-    type Error;
-    #[allow(missing_docs, reason = "no need for doc")]
     type Output;
+    #[allow(missing_docs, reason = "no need for doc")]
+    type Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for `checked_next_power_of_two`.
-    fn cnext_power_of_two(value: Self) -> Result<Self::Output, Self::Error>;
+    fn cnext_power_of_two(self) -> Result<Self::Output, Self::Error>;
 }
 ///Checked next power of 2, returning an error if overflow occured.
 ///
@@ -5304,181 +6370,181 @@ where
     CnextPowerOfTwo::cnext_power_of_two(value)
 }
 impl CnextPowerOfTwo for NonZero<u8> {
-    type Error = Error;
     type Output = NonZero<u8>;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u8>::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<NonZero<u8>, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<NonZero<u8>, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "NonZero<u8>"
+                self, "NonZero<u8>"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for NonZero<u16> {
-    type Error = Error;
     type Output = NonZero<u16>;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u16>::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<NonZero<u16>, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<NonZero<u16>, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "NonZero<u16>"
+                self, "NonZero<u16>"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for NonZero<u32> {
-    type Error = Error;
     type Output = NonZero<u32>;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u32>::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<NonZero<u32>, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<NonZero<u32>, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "NonZero<u32>"
+                self, "NonZero<u32>"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for NonZero<u64> {
-    type Error = Error;
     type Output = NonZero<u64>;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u64>::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<NonZero<u64>, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<NonZero<u64>, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "NonZero<u64>"
+                self, "NonZero<u64>"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for NonZero<u128> {
-    type Error = Error;
     type Output = NonZero<u128>;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<u128>::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<NonZero<u128>, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<NonZero<u128>, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "NonZero<u128>"
+                self, "NonZero<u128>"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for NonZero<usize> {
-    type Error = Error;
     type Output = NonZero<usize>;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`NonZero<usize>::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<NonZero<usize>, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<NonZero<usize>, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "NonZero<usize>"
+                self, "NonZero<usize>"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for u8 {
-    type Error = Error;
     type Output = u8;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`u8::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<u8, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<u8, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "u8"
+                self, "u8"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for u16 {
-    type Error = Error;
     type Output = u16;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`u16::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<u16, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<u16, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "u16"
+                self, "u16"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for u32 {
-    type Error = Error;
     type Output = u32;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`u32::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<u32, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<u32, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "u32"
+                self, "u32"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for u64 {
-    type Error = Error;
     type Output = u64;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`u64::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<u64, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<u64, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "u64"
+                self, "u64"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for u128 {
-    type Error = Error;
     type Output = u128;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`u128::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<u128, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<u128, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "u128"
+                self, "u128"
             ))
         })
     }
 }
 impl CnextPowerOfTwo for usize {
-    type Error = Error;
     type Output = usize;
+    type Error = Error;
     ///Checked next power of 2, returning an error if overflow occured.
     ///
     ///Wrapper for [`usize::checked_next_power_of_two`].
-    fn cnext_power_of_two(value: Self) -> Result<usize, Error> {
-        value.checked_next_power_of_two().ok_or_else(|| {
+    fn cnext_power_of_two(self) -> Result<usize, Error> {
+        self.checked_next_power_of_two().ok_or_else(|| {
             Error::new(format!(
                 "failed to compute next_power_of_two({:?}): {} overflow",
-                value, "usize"
+                self, "usize"
             ))
         })
     }

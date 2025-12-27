@@ -46,15 +46,16 @@ fn main() -> anyhow::Result<()> {
     let alloc_file = expand_lib(&src_dir, "alloc", &output_dir)?;
     let std_file = expand_lib(&src_dir, "std", &output_dir)?;
 
-    println!("core:");
-    find_try_from(&core_file.items)?;
-    println!("alloc:");
-    find_try_from(&alloc_file.items)?;
-    println!("std:");
-    find_try_from(&std_file.items)?;
+    if env::args().any(|arg| arg == "--find-try-from") {
+        println!("core:");
+        find_try_from(&core_file.items)?;
+        println!("alloc:");
+        find_try_from(&alloc_file.items)?;
+        println!("std:");
+        find_try_from(&std_file.items)?;
+    }
     let fns = find_fns(&core_file.items)?;
     write_file(&generate_ops_traits(&fns)?, &output_dir.join("src/ops.rs"))?;
-    write_file(&generate_ext_traits(&fns)?, &output_dir.join("src/ext.rs"))?;
     Ok(())
 }
 
@@ -205,6 +206,7 @@ fn use_parens(type_: &Type) -> bool {
     }
 }
 
+#[expect(dead_code)]
 fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
     let mut fns_per_self_type = Vec::<FunctionsPerSelfType>::new();
     for f in all_fns {
@@ -360,23 +362,16 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
         let ext_fn_ident = ident(ext_fn_name);
 
         let (first_arg_name, second_arg_name) = kind.pair_arg_names();
-        let (first_param_name, second_param_name) = kind.pair_param_names();
         let first_arg_ident = ident(first_arg_name);
-        let first_param_ident = ident(first_param_name);
+        let first_param_ident = ident("T");
 
         let other_param_ident = ident(kind.other_param_name());
+        let other_arg_name = kind.other_arg_name();
+        let other_arg_ident = ident(other_arg_name);
 
         let impl_fn_name = kind.impl_fn_name();
 
-        let trait_docs = [
-            kind.general_doc(first_arg_name, second_arg_name),
-            String::new(),
-            format!(
-                "Instead of using this trait directly, it's recommended to \
-                use [`{}`] function or extension traits from the [`ext`](crate::ext) module.",
-                ext_fn_ident,
-            ),
-        ];
+        let trait_docs = [kind.general_doc(first_arg_name, second_arg_name)];
 
         let trait_fn_docs = [
             kind.general_doc(first_arg_name, second_arg_name),
@@ -384,34 +379,53 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             format!("Wrapper for `{}`.", impl_fn_name),
         ];
 
-        if let (Some(second_arg_name), Some(second_param_name)) =
-            (second_arg_name, second_param_name)
-        {
+        if let Some(second_arg_name) = second_arg_name {
             let second_arg_ident = ident(second_arg_name);
-            let second_param_ident = ident(second_param_name);
+            let second_arg_type_in_fn = quote! { #first_param_ident::#other_param_ident };
+
+            let assign_method = if kind.has_assign_method() {
+                let ext_assign_fn_ident = ident(&format!("{ext_fn_name}_assign"));
+
+                let assign_fn_docs = [
+                    kind.assign_doc("self", other_arg_name),
+                    String::new(),
+                    format!("Wrapper for `{}`.", kind.impl_fn_name()),
+                ];
+
+                quote! {
+                    #(#[doc = #assign_fn_docs])*
+                    fn #ext_assign_fn_ident(&mut self, #other_arg_ident: Self::#other_param_ident) -> Result<(), Self::Error>;
+                }
+            } else {
+                quote! {}
+            };
+
             contents.push(quote! {
                 #(#[doc = #trait_docs])*
-                pub trait #ext_trait_ident<#other_param_ident = Self>: Sized {
+                pub trait #ext_trait_ident: Sized {
                     #[allow(missing_docs, reason = "no need for doc")]
-                    type Error;
+                    type #other_param_ident;
                     #[allow(missing_docs, reason = "no need for doc")]
                     type Output;
+                    #[allow(missing_docs, reason = "no need for doc")]
+                    type Error;
                     #(#[doc = #trait_fn_docs])*
-                    fn #ext_fn_ident(#first_arg_ident: Self, #second_arg_ident: #other_param_ident)
+                    fn #ext_fn_ident(self, #other_arg_ident: Self::#other_param_ident)
                         -> Result<Self::Output, Self::Error>;
+                    #assign_method
                 }
 
                 #(#[doc = #trait_fn_docs])*
                 #[doc(alias = #impl_fn_name)]
                 #[inline]
-                pub fn #ext_fn_ident<#first_param_ident, #second_param_ident>(
+                pub fn #ext_fn_ident<#first_param_ident>(
                     #first_arg_ident: #first_param_ident,
-                    #second_arg_ident: #second_param_ident,
+                    #second_arg_ident: #second_arg_type_in_fn,
                 ) -> Result<#first_param_ident::Output, #first_param_ident::Error>
                 where
-                    #first_param_ident: #ext_trait_ident<#second_param_ident>,
+                    #first_param_ident: #ext_trait_ident,
                 {
-                    #ext_trait_ident::#ext_fn_ident(#first_arg_ident, #second_arg_ident)
+                    #first_arg_ident.#ext_fn_ident(#second_arg_ident)
                 }
             });
 
@@ -425,17 +439,11 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                 );
                 let fn_ident = &f.ident;
                 let map_err_code = kind.map_err_code(
-                    quote! { #first_arg_ident },
-                    quote! { #second_arg_ident },
+                    quote! { self },
+                    quote! { #other_arg_ident },
                     use_parens(&f.self_type),
                     &quote! { #output_type }.to_string().replace(' ', ""),
                 );
-
-                let trait_param = if other_type == self_type {
-                    quote! {}
-                } else {
-                    quote! { <#other_type> }
-                };
 
                 let fn_docs = [
                     f.kind.general_doc(first_arg_name, Some(second_arg_name)),
@@ -448,16 +456,45 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                     ),
                 ];
 
+                let assign_method = if kind.has_assign_method() {
+                    let ext_assign_fn_ident = ident(&format!("{ext_fn_name}_assign"));
+
+                    let assign_fn_docs = [
+                        kind.assign_doc("self", other_arg_name),
+                        String::new(),
+                        format!(
+                            "Wrapper for [`{}`].",
+                            quote! { #self_type::#fn_ident }
+                                .to_string()
+                                .replace(" ", "")
+                        ),
+                    ];
+
+                    quote! {
+                        #[inline]
+                        #(#[doc = #assign_fn_docs])*
+                        fn #ext_assign_fn_ident(&mut self, #other_arg_ident: #other_type) -> Result<(), Self::Error> {
+                            *self = self.#ext_fn_ident(#other_arg_ident)?;
+                           Ok(())
+                        }
+                    }
+                } else {
+                    quote! {}
+                };
+
                 contents.push(quote! {
-                    impl #ext_trait_ident #trait_param for #self_type {
-                        type Error = Error;
+                    impl #ext_trait_ident for #self_type {
+                        type #other_param_ident = #other_type;
                         type Output = #output_type;
+                        type Error = Error;
                         #(#[doc = #fn_docs])*
-                        fn #ext_fn_ident(#first_arg_ident: Self, #second_arg_ident: #other_type)
+                        fn #ext_fn_ident(self, #other_arg_ident: #other_type)
                             -> Result<#output_type, Error>
                         {
-                            #first_arg_ident.#fn_ident(#second_arg_ident).ok_or_else(|| #map_err_code)
+                            self.#fn_ident(#other_arg_ident).ok_or_else(|| #map_err_code)
                         }
+
+                        #assign_method
                     }
 
                 });
@@ -467,11 +504,11 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                 #(#[doc = #trait_docs])*
                 pub trait #ext_trait_ident: Sized {
                     #[allow(missing_docs, reason = "no need for doc")]
-                    type Error;
-                    #[allow(missing_docs, reason = "no need for doc")]
                     type Output;
+                    #[allow(missing_docs, reason = "no need for doc")]
+                    type Error;
                     #(#[doc = #trait_fn_docs])*
-                    fn #ext_fn_ident(#first_arg_ident: Self) -> Result<Self::Output, Self::Error>;
+                    fn #ext_fn_ident(self) -> Result<Self::Output, Self::Error>;
                 }
 
                 #(#[doc = #trait_fn_docs])*
@@ -492,7 +529,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                 let output_type = unself(&f.output_type, &f.self_type);
                 let fn_ident = &f.ident;
                 let map_err_code = kind.map_err_code(
-                    quote! { #first_arg_ident },
+                    quote! { self },
                     quote! {},
                     use_parens(&f.self_type),
                     &quote! { #output_type }.to_string().replace(' ', ""),
@@ -511,11 +548,11 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
 
                 contents.push(quote! {
                     impl #ext_trait_ident for #self_type {
-                        type Error = Error;
                         type Output = #output_type;
+                        type Error = Error;
                         #(#[doc = #fn_docs])*
-                        fn #ext_fn_ident(#first_arg_ident: Self) -> Result<#output_type, Error> {
-                            #first_arg_ident.#fn_ident().ok_or_else(|| #map_err_code)
+                        fn #ext_fn_ident(self) -> Result<#output_type, Error> {
+                            self.#fn_ident().ok_or_else(|| #map_err_code)
                         }
                     }
                 });
@@ -1019,24 +1056,6 @@ impl FunctionKind {
             | FunctionKind::Ilog10
             | FunctionKind::NextPowerOfTwo => ("value", None),
             _ => ("a", Some("b")),
-        }
-    }
-
-    fn pair_param_names(self) -> (&'static str, Option<&'static str>) {
-        match self {
-            FunctionKind::Div
-            | FunctionKind::DivEuclid
-            | FunctionKind::Rem
-            | FunctionKind::RemEuclid => ("T", Some("Divisor")),
-            FunctionKind::Ilog => ("T", Some("Base")),
-            FunctionKind::Pow => ("T", Some("Power")),
-            FunctionKind::Neg
-            | FunctionKind::Abs
-            | FunctionKind::Isqrt
-            | FunctionKind::Ilog2
-            | FunctionKind::Ilog10
-            | FunctionKind::NextPowerOfTwo => ("T", None),
-            _ => ("T1", Some("T2")),
         }
     }
 }

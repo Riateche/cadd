@@ -4,7 +4,7 @@
 //! # `cadd`: painless checked arithmetics and conversions
 //!
 //! Features:
-//! * [`ext`]: checked arithmetics with `Result`, informative errors, and backtrace.
+//! * [`ops`]: checked arithmetics with `Result`, informative errors, and backtrace.
 //! * [`Cinto`](convert::Cinto): `TryInto` alternative for type conversions with better error messages and backtrace.
 //!   Works for integer types, other primitives, arrays, and string-like types.
 //! * [`SaturatingInto`](convert::SaturatingInto):
@@ -13,7 +13,6 @@
 //!   conversion to [`NonZero`] with `Result`, informative errors, and backtrace.
 //! * <code>.[into_type](https://docs.rs/cadd/latest/cadd/convert/trait.IntoType.html)::&lt;T&gt;()</code>
 //!   as an alternative to `into()` and `try_into()` without type inference errors.
-//! * [`ops`]: generic functions for checked arithmetics.
 //! * `no_std` support (`alloc` is still required).
 //!
 //! # Introduction
@@ -123,11 +122,7 @@ mod error;
 
 pub mod convert;
 
-/// Generic functions for checked arithmetics.
-///
-pub mod ops;
-
-/// Extension traits for enhanced checked arithmetics.
+/// Enhanced checked arithmetics.
 ///
 /// Many operators on integer primitives (`a + b`, `a / b`, etc) and associated functions (`a.pow(b)`, `a.ilog(b)`, etc)
 /// can overflow or fail under certain conditions. With debug assertions enabled (default when building in debug mode),
@@ -163,109 +158,79 @@ pub mod ops;
 /// This crate offers a set of traits and functions for easy handling of checked arithmetics.
 /// These traits and functions are modelled after the `checked_*` family of functions provided by the standard
 /// library for primitive numeric types, such as [`checked_add`](u32::checked_add),
-/// [`checked_pow`](u32::checked_pow), etc. These traits and functions offer a number of benefits
-/// over the standard library functions:
+/// [`checked_pow`](u32::checked_pow), etc.
 ///
-/// * They return `Result` instead of `Option`, enabling the use of `?` in functions returning `Result`.
-///   ```
-///   use cadd::{ops::{Cpow, cmul}, ext::U32Ext};
+/// Function names are shorter, so it's easier to keep the code readable.
+/// There is only one rule to remember: replace "checked_" with "c" to get the corresponding improved function.
+/// `checked_add` becomes `cadd`, `checked_pow` becomes `cpow`, and so on.
 ///
-///   fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
-///       cmul(mass, velocity.cpow(2)?)?.cdiv(2)
-///   }
-///   ```
-/// * The error values they return provide a meaningful error message and a backtrace:
-///   ```
-///   # use cadd::{ops::cmul, ext::U32Ext};
-///   # fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
-///   #     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
-///   # }
-///   # fn backtrace_enabled() -> bool {
-///   #     match std::env::var("RUST_LIB_BACKTRACE") {
-///   #         Ok(s) => s != "0",
-///   #         Err(_) => match std::env::var("RUST_BACKTRACE") {
-///   #             Ok(s) => s != "0",
-///   #             Err(_) => false,
-///   #         },
-///   #     }
-///   # }
-///   let err_msg = kinetic_energy(10, 100_000).unwrap_err().to_string();
-///   if backtrace_enabled() {
-///       assert!(err_msg.starts_with("failed to compute pow(100000, 2): u32 overflow\nstack backtrace:\n"));
-///   } else {
-///       assert_eq!(err_msg, "failed to compute pow(100000, 2): u32 overflow");
-///   }
-///   ```
-/// * Both method style (`a.cadd(b)`) and function style (`cadd(a, b)`) APIs are available.
-///   Free functions (available in the [`ops`] module)
-///   can make expressions more readable when there are multiple levels of nesting:
-///   ```
-///   # use cadd::ops::{cadd, cmul};
-///   fn f1(a1: u32, b1: u32, a2: u32, b2: u32) -> cadd::Result<u32> {
-///       cadd(
-///           cmul(a1, b1)?,
-///           cmul(a2, b2)?,
-///       )
-///   }
-///   ```
-///   Method style may be preferred for better chaining:
-///   ```
-///   # use cadd::ext::U32Ext;
-///   fn f2(a1: u32, b1: u32, c1: u32, d1: u32) -> cadd::Result<u32> {
-///       a1.cadd(b1)?
-///          .cmul(c1)?
-///          .cdiv(d1)
-///   }
-///   ```
-/// * Function names are relatively short, so it's easier to keep the code readable.
-///   The names may look a bit cryptic at first, but there is really only one rule to remember:
-///   every function name is just the name of the unchecked alternative ([`add`](core::ops::Add::add),
-///   [`pow`](u32::pow), [`ilog`](u32::ilog), etc) with the "c" suffix that stands for "checked".
+/// All functions from this crate return `Result` instead of `Option`, enabling the use of `?`
+/// in functions returning `Result`.
+/// ```
+/// use cadd::{ops::{Cpow, cmul}, ext::U32Ext};
+///
+/// fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
+///     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
+/// }
+/// ```
+/// In case of an overflow or another failure, the returned error contains a meaningful error message
+/// and a backtrace (if enabled):
+/// ```
+/// # use cadd::{ops::cmul, ext::U32Ext};
+/// # fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
+/// #     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
+/// # }
+/// # fn backtrace_enabled() -> bool {
+/// #     match std::env::var("RUST_LIB_BACKTRACE") {
+/// #         Ok(s) => s != "0",
+/// #         Err(_) => match std::env::var("RUST_BACKTRACE") {
+/// #             Ok(s) => s != "0",
+/// #             Err(_) => false,
+/// #         },
+/// #     }
+/// # }
+/// let err_msg = kinetic_energy(10, 100_000).unwrap_err().to_string();
+/// if backtrace_enabled() {
+///     assert!(err_msg.starts_with(
+///         "failed to compute pow(100000, 2): u32 overflow\nstack backtrace:\n"
+///     ));
+/// } else {
+///     assert_eq!(err_msg, "failed to compute pow(100000, 2): u32 overflow");
+/// }
+/// ```
+/// Both method style (`a.cadd(b)`) and function style (`cadd(a, b)`) APIs are available.
+/// Free functions can make expressions more readable when there are multiple levels of nesting:
+/// ```
+/// use cadd::ops::{cadd, cmul};
+///
+/// fn f1(a1: u32, b1: u32, a2: u32, b2: u32) -> cadd::Result<u32> {
+///     cadd(
+///         cmul(a1, b1)?,
+///         cmul(a2, b2)?,
+///     )
+/// }
+/// ```
+/// On the other hand, method style may be preferred for better chaining:
+/// ```
+/// use cadd::ops::{Cadd, Cmul, Cdiv};
+///
+/// fn f2(a1: u32, b1: u32, c1: u32, d1: u32) -> cadd::Result<u32> {
+///     a1.cadd(b1)?
+///        .cmul(c1)?
+///        .cdiv(d1)
+/// }
+/// ```
+/// Assignment functions ([`cadd_assign`](ops::Cadd::cadd_assign), [`csub_assign`](ops::Csub::csub_assign), etc.)
+/// are also provided.
+///
+/// For binary operations, the traits use an associated type to specify the type of the second argument.
+/// It provides better type inference: when the type of the first argument is known, the type of the second argument
+/// becomes known as well.
 ///
 /// See also: [crate level documentation](crate).
-///
-/// `cadd` provides traits and functions that make checked arithmetics just as easy to do as
-/// unchecked ones. Just add "c" to the name of the corresponding unchecked function
-/// and import it:
-/// ```
-/// # struct S;
-/// # impl S {
-/// #   async fn handle_request(&self) -> anyhow::Result<()> {
-/// #       let price: u32 = 0;
-/// #       let discount_rate: u32 = 0;
-/// use cadd::{ops::csub, ext::U32Ext};
-///
-/// let amount = csub(
-///     price,
-///     discount_rate.cmul(price)?.cdiv(100)?,
-/// )?;
-/// #       Ok(())
-/// #   }
-/// # }
-/// ```
-/// Not only it's much more consise, but it also returns a `Result` with an error type that contains
-/// the failed operation, its arguments, and a backtrace:
-/// ```text
-/// overflow: 100 - 200
-/// stack backtrace:
-///    0: std::backtrace_rs::backtrace::libunwind::trace
-/// ...
-/// ```
-/// You can also freely choose between method form
-/// (<code>a.[cadd](https://docs.rs/cadd/latest/cadd/ops/trait.Cadd.html#tymethod.cadd)(b)</code>)
-/// and free function form (<code>[cadd](https://docs.rs/cadd/latest/cadd/ops/fn.cadd.html)(a, b)</code>)
-/// as you see fit.
-/// And it's not just operators (`+`, `-`, etc). For every `checked_*` function in `std`, there is a corresponding
-/// function in `cadd`: [`cdiv_euclid`](https://docs.rs/cadd/latest/cadd/ops/fn.cdiv_euclid.html),
-/// [`cilog2`](https://docs.rs/cadd/latest/cadd/ops/fn.cilog2.html), and so on.
-/// See [`ops`](https://docs.rs/cadd/latest/cadd/ops/index.html) module documentation for more information.
-pub mod ext;
+pub mod ops;
 
 pub mod prelude;
-
-mod private {
-    pub trait Sealed: Sized {}
-}
 
 pub use crate::error::Error;
 
