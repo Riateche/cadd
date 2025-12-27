@@ -78,8 +78,7 @@
 //! # Ok(())
 //! # }
 //! ```
-//! A safe and concise approach with extension traits from [`cadd::ext`](ext)
-//! and functions from [`cadd::ops`](ops),
+//! A safe and concise approach with traits and functions from [`cadd::ops`](ops),
 //! returning an informative error:
 //! ```
 //! # #[derive(Debug, thiserror::Error)]
@@ -88,7 +87,7 @@
 //! # let price = 1_u64;
 //! # let discount_rate = 1_u64;
 //! # let price = 1_u64;
-//! use cadd::{ext::U64Ext, ops::csub, convert::IntoType};
+//! use cadd::{ops::{csub, Cmul, Cdiv}, convert::IntoType};
 //!
 //! let amount = csub(price, discount_rate.cmul(price)?.cdiv(100)?)?;
 //! let output = amount.cinto_type::<u32>()?;
@@ -167,7 +166,7 @@ pub mod convert;
 /// All functions from this crate return `Result` instead of `Option`, enabling the use of `?`
 /// in functions returning `Result`.
 /// ```
-/// use cadd::{ops::{Cpow, cmul}, ext::U32Ext};
+/// use cadd::ops::{Cpow, Cdiv, cmul};
 ///
 /// fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
 ///     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
@@ -176,7 +175,7 @@ pub mod convert;
 /// In case of an overflow or another failure, the returned error contains a meaningful error message
 /// and a backtrace (if enabled):
 /// ```
-/// # use cadd::{ops::cmul, ext::U32Ext};
+/// # use cadd::ops::{Cpow, Cdiv, cmul};
 /// # fn kinetic_energy(mass: u32, velocity: u32) -> cadd::Result<u32> {
 /// #     cmul(mass, velocity.cpow(2)?)?.cdiv(2)
 /// # }

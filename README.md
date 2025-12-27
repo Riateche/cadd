@@ -70,11 +70,10 @@ let amount = discount_rate
     .ok_or_else(|| Error::Overflow)?;
 let output: u32 = amount.try_into().map_err(|_| Error::Overflow)?;
 ```
-A safe and concise approach with extension traits from [`cadd::ext`](ext)
-and functions from [`cadd::ops`](ops),
+A safe and concise approach with traits and functions from [`cadd::ops`](ops),
 returning an informative error:
 ```rust
-use cadd::{ext::U64Ext, ops::csub, convert::IntoType};
+use cadd::{ops::{csub, Cmul, Cdiv}, convert::IntoType};
 
 let amount = csub(price, discount_rate.cmul(price)?.cdiv(100)?)?;
 let output = amount.cinto_type::<u32>()?;
