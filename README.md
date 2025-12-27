@@ -14,7 +14,7 @@ Features:
   infallible number conversion that returns the closest valid value.
 * [`non_zero`](convert::non_zero) and [`to_non_zero()`](convert::ToNonZero):
   conversion to [`NonZero`] with `Result`, informative errors, and backtrace.
-* <code>.[into_type](https://docs.rs/cadd/latest/cadd/convert/trait.IntoType.html)::&lt;T&gt;()</code>
+* <code>.[into_type](convert::IntoType)::&lt;T&gt;()</code>
   as an alternative to `into()` and `try_into()` without type inference errors.
 * `no_std` support (`alloc` is still required).
 

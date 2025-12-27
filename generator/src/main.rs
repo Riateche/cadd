@@ -51,16 +51,18 @@ fn main() -> anyhow::Result<()> {
     let core_file = expand_lib(&src_dir, "core", &output_dir)?;
     let alloc_file = expand_lib(&src_dir, "alloc", &output_dir)?;
     let std_file = expand_lib(&src_dir, "std", &output_dir)?;
+    let all_items: Vec<_> = core_file
+        .items
+        .iter()
+        .chain(&alloc_file.items)
+        .chain(&std_file.items)
+        .cloned()
+        .collect();
 
     if env::args().any(|arg| arg == "--find-try-from") {
-        println!("core:");
-        find_try_from(&core_file.items)?;
-        println!("alloc:");
-        find_try_from(&alloc_file.items)?;
-        println!("std:");
-        find_try_from(&std_file.items)?;
+        find_try_from(&all_items)?;
     }
-    let fns = find_fns(&core_file.items)?;
+    let fns = find_fns(&all_items)?;
     write_file(&generate_ops_traits(&fns)?, &output_dir.join("src/ops.rs"))?;
     Ok(())
 }
@@ -130,6 +132,11 @@ fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {
                 {
                     continue;
                 }
+                if let Type::Path(path) = &*item_impl.self_ty
+                    && path.path.is_ident("Timespec")
+                {
+                    continue;
+                }
                 for impl_item in &item_impl.items {
                     let ImplItem::Fn(item_fn) = impl_item else {
                         continue;
@@ -173,6 +180,9 @@ fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {
                 }
             }
             Item::Mod(item_mod) => {
+                if item_mod.ident == "sys" {
+                    continue;
+                }
                 if let Some((_brace, content)) = &item_mod.content {
                     fns.extend(find_fns(content)?);
                 }
@@ -269,10 +279,6 @@ fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
         .map(|item| {
             let self_type = item.self_type;
             let trait_name = ident(&ext_trait_name(self_type)?);
-            // println!(
-            //     "trait_name={trait_name}, location={:?}",
-            //     item.fns[0].ident.span().start()
-            // );
 
             let mut fn_declarations = Vec::new();
             let mut fn_impls = Vec::new();
@@ -606,6 +612,8 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
             core::{num::NonZero, time::Duration},
             alloc::format,
         };
+        #[cfg(feature = "std")]
+        use std::time::{SystemTime, Instant};
         #(#contents)*
     })
 }
@@ -660,6 +668,7 @@ enum FunctionKind {
     Isqrt,
     NextMultipleOf,
     NextPowerOfTwo,
+    DurationSince,
 }
 
 impl FunctionKind {
@@ -688,6 +697,7 @@ impl FunctionKind {
             "checked_isqrt" => Self::Isqrt,
             "checked_next_multiple_of" => Self::NextMultipleOf,
             "checked_next_power_of_two" => Self::NextPowerOfTwo,
+            "checked_duration_since" => Self::DurationSince,
             _ => bail!("unknown fn: {name:?}"),
         };
         Ok(kind)
@@ -696,69 +706,65 @@ impl FunctionKind {
     fn has_assign_method(self) -> bool {
         matches!(
             self,
-            FunctionKind::Add
-                | FunctionKind::Sub
-                | FunctionKind::Mul
-                | FunctionKind::Div
-                | FunctionKind::Rem
-                | FunctionKind::Shl
-                | FunctionKind::Shr
+            Self::Add | Self::Sub | Self::Mul | Self::Div | Self::Rem | Self::Shl | Self::Shr
         )
     }
 
     fn impl_fn_name(self) -> &'static str {
         match self {
-            FunctionKind::Add => "checked_add",
-            FunctionKind::AddUnsigned => "checked_add_unsigned",
-            FunctionKind::AddSigned => "checked_add_signed",
-            FunctionKind::Sub => "checked_sub",
-            FunctionKind::SubUnsigned => "checked_sub_unsigned",
-            FunctionKind::SubSigned => "checked_sub_signed",
-            FunctionKind::SignedDiff => "checked_signed_diff",
-            FunctionKind::Neg => "checked_neg",
-            FunctionKind::Mul => "checked_mul",
-            FunctionKind::Div => "checked_div",
-            FunctionKind::DivEuclid => "checked_div_euclid",
-            FunctionKind::Rem => "checked_rem",
-            FunctionKind::RemEuclid => "checked_rem_euclid",
-            FunctionKind::Ilog => "checked_ilog",
-            FunctionKind::Ilog2 => "checked_ilog2",
-            FunctionKind::Ilog10 => "checked_ilog10",
-            FunctionKind::Shl => "checked_shl",
-            FunctionKind::Shr => "checked_shr",
-            FunctionKind::Pow => "checked_pow",
-            FunctionKind::Abs => "checked_abs",
-            FunctionKind::Isqrt => "checked_isqrt",
-            FunctionKind::NextMultipleOf => "checked_next_multiple_of",
-            FunctionKind::NextPowerOfTwo => "checked_next_power_of_two",
+            Self::Add => "checked_add",
+            Self::AddUnsigned => "checked_add_unsigned",
+            Self::AddSigned => "checked_add_signed",
+            Self::Sub => "checked_sub",
+            Self::SubUnsigned => "checked_sub_unsigned",
+            Self::SubSigned => "checked_sub_signed",
+            Self::SignedDiff => "checked_signed_diff",
+            Self::Neg => "checked_neg",
+            Self::Mul => "checked_mul",
+            Self::Div => "checked_div",
+            Self::DivEuclid => "checked_div_euclid",
+            Self::Rem => "checked_rem",
+            Self::RemEuclid => "checked_rem_euclid",
+            Self::Ilog => "checked_ilog",
+            Self::Ilog2 => "checked_ilog2",
+            Self::Ilog10 => "checked_ilog10",
+            Self::Shl => "checked_shl",
+            Self::Shr => "checked_shr",
+            Self::Pow => "checked_pow",
+            Self::Abs => "checked_abs",
+            Self::Isqrt => "checked_isqrt",
+            Self::NextMultipleOf => "checked_next_multiple_of",
+            Self::NextPowerOfTwo => "checked_next_power_of_two",
+            Self::DurationSince => "checked_duration_since",
         }
     }
 
     fn ext_fn_name(self) -> &'static str {
         match self {
-            FunctionKind::Add => "cadd",
-            FunctionKind::AddUnsigned => "cadd_unsigned",
-            FunctionKind::AddSigned => "cadd_signed",
-            FunctionKind::Sub => "csub",
-            FunctionKind::SubUnsigned => "csub_unsigned",
-            FunctionKind::SubSigned => "csub_signed",
-            FunctionKind::SignedDiff => "csigned_diff",
-            FunctionKind::Neg => "cneg",
-            FunctionKind::Mul => "cmul",
-            FunctionKind::Div => "cdiv",
-            FunctionKind::DivEuclid => "cdiv_euclid",
-            FunctionKind::Rem => "crem",
-            FunctionKind::RemEuclid => "crem_euclid",
-            FunctionKind::Ilog => "cilog",
-            FunctionKind::Ilog2 => "cilog2",
-            FunctionKind::Ilog10 => "cilog10",
-            FunctionKind::Shl => "cshl",
-            FunctionKind::Shr => "cshr",
-            FunctionKind::Pow => "cpow",
-            FunctionKind::Abs => "cabs",
-            FunctionKind::Isqrt => "cisqrt",
-            FunctionKind::NextMultipleOf => "cnext_multiple_of",
-            FunctionKind::NextPowerOfTwo => "cnext_power_of_two",
+            Self::Add => "cadd",
+            Self::AddUnsigned => "cadd_unsigned",
+            Self::AddSigned => "cadd_signed",
+            Self::Sub => "csub",
+            Self::SubUnsigned => "csub_unsigned",
+            Self::SubSigned => "csub_signed",
+            Self::SignedDiff => "csigned_diff",
+            Self::Neg => "cneg",
+            Self::Mul => "cmul",
+            Self::Div => "cdiv",
+            Self::DivEuclid => "cdiv_euclid",
+            Self::Rem => "crem",
+            Self::RemEuclid => "crem_euclid",
+            Self::Ilog => "cilog",
+            Self::Ilog2 => "cilog2",
+            Self::Ilog10 => "cilog10",
+            Self::Shl => "cshl",
+            Self::Shr => "cshr",
+            Self::Pow => "cpow",
+            Self::Abs => "cabs",
+            Self::Isqrt => "cisqrt",
+            Self::NextMultipleOf => "cnext_multiple_of",
+            Self::NextPowerOfTwo => "cnext_power_of_two",
+            Self::DurationSince => "cduration_since",
         }
     }
 
@@ -770,118 +776,123 @@ impl FunctionKind {
         let a = first_arg;
         let b = second_arg.unwrap_or("other");
         match self {
-            FunctionKind::Add => {
+            Self::Add => {
                 format!(
                     "Checked addition: computes `{a} + {b}`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::AddUnsigned => {
+            Self::AddUnsigned => {
                 format!(
                     "Checked addition: computes `add_unsigned({a}, {b})`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::AddSigned => {
+            Self::AddSigned => {
                 format!(
                     "Checked addition: computes `add_signed({a}, {b})`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Sub => {
+            Self::Sub => {
                 format!(
                     "Checked subtraction:  computes `{a} - {b}`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::SubUnsigned => {
+            Self::SubUnsigned => {
                 format!(
                     "Checked subtraction:  computes `sub_unsigned({a}, {b})`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::SubSigned => {
+            Self::SubSigned => {
                 format!(
                     "Checked subtraction:  computes `sub_signed({a}, {b})`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::SignedDiff => {
+            Self::SignedDiff => {
                 format!(
                     "Checked subtraction:  computes `signed_diff({a}, {b})`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Neg => {
+            Self::Neg => {
                 format!(
                     "Checked negation: computes `-{a}`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Mul => {
+            Self::Mul => {
                 format!(
                     "Checked multiplication: computes `{a} * {b}`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Div => {
+            Self::Div => {
                 format!(
                     "Checked division: computes `{a} / {b}`, returning an error if overflow occured or if `{b}` is zero."
                 )
             }
-            FunctionKind::DivEuclid => {
+            Self::DivEuclid => {
                 format!(
                     "Checked euclidian division: computes `div_euclid({a}, {b})`, returning an error if overflow occured or if `{b}` is zero."
                 )
             }
-            FunctionKind::Rem => {
+            Self::Rem => {
                 format!(
                     "Checked remainder: computes `{a} % {b}`, returning an error if overflow occured or if `{b}` is zero."
                 )
             }
-            FunctionKind::RemEuclid => {
+            Self::RemEuclid => {
                 format!(
                     "Checked euclidian reminder: computes `rem_euclid({a}, {b})`, returning an error if overflow occured or if `{b}` is zero."
                 )
             }
-            FunctionKind::Ilog => {
+            Self::Ilog => {
                 format!(
                     "Checked logarithm: computes <code>log<sub>{b}</sub> {a}</code>, returning an error if `{a}` is negative or zero, or if `{b}` is less than 2."
                 )
             }
-            FunctionKind::Ilog2 => {
+            Self::Ilog2 => {
                 format!(
                     "Checked base 2 logarithm: computes `ln {a}`, returning an error if `{a}` is negative or zero."
                 )
             }
-            FunctionKind::Ilog10 => {
+            Self::Ilog10 => {
                 format!(
                     "Checked base 10 logarithm: computes <code>log<sub>10</sub> {a}</code>, returning an error if `{a}` is negative or zero."
                 )
             }
-            FunctionKind::Shl => {
+            Self::Shl => {
                 format!(
                     "Checked shift left: computes `{a} << {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
                 )
             }
-            FunctionKind::Shr => {
+            Self::Shr => {
                 format!(
                     "Checked shift right: computes `{a} >> {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
                 )
             }
-            FunctionKind::Pow => {
+            Self::Pow => {
                 format!(
                     "Checked exponentiation: computes <code>{a}<sup>{b}</sup></code>, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Abs => {
+            Self::Abs => {
                 format!(
                     "Checked absolute value: computes `|{a}|`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Isqrt => {
+            Self::Isqrt => {
                 format!(
                     "Checked square root: computes `√{a}`, returning an error if `{a}` is negative."
                 )
             }
-            FunctionKind::NextMultipleOf => {
+            Self::NextMultipleOf => {
                 format!(
                     "Checked next multiple of `{b}`, returning an error if overflow occured or if `{b}` is zero."
                 )
             }
-            FunctionKind::NextPowerOfTwo => {
+            Self::NextPowerOfTwo => {
                 "Checked next power of 2, returning an error if overflow occured.".into()
+            }
+            Self::DurationSince => {
+                format!(
+                    "Checked duration since: computes `{a}.duration_since({b})`, returning an error if {b} is earlier than {a}."
+                )
             }
         }
     }
@@ -890,57 +901,58 @@ impl FunctionKind {
         let a = first_arg;
         let b = second_arg;
         let text = match self {
-            FunctionKind::Add => {
+            Self::Add => {
                 format!(
                     "Checked addition assigement: executes `{a} += {b}`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Sub => {
+            Self::Sub => {
                 format!(
                     "Checked subtraction assigement:  executes `{a} -= {b}`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Mul => {
+            Self::Mul => {
                 format!(
                     "Checked multiplication assigement: executes `{a} *= {b}`, returning an error if overflow occured."
                 )
             }
-            FunctionKind::Div => {
+            Self::Div => {
                 format!(
                     "Checked division assigement: executes `{a} /= {b}`, returning an error if overflow occured or if `{b}` is zero."
                 )
             }
-            FunctionKind::Rem => {
+            Self::Rem => {
                 format!(
                     "Checked remainder assigement: executes `{a} %= {b}`, returning an error if overflow occured or if `{b}` is zero."
                 )
             }
-            FunctionKind::Shl => {
+            Self::Shl => {
                 format!(
                     "Checked shift left assigement: executes `{a} <<= {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
                 )
             }
-            FunctionKind::Shr => {
+            Self::Shr => {
                 format!(
                     "Checked shift right assigement: executes `{a} >>= {b}`, returning an error if `{b}` is greater or equal to the number of bits in the type."
                 )
             }
-            FunctionKind::AddUnsigned
-            | FunctionKind::AddSigned
-            | FunctionKind::SubUnsigned
-            | FunctionKind::SubSigned
-            | FunctionKind::SignedDiff
-            | FunctionKind::Neg
-            | FunctionKind::DivEuclid
-            | FunctionKind::RemEuclid
-            | FunctionKind::Ilog
-            | FunctionKind::Ilog2
-            | FunctionKind::Ilog10
-            | FunctionKind::Pow
-            | FunctionKind::Abs
-            | FunctionKind::Isqrt
-            | FunctionKind::NextMultipleOf
-            | FunctionKind::NextPowerOfTwo => bail!("unexpected assign function for {:?}", self),
+            Self::AddUnsigned
+            | Self::AddSigned
+            | Self::SubUnsigned
+            | Self::SubSigned
+            | Self::SignedDiff
+            | Self::Neg
+            | Self::DivEuclid
+            | Self::RemEuclid
+            | Self::Ilog
+            | Self::Ilog2
+            | Self::Ilog10
+            | Self::Pow
+            | Self::Abs
+            | Self::Isqrt
+            | Self::NextMultipleOf
+            | Self::NextPowerOfTwo
+            | Self::DurationSince => bail!("unexpected assign function for {:?}", self),
         };
         Ok(text)
     }
@@ -965,34 +977,34 @@ impl FunctionKind {
             quote! { #b }
         };
         match self {
-            FunctionKind::Add => quote! {
+            Self::Add => quote! {
                 Error::new(format!("failed to compute {:?} + {:?}: {} overflow", #a, #maybe_parens_b, #type_name))
             },
-            FunctionKind::AddUnsigned => quote! {
+            Self::AddUnsigned => quote! {
                 Error::new(format!("failed to compute add_unsigned({:?}, {:?}): {} overflow", #a, #b, #type_name))
             },
-            FunctionKind::AddSigned => quote! {
+            Self::AddSigned => quote! {
                 Error::new(format!("failed to compute add_signed({:?}, {:?}): {} overflow", #a, #b, #type_name))
             },
-            FunctionKind::Sub => quote! {
+            Self::Sub => quote! {
                 Error::new(format!("failed to compute {:?} - {:?}: {} overflow", #a, #maybe_parens_b, #type_name))
             },
-            FunctionKind::SubUnsigned => quote! {
+            Self::SubUnsigned => quote! {
                 Error::new(format!("failed to compute sub_unsigned({:?}, {:?}): {} overflow", #a, #b, #type_name))
             },
-            FunctionKind::SubSigned => quote! {
+            Self::SubSigned => quote! {
                 Error::new(format!("failed to compute sub_signed({:?}, {:?}): {} overflow", #a, #b, #type_name))
             },
-            FunctionKind::SignedDiff => quote! {
+            Self::SignedDiff => quote! {
                 Error::new(format!("failed to compute signed_diff({:?}, {:?}): {} overflow", #a, #b, #type_name))
             },
-            FunctionKind::Neg => quote! {
+            Self::Neg => quote! {
                 Error::new(format!("failed to compute -({:?}): {} overflow", #a, #type_name))
             },
-            FunctionKind::Mul => quote! {
+            Self::Mul => quote! {
                 Error::new(format!("failed to compute {:?} * {:?}: {} overflow", #a, #maybe_parens_b, #type_name))
             },
-            FunctionKind::Div => quote! {
+            Self::Div => quote! {
                 Error::new({
                     if #b == 0 {
                         format!("failed to compute {:?} / {:?}: division by zero", #a, #maybe_parens_b)
@@ -1001,7 +1013,7 @@ impl FunctionKind {
                     }
                 })
             },
-            FunctionKind::DivEuclid => quote! {
+            Self::DivEuclid => quote! {
                 Error::new({
                     if #b == 0 {
                         format!("failed to compute div_euclid({:?}, {:?}): division by zero", #a, #b)
@@ -1010,7 +1022,7 @@ impl FunctionKind {
                     }
                 })
             },
-            FunctionKind::Rem => quote! {
+            Self::Rem => quote! {
                 Error::new({
                     if #b == 0 {
                         format!("failed to compute {:?} % {:?}: division by zero", #a, #maybe_parens_b)
@@ -1019,7 +1031,7 @@ impl FunctionKind {
                     }
                 })
             },
-            FunctionKind::RemEuclid => quote! {
+            Self::RemEuclid => quote! {
                 Error::new({
                     if #b == 0 {
                         format!("failed to compute rem_euclid({:?}, {:?}): division by zero", #a, #b)
@@ -1028,7 +1040,7 @@ impl FunctionKind {
                     }
                 })
             },
-            FunctionKind::Ilog => quote! {
+            Self::Ilog => quote! {
                 Error::new({
                     if #b < 2 {
                         format!("failed to compute ilog({:?}, {:?}): base is less than 2", #a, #b)
@@ -1037,28 +1049,28 @@ impl FunctionKind {
                     }
                 })
             },
-            FunctionKind::Ilog2 => quote! {
+            Self::Ilog2 => quote! {
                 Error::new(format!("failed to compute ilog2({:?}): argument is not positive", #a))
             },
-            FunctionKind::Ilog10 => quote! {
+            Self::Ilog10 => quote! {
                 Error::new(format!("failed to compute ilog10({:?}): argument is not positive", #a))
             },
-            FunctionKind::Shl => quote! {
+            Self::Shl => quote! {
                 Error::new(format!("failed to compute {:?} << {:?}: shift amount is too large", #maybe_parens_a, #maybe_parens_b))
             },
-            FunctionKind::Shr => quote! {
+            Self::Shr => quote! {
                 Error::new(format!("failed to compute {:?} >> {:?}: shift amount is too large", #maybe_parens_a, #maybe_parens_b))
             },
-            FunctionKind::Pow => quote! {
+            Self::Pow => quote! {
                 Error::new(format!("failed to compute pow({:?}, {:?}): {} overflow", #a, #b, #type_name))
             },
-            FunctionKind::Abs => quote! {
+            Self::Abs => quote! {
                 Error::new(format!("failed to compute abs({:?}): {} overflow", #a, #type_name))
             },
-            FunctionKind::Isqrt => quote! {
+            Self::Isqrt => quote! {
                 Error::new(format!("failed to compute isqrt({:?}): argument is negative", #a))
             },
-            FunctionKind::NextMultipleOf => quote! {
+            Self::NextMultipleOf => quote! {
                 Error::new({
                     if #b < 2 {
                         format!("failed to compute next_multiple_of({:?}, {:?}): multiplier is zero", #a, #b)
@@ -1067,93 +1079,90 @@ impl FunctionKind {
                     }
                 })
             },
-            FunctionKind::NextPowerOfTwo => quote! {
+            Self::NextPowerOfTwo => quote! {
                 Error::new(format!("failed to compute next_power_of_two({:?}): {} overflow", #a, #type_name))
+            },
+            Self::DurationSince => quote! {
+                Error::new(format!("failed to compute {:?}.duration_since({:?}): {:?} is earlier than {:?}", #a, #b, #b, #a))
             },
         }
     }
 
     fn other_arg_name(self) -> &'static str {
         match self {
-            FunctionKind::Div
-            | FunctionKind::DivEuclid
-            | FunctionKind::Rem
-            | FunctionKind::RemEuclid => "divisor",
-            FunctionKind::Ilog => "base",
-            FunctionKind::Pow => "power",
-            FunctionKind::Add
-            | FunctionKind::AddUnsigned
-            | FunctionKind::AddSigned
-            | FunctionKind::Sub
-            | FunctionKind::SubUnsigned
-            | FunctionKind::SubSigned
-            | FunctionKind::SignedDiff
-            | FunctionKind::Neg
-            | FunctionKind::Mul
-            | FunctionKind::Ilog2
-            | FunctionKind::Ilog10
-            | FunctionKind::Shl
-            | FunctionKind::Shr
-            | FunctionKind::Abs
-            | FunctionKind::Isqrt
-            | FunctionKind::NextMultipleOf
-            | FunctionKind::NextPowerOfTwo => "other",
+            Self::Div | Self::DivEuclid | Self::Rem | Self::RemEuclid => "divisor",
+            Self::Ilog => "base",
+            Self::Pow => "power",
+            Self::Add
+            | Self::AddUnsigned
+            | Self::AddSigned
+            | Self::Sub
+            | Self::SubUnsigned
+            | Self::SubSigned
+            | Self::SignedDiff
+            | Self::Neg
+            | Self::Mul
+            | Self::Ilog2
+            | Self::Ilog10
+            | Self::Shl
+            | Self::Shr
+            | Self::Abs
+            | Self::Isqrt
+            | Self::NextMultipleOf
+            | Self::NextPowerOfTwo
+            | Self::DurationSince => "other",
         }
     }
 
     fn other_param_name(self) -> &'static str {
         match self {
-            FunctionKind::Div
-            | FunctionKind::DivEuclid
-            | FunctionKind::Rem
-            | FunctionKind::RemEuclid => "Divisor",
-            FunctionKind::Ilog => "Base",
-            FunctionKind::Pow => "Power",
-            FunctionKind::Add
-            | FunctionKind::AddUnsigned
-            | FunctionKind::AddSigned
-            | FunctionKind::Sub
-            | FunctionKind::SubUnsigned
-            | FunctionKind::SubSigned
-            | FunctionKind::SignedDiff
-            | FunctionKind::Neg
-            | FunctionKind::Mul
-            | FunctionKind::Ilog2
-            | FunctionKind::Ilog10
-            | FunctionKind::Shl
-            | FunctionKind::Shr
-            | FunctionKind::Abs
-            | FunctionKind::Isqrt
-            | FunctionKind::NextMultipleOf
-            | FunctionKind::NextPowerOfTwo => "Other",
+            Self::Div | Self::DivEuclid | Self::Rem | Self::RemEuclid => "Divisor",
+            Self::Ilog => "Base",
+            Self::Pow => "Power",
+            Self::Add
+            | Self::AddUnsigned
+            | Self::AddSigned
+            | Self::Sub
+            | Self::SubUnsigned
+            | Self::SubSigned
+            | Self::SignedDiff
+            | Self::Neg
+            | Self::Mul
+            | Self::Ilog2
+            | Self::Ilog10
+            | Self::Shl
+            | Self::Shr
+            | Self::Abs
+            | Self::Isqrt
+            | Self::NextMultipleOf
+            | Self::NextPowerOfTwo
+            | Self::DurationSince => "Other",
         }
     }
 
     fn pair_arg_names(self) -> (&'static str, Option<&'static str>) {
         match self {
-            FunctionKind::Div
-            | FunctionKind::DivEuclid
-            | FunctionKind::Rem
-            | FunctionKind::RemEuclid => ("value", Some("divisor")),
-            FunctionKind::Ilog => ("value", Some("base")),
-            FunctionKind::Pow => ("value", Some("power")),
-            FunctionKind::Neg
-            | FunctionKind::Abs
-            | FunctionKind::Isqrt
-            | FunctionKind::Ilog2
-            | FunctionKind::Ilog10
-            | FunctionKind::NextPowerOfTwo => ("value", None),
-            FunctionKind::Add
-            | FunctionKind::AddUnsigned
-            | FunctionKind::AddSigned
-            | FunctionKind::Sub
-            | FunctionKind::SubUnsigned
-            | FunctionKind::SubSigned
-            | FunctionKind::SignedDiff
-            | FunctionKind::Mul
-            | FunctionKind::Shl
-            | FunctionKind::Shr
-            | FunctionKind::NextMultipleOf => ("a", Some("b")),
+            Self::Div | Self::DivEuclid | Self::Rem | Self::RemEuclid => ("value", Some("divisor")),
+            Self::Ilog => ("value", Some("base")),
+            Self::Pow => ("value", Some("power")),
+            Self::Neg
+            | Self::Abs
+            | Self::Isqrt
+            | Self::Ilog2
+            | Self::Ilog10
+            | Self::NextPowerOfTwo => ("value", None),
+            Self::Add
+            | Self::AddUnsigned
+            | Self::AddSigned
+            | Self::Sub
+            | Self::SubUnsigned
+            | Self::SubSigned
+            | Self::SignedDiff
+            | Self::Mul
+            | Self::Shl
+            | Self::Shr
+            | Self::NextMultipleOf
+            | Self::DurationSince => ("a", Some("b")),
         }
     }
 }
