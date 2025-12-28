@@ -18,6 +18,13 @@ use {
     syn::{GenericArgument, Ident, ImplItem, Item, PathArguments, ReturnType, Type, parse_quote},
 };
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Crate {
+    Core,
+    Alloc,
+    Std,
+}
+
 fn expand_lib(src_dir: &Path, lib_name: &str, output_dir: &Path) -> anyhow::Result<syn::File> {
     let lib_path = src_dir.join(lib_name);
     let rustc_output = Command::new("rustc")
@@ -54,15 +61,15 @@ fn main() -> anyhow::Result<()> {
     let all_items: Vec<_> = core_file
         .items
         .iter()
-        .chain(&alloc_file.items)
-        .chain(&std_file.items)
-        .cloned()
+        .map(|item| (Crate::Core, item))
+        .chain(alloc_file.items.iter().map(|item| (Crate::Alloc, item)))
+        .chain(std_file.items.iter().map(|item| (Crate::Std, item)))
         .collect();
 
     if env::args().any(|arg| arg == "--find-try-from") {
-        find_try_from(&all_items)?;
+        find_try_from(all_items.iter().copied())?;
     }
-    let fns = find_fns(&all_items)?;
+    let fns = find_fns(all_items.iter().copied())?;
     write_file(&generate_ops_traits(&fns)?, &output_dir.join("src/ops.rs"))?;
     Ok(())
 }
@@ -82,8 +89,8 @@ struct CheckedFn {
     kind: FunctionKind,
 }
 
-fn find_try_from(items: &[Item]) -> anyhow::Result<()> {
-    for item in items {
+fn find_try_from<'a>(items: impl Iterator<Item = (Crate, &'a Item)>) -> anyhow::Result<()> {
+    for (crate_, item) in items {
         match item {
             Item::Impl(item_impl) => {
                 if let Some((_neg, trait_, _for)) = &item_impl.trait_
@@ -97,9 +104,11 @@ fn find_try_from(items: &[Item]) -> anyhow::Result<()> {
                     println!("{text}");
                 }
             }
+            #[expect(clippy::as_conversions, reason = "no alternative")]
             Item::Mod(item_mod) => {
                 if let Some((_brace, content)) = &item_mod.content {
-                    find_try_from(content)?;
+                    find_try_from(Box::new(content.iter().map(|mod_item| (crate_, mod_item)))
+                        as Box<dyn Iterator<Item = (Crate, &'a Item)>>)?;
                 }
             }
             Item::Const(_)
@@ -122,9 +131,11 @@ fn find_try_from(items: &[Item]) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {
+fn find_fns<'a>(
+    items: impl Iterator<Item = (Crate, &'a Item)>,
+) -> anyhow::Result<Vec<(Crate, CheckedFn)>> {
     let mut fns = Vec::new();
-    for item in items {
+    for (crate_, item) in items {
         match item {
             Item::Impl(item_impl) => {
                 if let Some((_neg, trait_, _for)) = &item_impl.trait_
@@ -168,23 +179,26 @@ fn find_fns(items: &[Item]) -> anyhow::Result<Vec<CheckedFn>> {
                             quote! { #return_type }
                         );
                     };
-                    // let s = &item_impl.self_ty;
-                    // println!("item_impl.self_ty = {}", quote! { #s });
-                    fns.push(CheckedFn {
+                    let f = CheckedFn {
                         self_type: (*item_impl.self_ty).clone(),
                         other_type,
                         output_type,
                         ident: item_fn.sig.ident.clone(),
                         kind: FunctionKind::from_impl_fn_name(&item_fn.sig.ident.to_string())?,
-                    });
+                    };
+                    fns.push((crate_, f));
                 }
             }
+            #[expect(clippy::as_conversions, reason = "no alternative")]
             Item::Mod(item_mod) => {
                 if item_mod.ident == "sys" {
                     continue;
                 }
                 if let Some((_brace, content)) = &item_mod.content {
-                    fns.extend(find_fns(content)?);
+                    fns.extend(find_fns(
+                        Box::new(content.iter().map(|mod_item| (crate_, mod_item)))
+                            as Box<dyn Iterator<Item = (Crate, &'a Item)>>,
+                    )?);
                 }
             }
             Item::Const(_)
@@ -394,10 +408,10 @@ fn generate_ext_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
     })
 }
 
-fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
+fn generate_ops_traits(all_fns: &[(Crate, CheckedFn)]) -> anyhow::Result<syn::File> {
     let mut by_kind = BTreeMap::<_, Vec<_>>::new();
-    for f in all_fns {
-        by_kind.entry(f.kind).or_default().push(f);
+    for (crate_, f) in all_fns {
+        by_kind.entry(f.kind).or_default().push((crate_, f));
     }
     let mut contents = Vec::new();
     for (kind, fns) in by_kind {
@@ -473,7 +487,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                 }
             });
 
-            for f in fns {
+            for (crate_, f) in fns {
                 ensure!(kind == f.kind);
                 let self_type = &f.self_type;
                 let output_type = unself(&f.output_type, &f.self_type);
@@ -526,7 +540,13 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                     quote! {}
                 };
 
+                let cfg = if *crate_ == Crate::Std {
+                    quote! { #[cfg(feature = "std")] }
+                } else {
+                    quote! {}
+                };
                 contents.push(quote! {
+                    #cfg
                     impl #ext_trait_ident for #self_type {
                         type #other_param_ident = #other_type;
                         type Output = #output_type;
@@ -568,7 +588,7 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                 }
             });
 
-            for f in fns {
+            for (crate_, f) in fns {
                 ensure!(kind == f.kind);
                 let self_type = &f.self_type;
                 let output_type = unself(&f.output_type, &f.self_type);
@@ -590,8 +610,14 @@ fn generate_ops_traits(all_fns: &[CheckedFn]) -> anyhow::Result<syn::File> {
                             .replace(' ', "")
                     ),
                 ];
+                let cfg = if *crate_ == Crate::Std {
+                    quote! { #[cfg(feature = "std")] }
+                } else {
+                    quote! {}
+                };
 
                 contents.push(quote! {
+                    #cfg
                     impl #ext_trait_ident for #self_type {
                         type Output = #output_type;
                         type Error = Error;

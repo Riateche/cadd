@@ -548,6 +548,7 @@ impl Cadd for Duration {
         Ok(())
     }
 }
+#[cfg(feature = "std")]
 impl Cadd for Instant {
     type Other = Duration;
     type Output = Instant;
@@ -575,6 +576,7 @@ impl Cadd for Instant {
         Ok(())
     }
 }
+#[cfg(feature = "std")]
 impl Cadd for SystemTime {
     type Other = Duration;
     type Output = SystemTime;
@@ -1233,6 +1235,7 @@ impl Csub for Duration {
         Ok(())
     }
 }
+#[cfg(feature = "std")]
 impl Csub for Instant {
     type Other = Duration;
     type Output = Instant;
@@ -1260,6 +1263,7 @@ impl Csub for Instant {
         Ok(())
     }
 }
+#[cfg(feature = "std")]
 impl Csub for SystemTime {
     type Other = Duration;
     type Output = SystemTime;
@@ -6957,6 +6961,7 @@ where
 {
     a.cduration_since(b)
 }
+#[cfg(feature = "std")]
 impl CdurationSince for Instant {
     type Other = Instant;
     type Output = Duration;
