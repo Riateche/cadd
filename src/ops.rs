@@ -8,6 +8,8 @@ use {
     core::{num::NonZero, time::Duration},
 };
 ///Checked addition: computes `a + b`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait Cadd: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -27,6 +29,8 @@ pub trait Cadd: Sized {
 ///Checked addition: computes `a + b`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_add`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_add")]
 #[inline]
 pub fn cadd<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -605,6 +609,8 @@ impl Cadd for SystemTime {
     }
 }
 ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait CaddUnsigned: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -620,6 +626,8 @@ pub trait CaddUnsigned: Sized {
 ///Checked addition: computes `add_unsigned(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_add_unsigned`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_add_unsigned")]
 #[inline]
 pub fn cadd_unsigned<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -731,6 +739,8 @@ impl CaddUnsigned for isize {
     }
 }
 ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait CaddSigned: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -746,6 +756,8 @@ pub trait CaddSigned: Sized {
 ///Checked addition: computes `add_signed(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_add_signed`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_add_signed")]
 #[inline]
 pub fn cadd_signed<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -857,6 +869,8 @@ impl CaddSigned for usize {
     }
 }
 ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait Csub: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -876,6 +890,8 @@ pub trait Csub: Sized {
 ///Checked subtraction:  computes `a - b`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_sub`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_sub")]
 #[inline]
 pub fn csub<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -1292,6 +1308,8 @@ impl Csub for SystemTime {
     }
 }
 ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait CsubUnsigned: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -1307,6 +1325,8 @@ pub trait CsubUnsigned: Sized {
 ///Checked subtraction:  computes `sub_unsigned(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_sub_unsigned`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_sub_unsigned")]
 #[inline]
 pub fn csub_unsigned<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -1418,6 +1438,8 @@ impl CsubUnsigned for isize {
     }
 }
 ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait CsubSigned: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -1433,6 +1455,8 @@ pub trait CsubSigned: Sized {
 ///Checked subtraction:  computes `sub_signed(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_sub_signed`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_sub_signed")]
 #[inline]
 pub fn csub_signed<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -1544,6 +1568,8 @@ impl CsubSigned for usize {
     }
 }
 ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait CsignedDiff: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -1559,6 +1585,8 @@ pub trait CsignedDiff: Sized {
 ///Checked subtraction:  computes `signed_diff(a, b)`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_signed_diff`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_signed_diff")]
 #[inline]
 pub fn csigned_diff<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -1670,6 +1698,8 @@ impl CsignedDiff for usize {
     }
 }
 ///Checked negation: computes `-value`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait Cneg: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Output;
@@ -1980,6 +2010,8 @@ impl Cneg for usize {
     }
 }
 ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait Cmul: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -1999,6 +2031,8 @@ pub trait Cmul: Sized {
 ///Checked multiplication: computes `a * b`, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_mul`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_mul")]
 #[inline]
 pub fn cmul<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -2683,6 +2717,8 @@ impl Cmul for Duration {
     }
 }
 ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
+///
+///See also: [module documentation](self).
 pub trait Cdiv: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Divisor;
@@ -2702,6 +2738,8 @@ pub trait Cdiv: Sized {
 ///Checked division: computes `value / divisor`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_div`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_div")]
 #[inline]
 pub fn cdiv<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
@@ -3192,6 +3230,8 @@ impl Cdiv for Duration {
     }
 }
 ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
+///
+///See also: [module documentation](self).
 pub trait CdivEuclid: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Divisor;
@@ -3207,6 +3247,8 @@ pub trait CdivEuclid: Sized {
 ///Checked euclidian division: computes `div_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_div_euclid`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_div_euclid")]
 #[inline]
 pub fn cdiv_euclid<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
@@ -3528,6 +3570,8 @@ impl CdivEuclid for usize {
     }
 }
 ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
+///
+///See also: [module documentation](self).
 pub trait Crem: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Divisor;
@@ -3547,6 +3591,8 @@ pub trait Crem: Sized {
 ///Checked remainder: computes `value % divisor`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_rem`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_rem")]
 #[inline]
 pub fn crem<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
@@ -4000,6 +4046,8 @@ impl Crem for usize {
     }
 }
 ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
+///
+///See also: [module documentation](self).
 pub trait CremEuclid: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Divisor;
@@ -4015,6 +4063,8 @@ pub trait CremEuclid: Sized {
 ///Checked euclidian reminder: computes `rem_euclid(value, divisor)`, returning an error if overflow occured or if `divisor` is zero.
 ///
 ///Wrapper for `checked_rem_euclid`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_rem_euclid")]
 #[inline]
 pub fn crem_euclid<T>(value: T, divisor: T::Divisor) -> Result<T::Output, T::Error>
@@ -4336,6 +4386,8 @@ impl CremEuclid for usize {
     }
 }
 ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
+///
+///See also: [module documentation](self).
 pub trait Cilog: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Base;
@@ -4351,6 +4403,8 @@ pub trait Cilog: Sized {
 ///Checked logarithm: computes <code>log<sub>base</sub> value</code>, returning an error if `value` is negative or zero, or if `base` is less than 2.
 ///
 ///Wrapper for `checked_ilog`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_ilog")]
 #[inline]
 pub fn cilog<T>(value: T, base: T::Base) -> Result<T::Output, T::Error>
@@ -4672,6 +4726,8 @@ impl Cilog for usize {
     }
 }
 ///Checked base 2 logarithm: computes `ln value`, returning an error if `value` is negative or zero.
+///
+///See also: [module documentation](self).
 pub trait Cilog2: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Output;
@@ -4886,6 +4942,8 @@ impl Cilog2 for usize {
     }
 }
 ///Checked base 10 logarithm: computes <code>log<sub>10</sub> value</code>, returning an error if `value` is negative or zero.
+///
+///See also: [module documentation](self).
 pub trait Cilog10: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Output;
@@ -5100,6 +5158,8 @@ impl Cilog10 for usize {
     }
 }
 ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
+///
+///See also: [module documentation](self).
 pub trait Cshl: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -5119,6 +5179,8 @@ pub trait Cshl: Sized {
 ///Checked shift left: computes `a << b`, returning an error if `b` is greater or equal to the number of bits in the type.
 ///
 ///Wrapper for `checked_shl`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_shl")]
 #[inline]
 pub fn cshl<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -5440,6 +5502,8 @@ impl Cshl for usize {
     }
 }
 ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
+///
+///See also: [module documentation](self).
 pub trait Cshr: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -5459,6 +5523,8 @@ pub trait Cshr: Sized {
 ///Checked shift right: computes `a >> b`, returning an error if `b` is greater or equal to the number of bits in the type.
 ///
 ///Wrapper for `checked_shr`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_shr")]
 #[inline]
 pub fn cshr<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -5780,6 +5846,8 @@ impl Cshr for usize {
     }
 }
 ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait Cpow: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Power;
@@ -5795,6 +5863,8 @@ pub trait Cpow: Sized {
 ///Checked exponentiation: computes <code>value<sup>power</sup></code>, returning an error if overflow occured.
 ///
 ///Wrapper for `checked_pow`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_pow")]
 #[inline]
 pub fn cpow<T>(value: T, power: T::Power) -> Result<T::Output, T::Error>
@@ -6212,6 +6282,8 @@ impl Cpow for usize {
     }
 }
 ///Checked absolute value: computes `|value|`, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait Cabs: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Output;
@@ -6426,6 +6498,8 @@ impl Cabs for isize {
     }
 }
 ///Checked square root: computes `√value`, returning an error if `value` is negative.
+///
+///See also: [module documentation](self).
 pub trait Cisqrt: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Output;
@@ -6544,6 +6618,8 @@ impl Cisqrt for isize {
     }
 }
 ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
+///
+///See also: [module documentation](self).
 pub trait CnextMultipleOf: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -6559,6 +6635,8 @@ pub trait CnextMultipleOf: Sized {
 ///Checked next multiple of `b`, returning an error if overflow occured or if `b` is zero.
 ///
 ///Wrapper for `checked_next_multiple_of`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_next_multiple_of")]
 #[inline]
 pub fn cnext_multiple_of<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>
@@ -6724,6 +6802,8 @@ impl CnextMultipleOf for usize {
     }
 }
 ///Checked next power of 2, returning an error if overflow occured.
+///
+///See also: [module documentation](self).
 pub trait CnextPowerOfTwo: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Output;
@@ -6938,6 +7018,8 @@ impl CnextPowerOfTwo for usize {
     }
 }
 ///Checked duration since: computes `a.duration_since(b)`, returning an error if b is earlier than a.
+///
+///See also: [module documentation](self).
 pub trait CdurationSince: Sized {
     #[expect(missing_docs, reason = "no need for doc")]
     type Other;
@@ -6953,6 +7035,8 @@ pub trait CdurationSince: Sized {
 ///Checked duration since: computes `a.duration_since(b)`, returning an error if b is earlier than a.
 ///
 ///Wrapper for `checked_duration_since`.
+///
+///See also: [module documentation](self).
 #[doc(alias = "checked_duration_since")]
 #[inline]
 pub fn cduration_since<T>(a: T, b: T::Other) -> Result<T::Output, T::Error>

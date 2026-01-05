@@ -14,7 +14,6 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           rustflags: ""
-          components: rustfmt, clippy
       - run: cargo fmt -- --check
       - run: cargo clippy --all-targets --all-features -- --deny warnings
       - run: cargo clippy --no-default-features -- --deny warnings

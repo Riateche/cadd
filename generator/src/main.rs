@@ -429,13 +429,22 @@ fn generate_ops_traits(all_fns: &[(Crate, CheckedFn)]) -> anyhow::Result<syn::Fi
 
         let impl_fn_name = kind.impl_fn_name();
 
-        let trait_docs = [kind.general_doc(first_arg_name, second_arg_name)];
+        let trait_docs = [
+            kind.general_doc(first_arg_name, second_arg_name),
+            String::new(),
+            "See also: [module documentation](self).".to_owned(),
+        ];
 
         let trait_fn_docs = [
             kind.general_doc(first_arg_name, second_arg_name),
             String::new(),
             format!("Wrapper for `{}`.", impl_fn_name),
         ];
+
+        let free_fn_docs = trait_fn_docs.iter().cloned().chain([
+            String::new(),
+            "See also: [module documentation](self).".to_owned(),
+        ]);
 
         if let Some(second_arg_name) = second_arg_name {
             let second_arg_ident = ident(second_arg_name);
@@ -473,7 +482,7 @@ fn generate_ops_traits(all_fns: &[(Crate, CheckedFn)]) -> anyhow::Result<syn::Fi
                     #assign_method
                 }
 
-                #(#[doc = #trait_fn_docs])*
+                #(#[doc = #free_fn_docs])*
                 #[doc(alias = #impl_fn_name)]
                 #[inline]
                 pub fn #ext_fn_ident<#first_param_ident>(
